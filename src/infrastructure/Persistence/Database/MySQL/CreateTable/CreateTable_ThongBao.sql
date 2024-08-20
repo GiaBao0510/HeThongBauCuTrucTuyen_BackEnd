@@ -1,0 +1,5 @@
+CREATE TABLE ThongBao(
+	ID_ThongBao INT PRIMARY KEY AUTO_INCREMENT,
+	NoiDungThongBao VARCHAR(255),
+	ThoiDiem Date
+);

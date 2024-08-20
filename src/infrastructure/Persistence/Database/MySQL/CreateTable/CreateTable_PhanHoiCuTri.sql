@@ -1,0 +1,6 @@
+CREATE TABLE PhanHoiCuTri(
+	Ykien VARCHAR(255),
+	ThoiDiem DATE,
+	ID_CuTri VARCHAR(14),
+	FOREIGN KEY(ID_CuTri) REFERENCES CuTri(ID_CuTri)
+);

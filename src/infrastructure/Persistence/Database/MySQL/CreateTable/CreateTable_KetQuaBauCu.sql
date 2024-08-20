@@ -1,0 +1,12 @@
+CREATE TABLE KetQuaBauCu(
+	ID_ketQua INT PRIMARY KEY AUTO_INCREMENT,
+	SoLuotBinhChon INT,
+	ThoiDiemDangKy DATETIME,
+	TyLeBinhChon FLOAT,
+	ngayBD DATETIME,
+	ID_ucv VARCHAR(14),
+	ID_Cap SMALLINT,
+	FOREIGN KEY(ID_Cap) REFERENCES danhmucungcu(ID_Cap),
+	FOREIGN KEY(ID_ucv) REFERENCES UngCuVien(ID_ucv),
+	FOREIGN KEY(ngayBD) REFERENCES kybaucu(ngayBD) 
+);
