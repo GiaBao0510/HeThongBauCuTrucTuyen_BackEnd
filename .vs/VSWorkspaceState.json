@@ -1,7 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\src",
+    "\\src\\core",
+    "\\src\\core\\Entities"
   ],
-  "SelectedNode": "\\Program.cs",
+  "SelectedNode": "\\src\\core\\Entities\\VoterNoticeDetails.cs",
   "PreviewInSolutionExplorer": false
 }

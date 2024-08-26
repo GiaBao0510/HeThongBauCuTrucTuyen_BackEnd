@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\BackEnd\\BackEnd.csproj": {}
+    "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\BackEnd.csproj": {}
   },
   "projects": {
-    "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\BackEnd\\BackEnd.csproj": {
+    "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\BackEnd.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\BackEnd\\BackEnd.csproj",
+        "projectUniqueName": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\BackEnd.csproj",
         "projectName": "BackEnd",
-        "projectPath": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\BackEnd\\BackEnd.csproj",
+        "projectPath": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\BackEnd.csproj",
         "packagesPath": "C:\\Users\\VTOS\\.nuget\\packages\\",
-        "outputPath": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\BackEnd\\obj\\",
+        "outputPath": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -49,6 +49,60 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.1.35, )"
+            },
+            "DotNetEnv": {
+              "target": "Package",
+              "version": "[3.1.1, )"
+            },
+            "Microsoft.AspNetCore.Mvc": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Ini": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Json": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Xml": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.Options": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "Microsoft.Extensions.Options.ConfigurationExtensions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.OpenApi": {
+              "target": "Package",
+              "version": "[1.6.18, )"
+            },
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.7.2, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -65,7 +119,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

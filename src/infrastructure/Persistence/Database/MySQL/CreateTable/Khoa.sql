@@ -1,0 +1,5 @@
+CREATE TABLE Khoa(
+	ID_Khoa int PRIMARY KEY AUTO_INCREMENT,
+	KhoaCongKhai TEXT, 
+	KhoaBiMat TEXT
+);
