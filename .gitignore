@@ -1,1 +1,3 @@
 .env
+appsettings.json
+src/infrastructure/Config/.env

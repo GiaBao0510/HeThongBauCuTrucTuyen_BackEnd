@@ -23,17 +23,23 @@ namespace BackEnd.src.web_api.Controllers
             _roleResposistory = roleReposistory;
         }
 
-        public static List<Roles> ListOfRoles = new List<Roles>();
-
         //Liêt kê
         [HttpGet]
         public async Task<IActionResult> GetListOfRole(){
             try{
                 var roles = await _roleResposistory._GetListOfRoles();
-                return Ok(roles);
+                return Ok( new{
+                        Status = "Ok",
+                        Message = "null",
+                        Data = roles
+                    }
+                );
             }
             catch(Exception ex){
-                return StatusCode(500,$"Lỗi khi truy xuất danh sách các vai trò: {ex.Message}");
+                return StatusCode(500,new{
+                    Status = "false",
+                    Message=$"Lỗi khi truy xuất danh sách các vai trò: {ex.Message}"
+                });
             }
         }
 
@@ -47,10 +53,15 @@ namespace BackEnd.src.web_api.Controllers
                 }
                 await _roleResposistory._AddRole(role);
                 return Ok(new{
-                    Success = true, Data = role
+                    Status = "OK", 
+                    Message = "",
+                    Data = role
                 });
             }catch(Exception ex){
-                return StatusCode(500,$"Lỗi khi thực hiện thêm vai trò: {ex.Message}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện thêm vai trò: {ex.Message}"
+                });
             }
         }
 
@@ -63,12 +74,18 @@ namespace BackEnd.src.web_api.Controllers
                 //Nếu độ dài == 0 thì id không tồn tại => Báo lỗi
                 if(role.ToList().Count == 0)
                     return StatusCode(404,new{
-                        Description = $"Lỗi ID: {id} không tồn tại."
+                        Status = "false",
+                        Message = $"Lỗi ID: {id} không tồn tại."
                     });    
                 
                 return Ok(role);
             }catch(Exception ex){
-                return StatusCode(500,$"Lỗi khi thực hiện tìm kiếm vai trò theo ID: {ex.Message}");
+                return StatusCode(
+                    500, new{
+                        Status = "false",
+                        Message = $"Lỗi khi thực hiện tìm kiếm vai trò theo ID: {ex.Message}"
+                    }
+                );
             }
         }
 
@@ -78,20 +95,23 @@ namespace BackEnd.src.web_api.Controllers
             try{
                 if(role == null || string.IsNullOrEmpty(role.TenVaiTro))
                     return StatusCode(400,new{
-                        Description = $"Lỗi đầu vào không hợp lệ."
+                        Status = "False",
+                        Message = $"Lỗi đầu vào không hợp lệ."
                     }); 
 
                 var result = await _roleResposistory._EditRoleBy_ID(id,role);
 
                 if(result == false)
                     return NotFound(new{
-                        Description = $"Lỗi ID: {id} không tồn tại."
+                        Status = "False",
+                        Message = $"Lỗi ID: {id} không tồn tại."
                     });
 
                 return Ok(role); 
             }catch(Exception ex){
                 return StatusCode(500,new {
-                    Description = $"Lỗi khi thực hiện sửa vai trò theo ID: {ex.Message}"
+                    Status = "False",
+                    Message = $"Lỗi khi thực hiện sửa vai trò theo ID: {ex.Message}"
                 });
             }
         }
@@ -104,17 +124,20 @@ namespace BackEnd.src.web_api.Controllers
 
                 if(result == false)
                     return NotFound(new{
-                        Description = $"Lỗi ID: {id} không tồn tại."
+                        Status = "False",
+                        Message = $"Lỗi ID: {id} không tồn tại."
                     });
 
-                return Ok( new{ Description = "Đã xóa vai trò thành công" }); 
+                return Ok( new{
+                    Status = "ok", 
+                    Message = "Đã xóa vai trò thành công" 
+                }); 
             }catch(Exception ex){
                 return StatusCode(500,new {
-                    Description = $"Lỗi khi thực hiện sửa vai trò theo ID: {ex.Message}"
+                    Status = "False",
+                    Message = $"Lỗi khi thực hiện sửa vai trò theo ID: {ex.Message}"
                 });
             }
-        }
-        
-        
+        }        
     }
 }

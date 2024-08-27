@@ -9,8 +9,13 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using MySql.EntityFrameworkCore.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.infrastructure.DataAccess.Repositories;
+using BackEnd.src.infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace BackEnd
 {
@@ -25,15 +30,27 @@ namespace BackEnd
 
         //Thường khai báo các services Dependency
         public void ConfigureServices(IServiceCollection services){
+            var serverMysqlVersion = new MySqlServerVersion(new Version(9,0,1));
+            
             services.AddControllers();
             services.AddSwaggerGen(c =>{
                 c.SwaggerDoc("v1", new OpenApiInfo {Title="BauCuTrucTuyen", Version="v1"});
             });
+            services.AddDbContext<ApplicationDbContext>(option =>{
+                option.UseMySql( Configuration.GetConnectionString("MySQL") , serverMysqlVersion);
+            });
+
+            // --- Xác thực cookie
+            services.AddRazorPages();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+
             
             //-- Đăng ký dịch vụ tại đây
             services.AddSingleton<IAppConfig,AppConfig>();
             services.AddScoped<DatabaseContext>();
             services.AddScoped<RoleReposistory>();
+            services.AddScoped<ProvinceReposistory>();
+            services.AddScoped<DistrictReposistory>();
         }
 
         //Riêng các service muốn call thì sẽ goi trong đây

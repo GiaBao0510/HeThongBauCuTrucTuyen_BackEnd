@@ -3,8 +3,20 @@
   "WorkspaceRootPath": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\BackEnd.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:BackEnd.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\VoterNoticeDetails.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\core\\Entities\\VoterNoticeDetails.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\Notifications.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\core\\Entities\\Notifications.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\Vouter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\core\\Entities\\Vouter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\Candidate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\core\\Entities\\Candidate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,19 +26,58 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Notifications.cs",
+              "DocumentMoniker": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\Notifications.cs",
+              "RelativeDocumentMoniker": "src\\core\\Entities\\Notifications.cs",
+              "ToolTip": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\Notifications.cs",
+              "RelativeToolTip": "src\\core\\Entities\\Notifications.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T13:54:02.569Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Vouter.cs",
+              "DocumentMoniker": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\Vouter.cs",
+              "RelativeDocumentMoniker": "src\\core\\Entities\\Vouter.cs",
+              "ToolTip": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\Vouter.cs",
+              "RelativeToolTip": "src\\core\\Entities\\Vouter.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T13:53:51.122Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "BackEnd.csproj",
-              "DocumentMoniker": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\BackEnd.csproj",
-              "RelativeDocumentMoniker": "BackEnd.csproj",
-              "ToolTip": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\BackEnd.csproj",
-              "RelativeToolTip": "BackEnd.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAUwA4AAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-08-23T04:37:01.68Z",
+              "Title": "VoterNoticeDetails.cs",
+              "DocumentMoniker": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\VoterNoticeDetails.cs",
+              "RelativeDocumentMoniker": "src\\core\\Entities\\VoterNoticeDetails.cs",
+              "ToolTip": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\VoterNoticeDetails.cs",
+              "RelativeToolTip": "src\\core\\Entities\\VoterNoticeDetails.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T13:53:36.401Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Candidate.cs",
+              "DocumentMoniker": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\Candidate.cs",
+              "RelativeDocumentMoniker": "src\\core\\Entities\\Candidate.cs",
+              "ToolTip": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\src\\core\\Entities\\Candidate.cs",
+              "RelativeToolTip": "src\\core\\Entities\\Candidate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T13:07:08.489Z",
               "EditorCaption": ""
             }
           ]

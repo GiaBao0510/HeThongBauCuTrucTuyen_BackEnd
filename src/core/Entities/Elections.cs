@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd.core.Entities
 {
+    [Table("KyBauCu")]
 	public class Elections
 	{
 		[Key]

@@ -6,7 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd.core.Entities
 {
-    class Notifications
+    [Table("ThongBao")]
+    public class Notifications
     {
         [Key]
         public int ID_ThongBao { set; get; }
