@@ -1,7 +1,0 @@
-CREATE TABLE ChiTietBauCu(
-	ThoiDiem DATETIME ,
-	ID_Phieu VARCHAR(18),
-	ID_CuTri VARCHAR(14),
-	FOREIGN KEY(ID_CuTri) REFERENCES CuTri(ID_CuTri),
-	FOREIGN KEY(ID_Phieu) REFERENCES PhieuBau(ID_Phieu)
-);

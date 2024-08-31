@@ -18,7 +18,7 @@ namespace BackEnd.core.Entities
         public DateTime ngayKT { get; set; }
         [StringLength(50)]
         [DisplayName("Election name")]
-        public string TenKyBauCu {get; set;}
+        public required string TenKyBauCu {get; set;}
         [StringLength(50)]
         [DisplayName("Description")]
         public string MoTa { get; set; } = "";

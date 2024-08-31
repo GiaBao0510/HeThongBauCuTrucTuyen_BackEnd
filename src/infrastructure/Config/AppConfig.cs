@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using DotNetEnv;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using BackEnd.src.core.Interfaces;
 
 namespace BackEnd.infrastructure.config
@@ -8,9 +10,10 @@ namespace BackEnd.infrastructure.config
     class AppConfig : IAppConfig
     {
         //Thuộc tính
-        private string Server_Host, Server_Port,
+        private readonly string Server_Host, Server_Port,
         MYSQL_HOST, MYSQL_DBNAME, MYSQL_USER, MYSQL_PASSWORD, MYSQL_PORT,
-        MONGODB_HOST, MONGODB_PORT;
+        MONGODB_HOST, MONGODB_PORT, 
+        CLOUDINARY_URL;
 
         //Hàm khởi tạo
         public AppConfig()
@@ -27,6 +30,7 @@ namespace BackEnd.infrastructure.config
             MYSQL_PORT = Environment.GetEnvironmentVariable("MYSQL_PORT");
             MONGODB_HOST = Environment.GetEnvironmentVariable("MONGODB_HOST");
             MONGODB_PORT= Environment.GetEnvironmentVariable("MONGODB_PORT");
+            CLOUDINARY_URL = Environment.GetEnvironmentVariable("CLOUDINARY_URL");
             Console.WriteLine($"Loaded SERVER_HOST: {Server_Host}");
             Console.WriteLine($"Loaded SERVER_PORT: {Server_Port}");
         }
@@ -46,6 +50,9 @@ namespace BackEnd.infrastructure.config
         }
         public string GetMongoDBConnectionString(){
             return $"mongodb://{MONGODB_HOST}:{MONGODB_PORT}/";
+        }
+        public string GetCloudinaryURL(){
+            return CLOUDINARY_URL;
         }
     }
 }

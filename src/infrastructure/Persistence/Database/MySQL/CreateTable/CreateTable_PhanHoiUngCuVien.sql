@@ -1,6 +1,0 @@
-CREATE TABLE PhanHoiUngCuVien(
-	Ykien VARCHAR(255),
-	ThoiDiem DATE,
-	ID_ucv VARCHAR(14),
-	FOREIGN KEY(ID_ucv) REFERENCES UngCuVien(ID_ucv)
-);

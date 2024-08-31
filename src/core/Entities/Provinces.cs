@@ -15,6 +15,6 @@ namespace BackEnd.core.Entities
         [Required]
         [StringLength(50)]
         [DisplayName("Provice name")]
-        public string TenTinhThanh { set; get; }
+        public required string TenTinhThanh { set; get; }
     }
 }

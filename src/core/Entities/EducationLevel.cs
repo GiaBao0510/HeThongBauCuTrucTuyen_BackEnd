@@ -12,9 +12,9 @@ namespace BackEnd.core.Entities
 	{
 		[Key]
         [DisplayName("Determine educational level")]
-        public int ID_TrinhDo { set; get; }
+        public int? ID_TrinhDo { set; get; }
         [StringLength(50)]
         [DisplayName("Name of educational level")]
-        public string TenTrinhDoHocVan { set; get; }
+        public required string TenTrinhDoHocVan { set; get; }
 	}
 }

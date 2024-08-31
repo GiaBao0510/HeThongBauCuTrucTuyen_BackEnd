@@ -12,8 +12,8 @@ namespace BackEnd.src.core.Entities
         [Key]
         public int ID_Khoa {set;get;}
         [DisplayName("Public key")]
-        public string KhoaCongKhai{set; get;}
+        public DateTime NgayTao{set; get;}
         [DisplayName("Private key")]
-        public string KhoaBiMat{set; get;}
+        public DateTime NgayHetHan{set; get;}
     }
 }

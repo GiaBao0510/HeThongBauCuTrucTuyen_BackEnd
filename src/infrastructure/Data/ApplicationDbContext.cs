@@ -42,6 +42,7 @@ namespace BackEnd.src.infrastructure.Data
         public DbSet<Vouter> Vouter{set;get;}
         #endregion
 
+        //Các lớp không có khóa chính thì đưa vô đây
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

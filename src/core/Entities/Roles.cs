@@ -16,6 +16,6 @@ namespace BackEnd.core.Entities
         [Required]
         [DisplayName("Role name")]
         [StringLength(30)]
-        public string TenVaiTro { set; get; }
+        public required string TenVaiTro { set; get; }
     }
 }

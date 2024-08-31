@@ -1,6 +1,0 @@
-CREATE TABLE ChiTietThongBaoCuTri(
-	ID_ThongBao INT,
-	ID_CuTri VARCHAR(14),
-	FOREIGN KEY(ID_CuTri) REFERENCES CuTri(ID_CuTri),
-	FOREIGN KEY(ID_ThongBao) REFERENCES ThongBao(ID_ThongBao)
-);
