@@ -9,7 +9,7 @@ namespace BackEnd.src.web_api.Controllers
     [ApiController]
     public class BoardController : ControllerBase
     {
-         private readonly BoardReposistory _boardReposistory;
+        private readonly BoardReposistory _boardReposistory;
 
         //Khởi tạo
         public BoardController(BoardReposistory boardReposistory) => _boardReposistory = boardReposistory;
@@ -32,6 +32,9 @@ namespace BackEnd.src.web_api.Controllers
                     Data = result
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
                 return StatusCode(500,new{
                     Status = "false",
                     Message=$"Lỗi khi truy xuất danh sách các ban: {ex.Message}"
@@ -63,6 +66,9 @@ namespace BackEnd.src.web_api.Controllers
                     Message = "Thêm ban thành công"
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện thêm ban: {ex.Message}"
@@ -87,6 +93,9 @@ namespace BackEnd.src.web_api.Controllers
                     Data = Board
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện lấy ID ban: {ex.Message}"
@@ -117,6 +126,9 @@ namespace BackEnd.src.web_api.Controllers
                     Data = Board
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện sửa ban: {ex.Message}"
@@ -140,6 +152,9 @@ namespace BackEnd.src.web_api.Controllers
                     Message = "Xóa thành công"
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện xóa ban: {ex.Message}"

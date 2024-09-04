@@ -3,22 +3,27 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BackEnd.core.Entities;
 
 namespace BackEnd.src.core.Entities
 {
     [Table("ChiTietPhieuBau")]
     public class BallotDetails
     {
-        [DisplayName("Vote")]
-        [StringLength(1)]
-        public string BinhChon{get;set;} = "0";
-        [ForeignKey("Vote")]
+        //Khóa ngoại
         public required string ID_Phieu{set;get;}
-        [ForeignKey("Candidate")]
+        [ForeignKey("ID_Phieu")]
+        public Vote vote {set; get;}
+        
         public required string ID_ucv { set; get; }
-        [ForeignKey("Vouter")]
+        [ForeignKey("ID_ucv")]
+        public Candidate candidate{set;get;}
         public required string ID_CuTri { set; get; }
-        [ForeignKey("Lock")]
+        [ForeignKey("ID_CuTri")]
+        public Voter voter{set;get;}
+        
         public int ID_Khoa { set; get; }
+        [ForeignKey("ID_Khoa")]
+        public Lock _lock{set;get;}
     }
 }

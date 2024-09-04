@@ -65,12 +65,17 @@ namespace BackEnd
             services.AddScoped<RoleReposistory>();
             services.AddScoped<ProvinceReposistory>();
             services.AddScoped<DistrictReposistory>();
-            services.AddScoped<VouterReposistory>();
-            services.AddScoped<CandidateReposistory>();
+            // services.AddScoped<VouterReposistory>();
+            // services.AddScoped<CandidateReposistory>();
             services.AddScoped<ConstituencyReposistory>();
             services.AddScoped<BoardReposistory>();
             services.AddScoped<NotificationsReposistory>();
             services.AddScoped<EducationLevelReposistory>();
+            services.AddScoped<ElectionsReposistory>();
+            services.AddScoped<EthnicityReposistory>();
+            services.AddScoped<PositionReposistory>();
+            services.AddScoped<VoteReposistory>();
+            services.AddScoped<ListOfPositionReposistory>();
         }
 
         //Riêng các service muốn call thì sẽ goi trong đây

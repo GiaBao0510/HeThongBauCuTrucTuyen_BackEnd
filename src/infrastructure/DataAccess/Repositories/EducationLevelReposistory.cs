@@ -7,7 +7,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
     public class EducationLevelReposistory : IDisposable
     {
-         private readonly DatabaseContext _context;
+        private readonly DatabaseContext _context;
 
         //Khởi tạo
         public EducationLevelReposistory(DatabaseContext context) => _context = context;

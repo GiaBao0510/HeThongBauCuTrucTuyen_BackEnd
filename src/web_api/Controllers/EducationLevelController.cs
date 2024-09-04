@@ -2,7 +2,6 @@ using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 
-
 namespace BackEnd.src.web_api.Controllers
 {
     [Route("api/[controller]")]
@@ -25,6 +24,9 @@ namespace BackEnd.src.web_api.Controllers
                     Data = result
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
                 return StatusCode(500,new{
                     Status = "false",
                     Message=$"Lỗi khi truy xuất danh sách các trình độ học vấn: {ex.Message}"
@@ -56,6 +58,9 @@ namespace BackEnd.src.web_api.Controllers
                     Message = "Thêm trình độ học vấn thành công"
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện thêm trình độ học vấn: {ex.Message}"
@@ -80,6 +85,9 @@ namespace BackEnd.src.web_api.Controllers
                     Data = EducationLevel
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện thêm trình độ học vấn: {ex.Message}"
@@ -110,6 +118,9 @@ namespace BackEnd.src.web_api.Controllers
                     Data = EducationLevel
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện sửa trình độ học vấn: {ex.Message}"
@@ -133,6 +144,9 @@ namespace BackEnd.src.web_api.Controllers
                     Message = "Xóa thành công"
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện xóa trình độ học vấn: {ex.Message}"

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BackEnd.src.core.Entities;
 
 namespace BackEnd.core.Entities
 {
@@ -17,5 +18,10 @@ namespace BackEnd.core.Entities
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DisplayName("Time")]
         public DateTime ThoiDiem { set;get; }
+
+        //Truy xuất ngược 
+        public virtual ICollection<CandidateNoticeDetails>? candidateNoticeDetails{set;get;}
+        public virtual ICollection<CadreNoiticeDetail>? cadreNoiticeDetail{set;get;}
+        public virtual ICollection<VoterNoticeDetails>? voterNoticeDetails{set;get;}  
     }
 }

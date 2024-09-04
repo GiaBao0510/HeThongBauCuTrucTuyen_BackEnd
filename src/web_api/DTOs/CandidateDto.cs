@@ -9,7 +9,7 @@ using BackEnd.core.Interfaces;
 
 namespace BackEnd.src.web_api.DTOs
 {
-    public class CandidateDto: Iuser
+    public class CandidateDto
     {
         [DisplayName("Identify candidates")]
         public string? ID_ucv { set; get; }

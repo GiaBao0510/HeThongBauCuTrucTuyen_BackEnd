@@ -1,0 +1,54 @@
+Kinh;Việt
+Tày;Thổ, Ngạn, Phén, Thù Lao, Pa Dí, Tày Khao
+Thái;Tày Đăm, Tày Mười, Tày Thanh, Mán Thanh, Hàng Bông, Tày Mường, Pa Thay, Thổ Đà Bắc
+Hoa;Hán, Triều Châu, Phúc Kiến, Quảng Đông, Hải Nam, Hạ, Xạ Phạng
+Khơ-me;Cur, Cul, Cu, Thổ, Việt gốc Miên, Krôm
+Mường;Mol, Mual, Mọi, Mọi Bi, Ao Tá, Ậu Tá
+Nùng;Xuồng, Giang, Nùng An, Phàn Sinh, Nùng Cháo, Nùng Lòi, Quý Rim, Khèn Lài
+HMông;Mèo, Hoa, Mèo Xanh, Mèo Đỏ, Mèo Đen, Ná Mẻo, Mán Trắng
+Dao;Mán, Động, Trại, Xá, Dìu, Miên, Kiềm, Miền, Quần Trắng, Dao Đỏ, Quần Chẹt, Lô Giang, Dao Tiền, Thanh Y, Lan Tẻn, Đại Bản, Tiểu Bản, Cóc Ngáng, Cóc Mùn, Sơn Đầu
+Gia-rai;Giơ-rai, Tơ-buăn, Chơ-rai, Hơ-bau, Hđrung, Chor
+Ngái;Xín, Lê, Đản, Khách Gia
+Ê-đê;Ra-đê, Đê, Kpạ, A-đham, Krung, Ktul, Đliê Ruê, Blô, Epan, Mđhur, Bih
+Ba na;Giơ-lar. Tơ-lô, Giơ-lâng, Y-lăng, Rơ-ngao, Krem, Roh, ConKđe, A-la Công, Kpăng Công, Bơ-nâm
+Xơ-Đăng;Xơ-teng, Hđang, Tơ-đra, Mơ-nâm, Ha-lăng, Ca-dong, Kmrâng, ConLan, Bri-la, Tang
+Sán Chay;Cao Lan, Sán Chỉ, Mán Cao Lan, Hờn Bạn, Sơn Tử
+Cơ-ho;Xrê, Nốp, Tu-lốp, Cơ-don, Chil, Lat, Lach, Trinh
+Chăm;Chàm, Chiêm Thành, Hroi
+Sán Dìu;Sán Dẻo, Trại, Trại Đất, Mán, Quần Cộc
+Hrê;Chăm Rê, Chom, Krẹ Luỹ
+Mnông;Pnông, Nông, Pré, Bu-đâng, ĐiPri, Biat, Gar, Rơ-lam, Chil
+Ra-glai;Ra-clây, Rai, Noang, La-oang
+Xtiêng;Xa-điêng
+Bru-Vân Kiều;Bru, Vân Kiều, Măng Coong, Tri Khùa
+Thổ;Kẹo, Mọn, Cuối, Họ, Đan Lai, Ly Hà, Tày Pọng, Con Kha, Xá Lá Vàng
+Giáy;Nhắng, Dẩng, Pầu Thìn Nu Nà, Cùi Chu, Xa
+Cơ-tu;Ca-tu, Cao, Hạ, Phương, Ca-tang
+Gié Triêng;Đgiéh, Tareb, Giang Rẫy Pin, Triêng, Treng, Ta-riêng, Ve, Veh, La-ve, Ca-tang
+Mạ;Châu Mạ, Mạ Ngăn, Mạ Xóp, Mạ Tô, Mạ Krung
+Khơ-mú;Xá Cẩu, Mứn Xen, Pu Thênh, Tềnh, Tày Hay
+Co;Cor, Col, Cùa, Trầu
+Tà-ôi;Tôi-ôi, Pa-co, Pa-hi, Ba-hi
+Chơ-ro;Dơ-ro, Châu-ro
+Kháng;Xá Khao, Xá Súa, Xá Dón, Xá Dẩng, Xá Hốc, Xá Ái, Xá Bung, Quảng Lâm
+Xinh-mun;Puộc, Pụa
+Hà Nhì;U Ni, Xá U Ni
+Chu ru;Chơ-ru, Chu
+Lào	;Là Bốc, Lào Nọi
+La Chí;Cù Tê, La Quả
+La Ha;Xá Khao, Khlá Phlạo
+Phù Lá;Bồ Khô Pạ, Mu Di Pạ Xá, Phó, Phổ, Va Xơ
+La Hủ;Lao, Pu Đang, Khù Xung, Cò Xung, Khả Quy
+4Lự	;Lừ, Nhuồn, Duôn
+Lô Lô;Mun Di
+Chứt;Sách, Máy, Rục, Mã-liêng, A-rem, Tu vang, Pa-leng, Xơ-Lang, Tơ-hung, Chà-củi, Tắc-củi, U-mo, Xá Lá Vàng
+Mảng;Mảng Ư, Xá Lá Vàng
+Pà Thẻn	Pà Hưng, Tống
+Co Lao; 	
+Cống;Xắm Khống, Mấng Nhé, Xá Xeng
+Bố Y;Chủng Chá, Trọng Gia, Tu Di, Tu Din
+Si La;Cù Dề Xừ, Khả pẻ
+Pu Péo;Ka Pèo, Pen Ti Lô Lô
+Brâu;Brao
+Ơ Đu;Tày Hạt
+Rơ măm;	

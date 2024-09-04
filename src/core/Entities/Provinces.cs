@@ -16,5 +16,13 @@ namespace BackEnd.core.Entities
         [StringLength(50)]
         [DisplayName("Provice name")]
         public required string TenTinhThanh { set; get; }
+
+        //Truy xuất ngược
+        public virtual ICollection<District> district {set;get;}
+
+        //Tạo danh sách rỗng cho đối tượng truy xuất ngược  
+        public Province(){
+            district = new List<District>();
+        }      
     }
 }

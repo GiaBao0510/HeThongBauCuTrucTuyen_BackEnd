@@ -116,14 +116,14 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
             const string sqlupdate = @"
                 UPDATE quanhuyen 
-                SET TenTinhThanh = @TenTinhThanh,
+                SET TenQH = @TenQH,
                     STT = @STT
                 WHERE ID_QH = @ID_QH";
             
             using var command = new MySqlCommand(sqlupdate, connection);
             command.Parameters.AddWithValue("@ID_QH",ID);
             command.Parameters.AddWithValue("@STT",District.STT);
-            command.Parameters.AddWithValue("@TenTinhThanh",District.TenQH);
+            command.Parameters.AddWithValue("@TenQH",District.TenQH);
 
             //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
             int rowAffected = await command.ExecuteNonQueryAsync();

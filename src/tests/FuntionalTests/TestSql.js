@@ -1,14 +1,19 @@
-let arrFile = [
-    "Account.cs", "Board.cs","Candidate.cs","CandidateNoticeDetails.cs",
-    "Constituency.cs","District.cs", "EducationLevel.cs","EducationLevelDetails.cs",
-    "ElectionDetails.cs","ElectionResults.cs","Elections.cs","ElectionStatus.cs",
-    "ListOdPositions.cs", "LoginHistory.cs","Notifications.cs","PermanentAddress.cs",      
-    "Provinces.cs","ResponseCandidate.cs","ResponseVoter.cs","Roles.cs",
-    "TemporaryAddress.cs","Vote.cs","VoterNoticeDetails.cs", "Vouter.cs"
-];
+const fs = require('fs');
+const readline = require('readline'); 
+async function readFile(filepath) {
+    try{
+        const rl = readline.createInterface({
+            input: fs.createReadStream(filepath),
+            crlfDelay: Infinity
+        });
 
-let result = "";
-for(let i in arrFile){
-    result += `"">I${arrFile[i]};`
+        for await(const line of rl){
+            let parts = line.split(";");
+            let A = parts[0], B = parts[1];
+            console.log(`INSERT INTO dantoc(TenDanToc,TenGoiKhac) VALUES("${A}","${B}");`);
+        }
+    }catch(err){
+        console.error('Erro reading file: ',err);
+    }
 }
-console.log(result);
+readFile('datatemp.txt');

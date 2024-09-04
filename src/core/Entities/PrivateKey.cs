@@ -9,10 +9,13 @@ namespace BackEnd.src.core.Entities
     public class PrivateKey
     {
         [DisplayName("Camichanel funtion")]
-        public double HamCamichanel {set;get;} = 0;
+        public int HamCamichanel {set;get;} = 0;
         [DisplayName("b -value division")]
-        public double GiaTriB_Phan {set;get;} = 0;
-        [ForeignKey("Lock")]
-        public double ID_Khoa {set;get;}
+        public int GiaTriB_Phan {set;get;} = 0;
+
+        //Khóa ngoại
+        public int? ID_Khoa {set;get;}
+        [ForeignKey("ID_Khoa")]
+        public Lock _lock {set;get;}
     }
 }
