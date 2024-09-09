@@ -1,6 +1,7 @@
 using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.src.core.Entities;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 
 namespace BackEnd.src.web_api.Controllers
@@ -9,10 +10,10 @@ namespace BackEnd.src.web_api.Controllers
     [ApiController]
     public class EthnicityController : ControllerBase
     {
-        private readonly EthnicityReposistory _ethnicityReposistory;
+        private readonly IEthnicityRepository _ethnicityReposistory;
 
         //Khởi tạo
-        public EthnicityController(EthnicityReposistory ethnicityReposistory) => _ethnicityReposistory = ethnicityReposistory;
+        public EthnicityController(IEthnicityRepository ethnicityReposistory) => _ethnicityReposistory = ethnicityReposistory;
 
         //Liệt kê
         [HttpGet]

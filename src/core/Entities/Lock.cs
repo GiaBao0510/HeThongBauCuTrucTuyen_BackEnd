@@ -19,11 +19,13 @@ namespace BackEnd.src.core.Entities
         //Truy xuất ngược
         public virtual ICollection<PrivateKey> privateKey{get;set;}
         public virtual ICollection<PublicKey> publicKey{get;set;}
+        public virtual ICollection<BallotDetails> ballotDetails{get;set;}
 
         //Cho các lớp truy xuất ngược trả về mảng rỗng khi mảng rỗng
         public Lock(){
             privateKey = new List<PrivateKey>();
             publicKey = new List<PublicKey>();
+            ballotDetails = new List<BallotDetails>();
         }
     }
 }

@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
-    public class RoleReposistory : IDisposable
+    public class RoleReposistory : IDisposable, IRoleRepository
     {
         private readonly DatabaseContext _context;
 

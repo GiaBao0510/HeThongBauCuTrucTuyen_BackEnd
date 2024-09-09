@@ -1,6 +1,7 @@
 using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -8,10 +9,10 @@ namespace BackEnd.src.web_api.Controllers
     [ApiController]
     public class ElectionsController : ControllerBase
     {
-        private readonly ElectionsReposistory _electionsReposistory;
+        private readonly IElectionsRepository _electionsReposistory;
 
         //Khởi tạo
-        public ElectionsController(ElectionsReposistory electionsReposistory) => _electionsReposistory = electionsReposistory;
+        public ElectionsController(IElectionsRepository electionsReposistory) => _electionsReposistory = electionsReposistory;
 
         //Liệt kê
         [HttpGet]

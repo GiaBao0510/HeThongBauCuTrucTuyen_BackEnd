@@ -22,7 +22,7 @@ namespace BackEnd.src.core.Entities
        //Khóa ngoại
        public string ID_user;
        [ForeignKey("ID_user")]  
-       public User user{set;get;}
+       public Users user{set;get;}
 
        //Truy xuất ngược
        public virtual ICollection<ResponseCadre> responseCadre{set;get;}

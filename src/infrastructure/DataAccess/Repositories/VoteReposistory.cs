@@ -1,12 +1,12 @@
-using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.web_api.DTOs;
 using MySql.Data.MySqlClient;
 using BackEnd.src.core.Common;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
-    public class VoteReposistory : IDisposable
+    public class VoteReposistory : IDisposable, IVoteRepository
     {
         private readonly DatabaseContext _context;
 

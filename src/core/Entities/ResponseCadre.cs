@@ -17,7 +17,7 @@ namespace BackEnd.src.core.Entities
         public required string YKien {set; get;} 
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DisplayName("Time")]
-        public DateTime ThoiDiem { get; set; }
+        public DateTime ThoiDiem { get; set; } = DateTime.Now;
         
         //Khóa ngoại
         public string? ID_CanBo { set; get; }

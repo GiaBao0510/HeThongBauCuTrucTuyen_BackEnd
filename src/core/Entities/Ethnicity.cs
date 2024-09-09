@@ -19,11 +19,11 @@ namespace BackEnd.src.core.Entities
         public string? TenGoiKhac{get;set;} = "null";
 
         //Lấy ngược lại, theo ID_DanToc
-        public virtual ICollection<User> users {get;set;}
+        public virtual ICollection<Users> users {get;set;}
 
         //Cho các lớp truy xuất ngược trả về mảng rỗng khi mảng rỗng
         public Ethnicity(){
-            users = new List<User>();
+            users = new List<Users>();
         }
     }
 }

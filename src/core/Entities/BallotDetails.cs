@@ -26,4 +26,4 @@ namespace BackEnd.src.core.Entities
         [ForeignKey("ID_Khoa")]
         public Lock _lock{set;get;}
     }
-}
+} 

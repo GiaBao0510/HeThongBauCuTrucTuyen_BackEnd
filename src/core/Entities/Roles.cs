@@ -19,12 +19,12 @@ namespace BackEnd.core.Entities
 
         //Truy xuất ngược lại
         public virtual ICollection<Account> account {set;get;}
-        public virtual ICollection<User> user {set;get;}
+        public virtual ICollection<Users> users {set;get;}
 
         //Cho các lớp truy xuất ngược trả về mảng rỗng khi mảng rỗng
         public Roles(){
             account = new List<Account>();
-            user = new List<User>();
+            users = new List<Users>();
         }
     }
 }

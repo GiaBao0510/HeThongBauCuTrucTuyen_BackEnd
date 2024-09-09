@@ -1,11 +1,11 @@
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
-using BackEnd.src.web_api.DTOs;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 using MySql.Data.MySqlClient;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
-    public class ListOfPositionReposistory : IDisposable
+    public class ListOfPositionReposistory : IDisposable,IListOfPositionRepository
     {
         private readonly DatabaseContext _context;
 

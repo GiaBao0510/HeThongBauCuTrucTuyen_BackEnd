@@ -2,6 +2,7 @@ using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.core.Entities;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -9,10 +10,10 @@ namespace BackEnd.src.web_api.Controllers
     [ApiController]
     public class PositionController : ControllerBase
     {
-        private readonly PositionReposistory _positionReposistory;
+        private readonly IPositionsRepository _positionReposistory;
 
         //Khởi tạo
-        public PositionController(PositionReposistory positionReposistory) => _positionReposistory = positionReposistory;
+        public PositionController(IPositionsRepository positionReposistory) => _positionReposistory = positionReposistory;
 
         //Liệt kê
         [HttpGet]

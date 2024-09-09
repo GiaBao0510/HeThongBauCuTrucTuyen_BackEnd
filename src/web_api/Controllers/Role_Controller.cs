@@ -1,16 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
-using System.Data;
-using MySql.Data.MySqlClient;
-using System.Data.Common;
-using BackEnd.src.core.Interfaces;
-using BackEnd.infrastructure.config;
-using BackEnd.src.infrastructure.DataAccess.Repositories;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -18,8 +8,8 @@ namespace BackEnd.src.web_api.Controllers
     [ApiController]
     public class RoleController:ControllerBase
     {
-        private readonly RoleReposistory _roleResposistory;
-        public RoleController(RoleReposistory roleReposistory){
+        private readonly IRoleRepository _roleResposistory;
+        public RoleController(IRoleRepository roleReposistory){
             _roleResposistory = roleReposistory;
         }
 

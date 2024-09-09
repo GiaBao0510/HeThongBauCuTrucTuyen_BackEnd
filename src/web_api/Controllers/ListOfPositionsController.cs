@@ -1,6 +1,7 @@
 using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -8,10 +9,10 @@ namespace BackEnd.src.web_api.Controllers
     [ApiController]
     public class ListOfPositionsController : ControllerBase
     {
-        private readonly ListOfPositionReposistory _listOfPositionReposistory;
+        private readonly IListOfPositionRepository _listOfPositionReposistory;
 
         //Khởi tạo
-        public ListOfPositionsController(ListOfPositionReposistory listOfPositionReposistory) => _listOfPositionReposistory = listOfPositionReposistory;
+        public ListOfPositionsController(IListOfPositionRepository listOfPositionReposistory) => _listOfPositionReposistory = listOfPositionReposistory;
 
         //Liệt kê
         [HttpGet]

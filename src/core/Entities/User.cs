@@ -6,7 +6,7 @@ using BackEnd.core.Entities;
 namespace BackEnd.src.core.Entities
 {
     [Table("NguoiDung")]
-    public class User
+    public class Users
     {
         [Key]
         [DisplayName("Identify user")]
@@ -17,7 +17,7 @@ namespace BackEnd.src.core.Entities
         [Required]
         [DisplayName("Sex")]
         [StringLength(1)]
-        public required string GioiTinh { set; get; }
+        public required string GioiTinh { set; get; } = "1";
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DisplayName("Date of birth")]
         public required DateTime NgaySinh { set; get; }
@@ -35,9 +35,12 @@ namespace BackEnd.src.core.Entities
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
         public required string Email { get; set; }
-        [DisplayName("avatar")]
-        [StringLength(12)]
-        public string HinhAnh { set; get; }
+        [DisplayName("PathImage")]
+        [StringLength(255)]
+        public string? HinhAnh { set; get; }
+        [DisplayName("PublicID")]
+        [StringLength(50)]
+        public string? PublicID { set; get; }
 
         //Khóa ngoại
         public int? ID_DanToc{set; get;}
@@ -55,7 +58,7 @@ namespace BackEnd.src.core.Entities
         public virtual ICollection<PermanentAddress> permanentAddress{set; get;}
 
         //Cho các lớp truy xuất ngược trả về mảng rỗng khi mảng rỗng
-        public User(){
+        public Users(){
             voter = new List<Voter>();
             candidates = new List<Candidate>();
             cadre = new List<Cadre>();

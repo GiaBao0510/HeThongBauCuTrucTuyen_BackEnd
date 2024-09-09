@@ -1,492 +1,388 @@
-// using System;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.Threading.Tasks;
-// using BackEnd.core.Entities;
-// using BackEnd.src.infrastructure.DataAccess.Context;
-// using Microsoft.AspNetCore.Mvc;
-// using MySql.Data.MySqlClient;
-// using BackEnd.src.web_api.DTOs;
-// using BCrypt.Net;
-// using System.Data;
+using BackEnd.src.infrastructure.DataAccess.Context;
+using MySql.Data.MySqlClient;
+using BackEnd.src.web_api.DTOs;
+using Microsoft.AspNetCore.Http;
+using BackEnd.src.infrastructure.Services;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
+using BackEnd.src.core.Common;
 
-// namespace BackEnd.src.infrastructure.DataAccess.Repositories
-// {
-//     public class CandidateReposistory : IDisposable
-//     {
-//         private readonly DatabaseContext _context;
+namespace BackEnd.src.infrastructure.DataAccess.Repositories
+{
+    public class CandidateRepository : UserRepository, IDisposable, ICandidateRepository
+    {
+        private readonly DatabaseContext _context;
+        private readonly CloudinaryService _cloudinaryService;
 
-//         //Khởi tạo
-//         public CandidateReposistory(DatabaseContext context) => _context=context;
-//         //Hủy
-//         public void Dispose() => _context.Dispose();
+        //Khởi tạo
+        public CandidateRepository(DatabaseContext context,CloudinaryService cloudinaryService): base(context, cloudinaryService){
+            _context=context;
+            _cloudinaryService = cloudinaryService;
+        }
+        //Hủy
+        public new void Dispose() => _context.Dispose();
 
-//         //  ---- 1. Tìm Email có bị trùng không
-//         private async Task<int> CheckEmail_AlreadyExitsForCandidate(string email, MySqlConnection connection){
-//             //Nếu đầu vào rỗng thì trả về false
-//             if(string.IsNullOrEmpty(email)) return 1;
-
-//             const string sql_check = "SELECT COUNT(Email) FROM UngCuVien WHERE Email = @Email;";
-//             using(var Command = new MySqlCommand(sql_check, connection)){
-//                 Command.Parameters.AddWithValue("@Email",email);
-//                 return Convert.ToInt32(await Command.ExecuteScalarAsync());
-//             }
-//         }
-
-//         //---- 2.Tìm CCCD có bị trung không
-//         private async Task<int> CheckCCCD_AlreadyExitsForCandidate(string CCCD,MySqlConnection connection){
+        //0. Lấy ID người dùng dựa trên ID ứng cử viên
+        public async Task<string> GetIDUserBaseOnIDUngCuVien(string id, MySqlConnection connection){
+            string ID_user = null;
+            const string sql = "SELECT ID_user FROM UngCuVien WHERE ID_ucv = @ID_ucv;";
             
-//             const string sql_check = "SELECT COUNT(CCCD) FROM UngCuVien WHERE CCCD = @CCCD;";
-//             using(var Command = new MySqlCommand(sql_check, connection)){
-//                 Command.Parameters.AddWithValue("@CCCD",CCCD);
-//                 return Convert.ToInt32(await Command.ExecuteScalarAsync());
-//             }
-//         }
+            using (var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_ucv", id);
 
-//         //---- 3.TÌm SDT có bị trùng không
-//         private async Task<int> CheckSDT_AlreadyExitsForCandidate(string SDT,MySqlConnection connection){
+                using var reader = await command.ExecuteReaderAsync();
+                if(await reader.ReadAsync())
+                    ID_user = reader.GetString(reader.GetOrdinal("ID_user"));
+            }
+            return ID_user;
+        }
 
-//             const string sql_check = "SELECT COUNT(SDT) FROM UngCuVien WHERE SDT = @SDT;";
-//             using(var Command = new MySqlCommand(sql_check, connection)){
-//                 Command.Parameters.AddWithValue("@SDT",SDT);
-//                 return Convert.ToInt32(await Command.ExecuteScalarAsync());
-//             }
-//         }
+        //1.Thêm
+        public async Task<int> _AddCandidate(CandidateDto Candidate, IFormFile fileAnh){
+            using var connect = await _context.Get_MySqlConnection();
 
-//         //---- 4.Tìm vai trò có tồn tại không nếu không tồn tại thì trả về false
-//         private async Task<bool> CheckRole_AlreadyExitsForCandidate(int role,MySqlConnection connection){
-        
-//             const string sql_check = "SELECT COUNT(RoleID) FROM vaitro WHERE RoleID = @RoleID;";
-//             using(var Command = new MySqlCommand(sql_check, connection)){
-//                 Command.Parameters.AddWithValue("@RoleID",role);
-//                 int count = Convert.ToInt32(await Command.ExecuteScalarAsync());
-//                 if(count < 0)
-//                     return false;       //Không tồn tại
-//             }
-//             return true;
-//         }
-
-//         //--- Kiểm tra thông tin không được trùng lặp như email, sdt, cccd
-//         private async Task<int> CheckTheCandidateInformationLoop(int N,CandidateDto UngCuVien, MySqlConnection connection){
-//             if(await CheckSDT_AlreadyExitsForCandidate(UngCuVien.SDT, connection) > N) return 0;
-//             if(await CheckEmail_AlreadyExitsForCandidate(UngCuVien.Email, connection) > N) return -1;
-//             if(await CheckCCCD_AlreadyExitsForCandidate(UngCuVien.CCCD, connection) > N) return -2;
-//             if(await CheckRole_AlreadyExitsForCandidate(UngCuVien.RoleID, connection) == false) return -3;
-//             return 1;
-//         }
-
-//         //Hàm mã hóa mật khẩu
-//         private string HashPassword(string pwd){
-//             string salt = BCrypt.Net.BCrypt.GenerateSalt(); //Tạo giá trị muối ngẫu nhiên
-//             int costFactor = 10; //Giá trị mặc định của cost là 10
-//             string hashedPwd = BCrypt.Net.BCrypt.HashPassword(pwd+salt, costFactor);
-
-//             return hashedPwd;
-//         }
-
-//         //hàm Kiểm tra các thông tin quan trọng không được null
-//         private bool CheckInformationIsNotEmpty(CandidateDto UngCuVien){
-//             if(UngCuVien.HoTen == null || UngCuVien.CCCD == null || UngCuVien.SDT == null || UngCuVien.GioiTinh == null || UngCuVien.GioiTinh.Length > 1 || UngCuVien.DiaChiLienLac == null
-//             || UngCuVien.Email == null || UngCuVien.RoleID == null || UngCuVien == null)
-//                 return false;
-//             return true;
-//         }
-
-//         //Kiểm tra mật khẩu cũ
-//         private bool CheckOldPassword(string oldpwd, string hashedpwd){
-//             Console.WriteLine($"Match: {BCrypt.Net.BCrypt.Verify(oldpwd, hashedpwd)}");
-//             return BCrypt.Net.BCrypt.Verify(oldpwd, hashedpwd);
-//         }
-
-//         //  ---- 5.Thêm ------
-//         public async Task<int> _AddCandidate(CandidateDto UngCuVien){
-//             using var connection = await _context.Get_MySqlConnection();
-
-//             //Kiểm tra trạng thái kết nối trước khi mở
-//             if(connection.State != System.Data.ConnectionState.Open){
-//                 await connection.OpenAsync();
-//             }
-
-//             //Kiểm tra đầu vào là không được null và giá trị hợp lệ
-//             if(CheckInformationIsNotEmpty(UngCuVien) == false){
-//                 Console.WriteLine("Xuất hiện có lỗi trong kiểm tra rỗng");
-//                 return -4;
-//             }
-
-//             //Kiểm tra điều kiện đầu vào sao cho SDT, email, cccd không được trùng nhau mới được phép thêm vào
-//             int KiemTraTrungNhau = await CheckTheCandidateInformationLoop(0, UngCuVien, connection);
-//             if(KiemTraTrungNhau <= 0){
-//                 Console.WriteLine("Xuất hiện có lỗi trong kiểm tra trùng nhau");
-//                 return KiemTraTrungNhau;
-//             }
-
-//             //Tạo ID tự động
-//             DateTime currentTime = DateTime.Now;
-//             string ID_ucv = $"{currentTime:yyyyMMddHHmmss}";
-
-//             //Mã hóa mật khẩu, CCCD
-//             string hashedPwd = HashPassword(UngCuVien.MatKhau);
-//             string hashedCCCD = HashPassword(UngCuVien.CCCD);
-
-//             //Thực hiện thêm bảng cử tri           
-//             string Input = @"INSERT INTO UngCuVien(ID_ucv,HoTen,GioiTinh,NgaySinh,DiaChiLienLac,CCCD,SDT,Email,HinhAnh,RoleID,TrangThai) 
-//             VALUES(@ID_ucv,@HoTen,@GioiTinh,@NgaySinh,@DiaChiLienLac,@CCCD,@SDT,@Email,@HinhAnh,@RoleID,@TrangThai);";
-
-//             using (var commandAdd = new MySqlCommand(Input, connection)){
-//                 commandAdd.Parameters.AddWithValue("@ID_ucv",ID_ucv);
-//                 commandAdd.Parameters.AddWithValue("@HoTen",UngCuVien.HoTen);
-//                 commandAdd.Parameters.AddWithValue("@GioiTinh",UngCuVien.GioiTinh);
-//                 commandAdd.Parameters.AddWithValue("@NgaySinh",UngCuVien.NgaySinh);
-//                 commandAdd.Parameters.AddWithValue("@DiaChiLienLac",UngCuVien.DiaChiLienLac);
-//                 commandAdd.Parameters.AddWithValue("@CCCD",hashedCCCD);
-//                 commandAdd.Parameters.AddWithValue("@SDT",UngCuVien.SDT);
-//                 commandAdd.Parameters.AddWithValue("@Email",UngCuVien.Email);
-//                 commandAdd.Parameters.AddWithValue("@HinhAnh",UngCuVien.HinhAnh);
-//                 commandAdd.Parameters.AddWithValue("@RoleID",UngCuVien.RoleID);
-//                 commandAdd.Parameters.AddWithValue("@TrangThai",UngCuVien.TrangThai);
-//                 await commandAdd.ExecuteNonQueryAsync();
-//                 Console.WriteLine("Thêm thông tin cá nhân thành công");
-//             } 
-
-//             //Thực hiện thêm bảng tài khoản
-//             string inputAccount = @"INSERT INTO taikhoan(TaiKhoan,MatKhau,BiKhoa,LyDoKhoa,NgayTao,SuDung,RoleID)
-//             VALUES(@TaiKhoan,@MatKhau,@BiKhoa,@LyDoKhoa,@NgayTao,@SuDung,@RoleID);";
-
-//             using(var commandAddAcount = new MySqlCommand(inputAccount, connection)){
-//                 commandAddAcount.Parameters.AddWithValue("@TaiKhoan",UngCuVien.SDT);
-//                 commandAddAcount.Parameters.AddWithValue("@MatKhau",hashedPwd);
-//                 commandAddAcount.Parameters.AddWithValue("@BiKhoa",0);
-//                 commandAddAcount.Parameters.AddWithValue("@LyDoKhoa","null");
-//                 commandAddAcount.Parameters.AddWithValue("@NgayTao",UngCuVien.NgayTao);
-//                 commandAddAcount.Parameters.AddWithValue("@SuDung",1);
-//                 commandAddAcount.Parameters.AddWithValue("@RoleID",UngCuVien.RoleID);
-
-//                 await commandAddAcount.ExecuteNonQueryAsync();
-//                 Console.WriteLine("Thêm tài khoản thành công");
-//             }
-//             Console.WriteLine("OK");
-
-//             return 1; 
-//         }
-
-//         //---- 6.Lấy all cử tri
-//         public async Task<List<Candidate>> _GetListOfCandidate(){
-//             var list = new List<Candidate>();
-
-//             using var connection = await _context.Get_MySqlConnection();
-//             using var command = new MySqlCommand("SELECT * FROM UngCuVien", connection);
-//             using var reader = await command.ExecuteReaderAsync();
+            //Kiểm tra kết nối
+            if(connect.State != System.Data.ConnectionState.Open )
+                await connect.OpenAsync();
             
-//             while(await reader.ReadAsync()){
-//                 list.Add(new Candidate{
-//                     ID_ucv = reader["ID_ucv"] as string,
-//                     HoTen = reader["HoTen"] as string,
-//                     GioiTinh = reader["GioiTinh"] as string,
-//                     NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")),
-//                     DiaChiLienLac = reader["DiaChiLienLac"] as string,
-//                     CCCD = reader["CCCD"] as string,
-//                     SDT = reader["SDT"] as string,
-//                     Email = string.IsNullOrEmpty(reader["Email"] as string) ? "" : (reader["Email"] as string),
-//                     HinhAnh = string.IsNullOrEmpty(reader["HinhAnh"] as string) ? "" : (reader["HinhAnh"] as string),
-//                     RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
-//                     TrangThai = reader["TrangThai"] as string
-//                 });
-//             }
-//             return list;
-//         }
+            using var transaction =await connect.BeginTransactionAsync();
 
-//         //---- 7.Lấy all cử tri - tài khoản
-//         public async Task<List<CandidateDto>> _GetListOfCandidateAndAccount(){
-//             var list = new List<CandidateDto>();
-//             using var connection = await _context.Get_MySqlConnection();
-            
-//             string sql =@"SELECT * FROM UngCuVien ct 
-//             INNER JOIN taikhoan tk ON tk.TaiKhoan = ct.SDT";
-//             using var command = new MySqlCommand(sql, connection);
-//             using var reader = await command.ExecuteReaderAsync();
-            
-//             while(await reader.ReadAsync()){
-//                 list.Add(new CandidateDto{
-//                     ID_ucv = reader["ID_ucv"] as string,
-//                     HoTen = reader["HoTen"] as string,
-//                     GioiTinh = reader["GioiTinh"] as string,
-//                     NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")),
-//                     DiaChiLienLac = reader["DiaChiLienLac"] as string,
-//                     CCCD = reader["CCCD"] as string,
-//                     SDT = reader["SDT"] as string,
-//                     TrangThai = reader["TrangThai"] as string,
-//                     Email = string.IsNullOrEmpty(reader["Email"] as string) ? "" : (reader["Email"] as string),
-//                     HinhAnh = string.IsNullOrEmpty(reader["HinhAnh"] as string) ? "" : (reader["HinhAnh"] as string),
-//                     RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
-//                     TaiKhoan = reader["TaiKhoan"] as string,
-//                     MatKhau = reader["MatKhau"] as string,
-//                     BiKhoa = reader["BiKhoa"] as string,
-//                     LyDoKhoa = reader["LyDoKhoa"] as string,
-//                     NgayTao = reader.GetDateTime(reader.GetOrdinal("NgayTao")),
-//                     SuDung = reader.GetInt32(reader.GetOrdinal("SuDung"))
-//                 });
-//             }
-//             return list;
-//         }    
-
-//         //---- 8.Lấy theo ID
-//         public async Task<Candidate> _GetCandidateBy_ID(string id){
-//             using var connection = await _context.Get_MySqlConnection();
-
-//             const string sql = @"
-//                 SELECT * FROM UngCuVien
-//                 WHERE ID_ucv = @ID_ucv";
-
-//             using var command = new MySqlCommand(sql, connection);
-//             command.Parameters.AddWithValue("@ID_ucv",id);
-
-//             using var reader = await command.ExecuteReaderAsync();
-//             if(await reader.ReadAsync()){
-//                 return new Candidate{
-//                     ID_ucv = reader["ID_ucv"] as string,
-//                     HoTen = reader["HoTen"] as string,
-//                     GioiTinh = reader["GioiTinh"] as string,
-//                     NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")),
-//                     DiaChiLienLac = reader["DiaChiLienLac"] as string,
-//                     CCCD = reader["CCCD"] as string,
-//                     SDT = reader["SDT"] as string,
-//                     TrangThai = reader["TrangThai"] as string,
-//                     Email = string.IsNullOrEmpty(reader["Email"] as string) ? "" : (reader["Email"] as string),
-//                     HinhAnh = string.IsNullOrEmpty(reader["HinhAnh"] as string) ? "" : (reader["HinhAnh"] as string),
-//                     RoleID = reader.GetInt32(reader.GetOrdinal("RoleID"))
-//                 };
-//             }
-
-//             return null;
-//         }
-
-//         //---- 9.Sửa theo ID - Admin
-//         public async Task<int> _EditCandidateBy_ID_Admin(string ID, CandidateDto UngCuVien){
-//             using var connection = await _context.Get_MySqlConnection();
-
-//             //Kiểm tra trạng thái kết nối trước khi mở
-//             if(connection.State != System.Data.ConnectionState.Open) await connection.OpenAsync();
-
-//             //Kiểm tra xem thông tin đầu vào phải không được trùng chỉ được trùng với bản thân thôi
-//             int KiemTraTrungNhau = await CheckTheCandidateInformationLoop(1, UngCuVien, connection);
-//             if(KiemTraTrungNhau <= 0){
-//                 Console.WriteLine("Xuất hiện có lỗi trong kiểm tra trùng nhau");
-//                 return KiemTraTrungNhau;
-//             }
-
-//             //Kiểm tra đầu vào là không được null và giá trị hợp lệ
-//             if(CheckInformationIsNotEmpty(UngCuVien) == false){
-//                 Console.WriteLine("Xuất hiện có lỗi trong kiểm tra rỗng");
-//                 return -4;
-//             }
-            
-//             //Băm mật khẩu, CCCD
-//             string hashedPwd = HashPassword(UngCuVien.MatKhau),
-//                     hashedCCCD = HashPassword(UngCuVien.CCCD);
-
-//             const string sqlUngCuVien = @"
-//                 UPDATE UngCuVien 
-//                 SET HoTen = @HoTen, GioiTinh=@GioiTinh, NgaySinh=@NgaySinh,
-//                     DiaChiLienLac=@DiaChiLienLac, CCCD=@CCCD, SDT=@SDT,
-//                     Email=@Email, HinhAnh=@HinhAnh, RoleID=@RoleID, TrangThai=@TrangThai
-//                 WHERE ID_ucv = @ID_ucv;";
-
-//             //Cập nhật cử tri
-//             using (var command0 = new MySqlCommand(sqlUngCuVien, connection)){
-//                 command0.Parameters.AddWithValue("@ID_ucv",ID);
-//                 command0.Parameters.AddWithValue("@HoTen",UngCuVien.HoTen);
-//                 command0.Parameters.AddWithValue("@GioiTinh",UngCuVien.GioiTinh);
-//                 command0.Parameters.AddWithValue("@NgaySinh",UngCuVien.NgaySinh);
-//                 command0.Parameters.AddWithValue("@DiaChiLienLac",UngCuVien.DiaChiLienLac);
-//                 command0.Parameters.AddWithValue("@CCCD",hashedCCCD);
-//                 command0.Parameters.AddWithValue("@SDT",UngCuVien.SDT);
-//                 command0.Parameters.AddWithValue("@Email",UngCuVien.Email);
-//                 command0.Parameters.AddWithValue("@HinhAnh",UngCuVien.HinhAnh);
-//                 command0.Parameters.AddWithValue("@TrangThai",UngCuVien.TrangThai);
-//                 command0.Parameters.AddWithValue("@RoleID",UngCuVien.RoleID);
+            try{
+                //Thêm thông tin cơ sở
+                var FillInBasicInfo = await _AddUserWithConnect(Candidate, fileAnh, connect, transaction);
                 
-//                 //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
-//                 int rowAffected = await command0.ExecuteNonQueryAsync();
-//                 if(rowAffected < 0){
-//                     return -5;
-//                 }
-//                 Console.WriteLine("Đã hoàn thành cập nhật thông tin cá nhân");
-//             }
+                //Nếu có lỗi thì in ra
+                if(FillInBasicInfo is int result && result <=0){
+                    await transaction.RollbackAsync();
+                    return result;
+                }
 
-//             const string sqlTaiKhoan = @"
-//                 UPDATE taikhoan
-//                 SET TaiKhoan=@SDT, MatKhau=@MatKhau, BiKhoa=@BiKhoa,
-//                     LyDoKhoa=@LyDoKhoa, NgayTao=@NgayTao, SuDung=@SuDung,
-//                     RoleID=@RoleID
-//                 WHERE TaiKhoan = @TaiKhoan;";
-//             //Cập nhật tài khoản
-//             using (var command1 = new MySqlCommand(sqlTaiKhoan, connection)){
-//                 command1.Parameters.AddWithValue("@SDT",UngCuVien.SDT);
-//                 command1.Parameters.AddWithValue("@TaiKhoan",UngCuVien.TaiKhoan);
-//                 command1.Parameters.AddWithValue("@MatKhau",hashedPwd);
-//                 command1.Parameters.AddWithValue("@BiKhoa",UngCuVien.BiKhoa);
-//                 command1.Parameters.AddWithValue("@LyDoKhoa",UngCuVien.LyDoKhoa);
-//                 command1.Parameters.AddWithValue("@NgayTao",UngCuVien.NgayTao);
-//                 command1.Parameters.AddWithValue("@RoleID",UngCuVien.RoleID);
-//                 command1.Parameters.AddWithValue("@SuDung",UngCuVien.SuDung);
                 
-//                 //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
-//                 int rowAffected = await command1.ExecuteNonQueryAsync();
-//                 if(rowAffected < 0){
-//                     return -6;
-//                 } 
-                
-//                 Console.WriteLine("Đã hoàn thành cập nhật thông tin tài khoản");
-//             }
+                //Lấy ID người dùng vừa tạo và tạo ID ứng cử viên
+                string ID_ucv = RandomString.CreateID(),
+                        ID_user = FillInBasicInfo.ToString();
 
-//             return 1;            
-//         }
+                //Ngược lại thêm ứng cử viên
+                const string sql = "INSERT INTO UngCuVien(ID_ucv,TrangThai,ID_user) VALUES(@ID_ucv,@TrangThai,@ID_user);";
+                using(var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@ID_ucv", ID_ucv);
+                    command.Parameters.AddWithValue("@ID_user", ID_user);
+                    command.Parameters.AddWithValue("@TrangThai", Candidate.TrangThai);
 
-//         //---- 10.Sửa theo ID - Candidate
-//         public async Task<int> _EditCandidateBy_ID_Candidate(string ID, CandidateDto UngCuVien){
-//             using var connection = await _context.Get_MySqlConnection();
+                    await command.ExecuteNonQueryAsync();
+                }
 
-//             //Kiểm tra trạng thái kết nối trước khi mở
-//             if(connection.State != System.Data.ConnectionState.Open) await connection.OpenAsync();
+                await transaction.CommitAsync();
+                return 1;
+            }catch(Exception ex){
+                try{
+                    await transaction.RollbackAsync();
+                }catch(Exception rollbackEx){
+                    // Log lỗi rollback nếu cần thiết
+                    Console.WriteLine($"Rollback Exception Message: {rollbackEx.Message}");
+                    Console.WriteLine($"Rollback Stack Trace: {rollbackEx.StackTrace}");
+                }
+                // Log lỗi và ném lại exception để controller xử lý
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                throw;
+            }
+        }
 
-//             //Kiểm tra xem thông tin đầu vào phải không được trùng chỉ được trùng với bản thân thôi
-//             int KiemTraTrungNhau = await CheckTheCandidateInformationLoop(1, UngCuVien, connection);
-//             if(KiemTraTrungNhau <= 0){
-//                 Console.WriteLine("Xuất hiện có lỗi trong kiểm tra trùng nhau");
-//                 return KiemTraTrungNhau;
-//             }
-
-//             //Kiểm tra đầu vào là không được null và giá trị hợp lệ
-//             if(CheckInformationIsNotEmpty(UngCuVien) == false){
-//                 Console.WriteLine("Xuất hiện có lỗi trong kiểm tra rỗng");
-//                 return -4;
-//             }
+        //2. Lấy thông tin người dùng theo ID
+        public async Task<CandidateDto> _GetCandidateBy_ID(string IDCandidate){
+            using var connection = await _context.Get_MySqlConnection();
             
-//             // --- Kiểm tra mật khẩu cũ xem người dùng có nhớ không
-//             const string sqlMatKhau = "SELECT MatKhau FROM Taikhoan WHERE TaiKhoan = @TaiKhoan";
+            const string sql = @"
+            SELECT * 
+            FROM UngCuVien ct 
+            INNER JOIN nguoidung nd ON nd.ID_user = ct.ID_user 
+            WHERE ct.ID_ucv = @ID_ucv;";
 
-//             //Kiểm tra mật khẩu nếu khớp thì mới cho cập nhật
-//             using (var command2 = new MySqlCommand(sqlMatKhau, connection)){
-//                 command2.Parameters.AddWithValue("@TaiKhoan",UngCuVien.SDT);
-//                 using var reader = await command2.ExecuteReaderAsync();
+            using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID_ucv", IDCandidate);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if(await reader.ReadAsync()){
+                return new CandidateDto{
+                    ID_ucv = reader.GetString(reader.GetOrdinal("ID_ucv")),
+                    ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
+                    HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
+                    GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh")),
+                    NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")).ToString("dd-MM-yyyy HH:mm:ss"),
+                    DiaChiLienLac = reader.GetString(reader.GetOrdinal("DiaChiLienLac")),
+                    CCCD = reader.GetString(reader.GetOrdinal("CCCD")),
+                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                    SDT = reader.GetString(reader.GetOrdinal("SDT")),
+                    HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
+                    ID_DanToc = reader.GetInt32(reader.GetOrdinal("ID_DanToc")),
+                    RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
+                    PublicID = reader.GetString(reader.GetOrdinal("PublicID"))
+                };
+            }
+            return null;
+        }
+
+        //3. Sửa thông tin ứng cử viên dựa trên ID ứng cử viên
+        public async Task<int> _EditCandidateBy_ID(string IDCandidate ,CandidateDto Candidate){
+            using var connection = await _context.Get_MySqlConnection();
+
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open) await connection.OpenAsync(); 
+
+            using var transaction = await connection.BeginTransactionAsync();
+
+            try{
+                //Lấy ID_user từ ứng cử viên
+                string ID_user = await GetIDUserBaseOnIDUngCuVien(IDCandidate, connection);
+                if(string.IsNullOrEmpty(ID_user))
+                    return -5;
                 
-//                 if(string.IsNullOrEmpty(UngCuVien.MatKhauCu)) return -7;
+                //Kiểm tra thông tin đầu vào không được trùng
+                int KiemTraThongTinTrungNhau = await CheckForDuplicateUserInformation(1, Candidate, connection);
+                if(KiemTraThongTinTrungNhau <= 0){
+                    Console.WriteLine("Thông tin đầu vào trùng nhau");
+                    return KiemTraThongTinTrungNhau;
+                }
 
-//                 if(await reader.ReadAsync()){
-//                     string hashdedpw = reader["MatKhau"] as string;
-//                     Console.WriteLine($">HashPWD: {hashdedpw}");
-//                     Console.WriteLine($">OldPWD: {UngCuVien.MatKhauCu}");
-//                     if (hashdedpw == null || !CheckOldPassword(UngCuVien.MatKhauCu, hashdedpw))
-//                     {
-//                         return -7; // Mật khẩu cũ không khớp
-//                     }
-//                     else
-//                     {
-//                         Console.WriteLine("Đổi PWD thành công");
-//                     }
-//                 }
-//             }
+                //Kiểm tra đầu vào không được null
+                if(CheckUserInformationIsNotEmpty(Candidate) == false){
+                    Console.WriteLine("Thông tin đầu vào chưa điền đây đủ");
+                    return -4;
+                }
+
+                //Cập nhật thông tin ứng cử viên - Và cập nhật phần tài khoảng ứng cử viên, nếu SDT thay đổi
+                const string sqlNguoiDung = @"
+                    UPDATE nguoidung 
+                    SET HoTen = @HoTen, GioiTinh=@GioiTinh, NgaySinh=@NgaySinh,
+                        DiaChiLienLac=@DiaChiLienLac, CCCD=@CCCD, SDT=@SDT, ID_DanToc=@ID_DanToc,
+                        Email=@Email, RoleID=@RoleID
+                    WHERE ID_user = @ID_user;";
+                const string sqlCandidateAccount = @"
+                UPDATE taikhoan
+                SET taikhoan = @SDT
+                WHERE Taikhoan = @Taikhoan;";
+
+                using(var command1 = new MySqlCommand($"{sqlNguoiDung} {sqlCandidateAccount}", connection)){
+                    command1.Parameters.AddWithValue("@ID_user", ID_user);
+                    command1.Parameters.AddWithValue("@HoTen", Candidate.HoTen);
+                    command1.Parameters.AddWithValue("@GioiTinh", Candidate.GioiTinh);
+                    command1.Parameters.AddWithValue("@NgaySinh", Candidate.NgaySinh);
+                    command1.Parameters.AddWithValue("@DiaChiLienLac", Candidate.DiaChiLienLac);
+                    command1.Parameters.AddWithValue("@CCCD", Candidate.CCCD);
+                    command1.Parameters.AddWithValue("@SDT", Candidate.SDT);
+                    command1.Parameters.AddWithValue("@Taikhoan", Candidate.TaiKhoan);
+                    command1.Parameters.AddWithValue("@Email", Candidate.Email);
+                    command1.Parameters.AddWithValue("@RoleID", Candidate.RoleID);
+                    command1.Parameters.AddWithValue("@ID_DanToc", Candidate.ID_DanToc);
+                
+                    int rowAffected = await command1.ExecuteNonQueryAsync();
+                    if(rowAffected < 0) return -6;
+
+                    Console.WriteLine("Cập nhật thông tin cá nhân thành công");
+                }
+                await transaction.CommitAsync();
+                return 1;
+            }catch(MySqlException ex){
+                await transaction.RollbackAsync();
+
+                //Xử lý lỗi MySQL cụ thể
+                switch(ex.Number){
+                    case 1062:
+                        if(ex.Message.Contains("CCCD"))
+                            return -2;
+                        else if(ex.Message.Contains("SDT"))
+                            return 0;
+                        else if(ex.Message.Contains("Email"))
+                            return -1;
+                        else
+                            return -7;
+                    default:
+                        return -8;
+                }
+
+            }catch(Exception){
+                await transaction.RollbackAsync();
+                return -9;
+            }
             
-//             //Băm mật khẩu, CCCD
-//             string hashedPwd = HashPassword(UngCuVien.MatKhau),
-//                     hashedCCCD = HashPassword(UngCuVien.CCCD);
+        }
 
-//             const string sqlUngCuVien = @"
-//                 UPDATE UngCuVien 
-//                 SET HoTen = @HoTen, GioiTinh=@GioiTinh, NgaySinh=@NgaySinh,
-//                     DiaChiLienLac=@DiaChiLienLac, CCCD=@CCCD, SDT=@SDT,
-//                     Email=@Email, HinhAnh=@HinhAnh, RoleID=@RoleID,TrangThai=@TrangThai
-//                 WHERE ID_ucv = @ID_ucv;";
+        //4. Lấy tất cả thông tin ứng cử viên
+        public async Task<List<CandidateDto>> _GetListOfCandidate(){
+            var list = new List<CandidateDto>();
+            using var connection = await _context.Get_MySqlConnection();
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
 
-//             //Cập nhật cử tri
-//             using (var command0 = new MySqlCommand(sqlUngCuVien, connection)){
-//                 command0.Parameters.AddWithValue("@ID_ucv",ID);
-//                 command0.Parameters.AddWithValue("@HoTen",UngCuVien.HoTen);
-//                 command0.Parameters.AddWithValue("@GioiTinh",UngCuVien.GioiTinh);
-//                 command0.Parameters.AddWithValue("@NgaySinh",UngCuVien.NgaySinh);
-//                 command0.Parameters.AddWithValue("@DiaChiLienLac",UngCuVien.DiaChiLienLac);
-//                 command0.Parameters.AddWithValue("@CCCD",hashedCCCD);
-//                 command0.Parameters.AddWithValue("@SDT",UngCuVien.SDT);
-//                 command0.Parameters.AddWithValue("@Email",UngCuVien.Email);
-//                 command0.Parameters.AddWithValue("@HinhAnh",UngCuVien.HinhAnh);
-//                 command0.Parameters.AddWithValue("@RoleID",UngCuVien.RoleID);
-//                 command0.Parameters.AddWithValue("@TrangThai",UngCuVien.TrangThai);
-//                 //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
-//                 int rowAffected = await command0.ExecuteNonQueryAsync();
-//                 if(rowAffected < 0){
-//                     return -5;
-//                 }
-//                 Console.WriteLine("Đã hoàn thành cập nhật thông tin cá nhân");
-//             }
-
-//             const string sqlTaiKhoan = @"
-//                 UPDATE taikhoan
-//                 SET TaiKhoan=@SDT, MatKhau=@MatKhau, BiKhoa=@BiKhoa,
-//                     LyDoKhoa=@LyDoKhoa, NgayTao=@NgayTao, SuDung=@SuDung,
-//                     RoleID=@RoleID
-//                 WHERE TaiKhoan = @TaiKhoan;";
-//             //Cập nhật tài khoản
-//             using (var command1 = new MySqlCommand(sqlTaiKhoan, connection)){
-//                 command1.Parameters.AddWithValue("@SDT",UngCuVien.SDT);
-//                 command1.Parameters.AddWithValue("@TaiKhoan",UngCuVien.TaiKhoan);
-//                 command1.Parameters.AddWithValue("@MatKhau",hashedPwd);
-//                 command1.Parameters.AddWithValue("@BiKhoa",UngCuVien.BiKhoa);
-//                 command1.Parameters.AddWithValue("@LyDoKhoa",UngCuVien.LyDoKhoa);
-//                 command1.Parameters.AddWithValue("@NgayTao",UngCuVien.NgayTao);
-//                 command1.Parameters.AddWithValue("@RoleID",UngCuVien.RoleID);
-//                 command1.Parameters.AddWithValue("@SuDung",UngCuVien.SuDung);
-                
-//                 //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
-//                 int rowAffected = await command1.ExecuteNonQueryAsync();
-//                 if(rowAffected < 0){
-//                     return -6;
-//                 } 
-                
-//                 Console.WriteLine("Đã hoàn thành cập nhật thông tin tài khoản");
-//             }
-
-//             return 1;            
-//         }
-
-//         //Xóa theo ID
-//         public async Task<bool> _DeleteCandidateBy_ID(string ID){
-//             using var connection = await _context.Get_MySqlConnection();
-
-//             //Tìm số điện thoại theo ID để dò tài khoản
-//             const string sql_SDT = "SELECT SDT FROM UngCuVien WHERE ID_ucv = @ID_ucv";
-//             string Acc = null;
-//             using (var command0 = new MySqlCommand(sql_SDT, connection)){
-//                 command0.Parameters.AddWithValue("@ID_ucv",ID);
-                
-//                 //Nếu có lấy ID tài khoản
-//                 using var reader = await command0.ExecuteReaderAsync();
-//                 if(await reader.ReadAsync())
-//                     Acc = reader.GetString(reader.GetOrdinal("SDT"));
-//             }
-
-//             //Nếu ID không tìm thấy thì xóa
-//             if(string.IsNullOrEmpty(Acc))
-//                 return false;
-
-//             //Xóa tài khoản
-//             const string sql_deleteAcc = "DELETE FROM TaiKhoan WHERE TaiKhoan = @TaiKhoan";
-//             using (var command1 = new MySqlCommand(sql_deleteAcc, connection)){
-//                 command1.Parameters.AddWithValue("@TaiKhoan",Acc);
-//                 int rowAffected = await command1.ExecuteNonQueryAsync();
-//                 if(rowAffected < 1) return false;
-//             }
-
-//             //Xóa thông tin cử tri
-//             const string sqldelete = "DELETE FROM UngCuVien WHERE ID_ucv = @ID_ucv";
+            const string sql = @"
+            SELECT * FROM nguoidung nd 
+            INNER JOIN UngCuVien ct ON ct.ID_user = nd.ID_user";
+            using var command = new MySqlCommand(sql, connection);
+            using var reader = await command.ExecuteReaderAsync();
             
-//             using (var command2 = new MySqlCommand(sqldelete, connection)){
-//                 command2.Parameters.AddWithValue("@ID_ucv",ID);    
-//                 //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
-//                 int rowAffected = await command2.ExecuteNonQueryAsync();
-//                 if(rowAffected < 1) return false;
-//             }
-//             return true;
-//         }
+            while(await reader.ReadAsync()){
+                list.Add(new CandidateDto{
+                    ID_ucv =reader.GetString(reader.GetOrdinal("ID_ucv")), 
+                    ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
+                    HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
+                    GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh")),
+                    NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")).ToString("dd-MM-yyyy"),
+                    DiaChiLienLac = reader.GetString(reader.GetOrdinal("DiaChiLienLac")),
+                    CCCD = reader.GetString(reader.GetOrdinal("CCCD")),
+                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                    SDT = reader.GetString(reader.GetOrdinal("SDT")),
+                    HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
+                    ID_DanToc = reader.GetInt32(reader.GetOrdinal("ID_DanToc")),
+                    RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
+                    PublicID = reader.GetString(reader.GetOrdinal("PublicID"))
+                });
+            }
+            return list;
+        }
 
-//     }
-// }
+        //5. Đặt mật khẩu ứng cử viên
+        public async Task<bool> _SetCandidatePassword(string id,string newPwd){
+            using var connection = await _context.Get_MySqlConnection();
+
+            //Băm mật khẩu
+            newPwd = Argon2.Hash(newPwd);
+
+            //Cập nhật mật khẩu dựa trên ID
+            const string sql = @"
+            UPDATE taikhoan tk 
+            JOIN nguoidung nd ON nd.sdt = tk.TaiKhoan
+            JOIN UngCuVien ct ON nd.ID_user = ct.ID_user
+            SET tk.MatKhau = @MatKhau
+            WHERE ct.ID_ucv = @ID_ucv;";
+            
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_ucv", id);
+                command.Parameters.AddWithValue("@MatKhau", newPwd);
+                
+                int rowAffect = await command.ExecuteNonQueryAsync();
+                if(rowAffect < 0)
+                    return false;
+            }
+            return true;
+        }
+
+        //6. ứng cử viên thay đổi mật khẩu
+        public async Task<int> _ChangeCandidatePassword(string id, string oldPwd, string newPwd){
+            using var connect = await _context.Get_MySqlConnection();
+
+            //Lấy mật khẩu đã băm của ứng cử viên
+            string hashedPwd = null;
+            const string sqlGetHashedPwd = @"
+            SELECT tk.MatKhau 
+            FROM taikhoan tk
+            INNER JOIN nguoidung nd ON tk.TaiKhoan = nd.SDT
+            INNER JOIN UngCuVien ct ON ct.ID_user = nd.ID_user
+            WHERE ct.ID_ucv = @ID_ucv;";
+
+            using(var command0 = new MySqlCommand(sqlGetHashedPwd,connect)){
+                command0.Parameters.AddWithValue("@ID_ucv", id);
+                
+                using var reader = await command0.ExecuteReaderAsync();
+                if(await reader.ReadAsync())
+                    hashedPwd = reader.GetString(reader.GetOrdinal("MatKhau"));
+            }
+
+            //Nếu tìm không thấy ID ứng cử viên thì trả về 0
+            if(string.IsNullOrEmpty(hashedPwd)) return 0;
+
+            //So sánh 2 mật khẩu đã băm và mật khẩu cũ
+            if(Argon2.Verify(hashedPwd, oldPwd) != true) return -1;
+
+            //Băm mật khẩu
+            newPwd = Argon2.Hash(newPwd);
+
+            //Truy xuất ID ứng cử viên rồi cập nhật lại
+            const string sqlUpdatePwd = @"
+            UPDATE taikhoan tk 
+            JOIN nguoidung nd ON nd.sdt = tk.TaiKhoan
+            JOIN UngCuVien ct ON nd.ID_user = ct.ID_user
+            SET tk.MatKhau = @MatKhau
+            WHERE ct.ID_ucv = @ID_ucv;";
+
+            using(var command1 = new MySqlCommand(sqlUpdatePwd, connect)){
+                command1.Parameters.AddWithValue("@ID_ucv", id);
+                command1.Parameters.AddWithValue("@MatKhau", newPwd);
+                
+                int rowAffect = await command1.ExecuteNonQueryAsync();
+                if(rowAffect < 0)
+                    return -2;
+            }
+
+            return 1;
+        }
+
+        //7. Xóa tài khoảng người dùng dựa trên ID cư tri
+        public async Task<bool> _DeleteCandidateBy_ID(string IDCandidate){
+            using var connect = await _context.Get_MySqlConnection();
+
+            //Truy xuất lấy ID ứng cử viên
+            string ID_user = await GetIDUserBaseOnIDUngCuVien(IDCandidate, connect);
+            if(string.IsNullOrEmpty(ID_user)) return false;
+
+            //Xóa tài khoản ứng cử viên trước rồi xóa tài khoản người dùng sau
+            const string sqlDeleteCandidate = @"DELETE FROM UngCuVien WHERE ID_ucv = @ID_ucv;";
+            using(var command1 = new MySqlCommand(sqlDeleteCandidate, connect)){
+                command1.Parameters.AddWithValue("@ID_ucv", IDCandidate);
+                
+                int rowAffect = await command1.ExecuteNonQueryAsync();
+                if(rowAffect < 0)
+                    return false;
+            }
+
+            if(await _DeleteUserBy_ID_withConnection(ID_user, connect) == false)
+                return false;
+
+            return true;
+        }
+
+        //8. Lấy thông tin ứng cử viên và kèm theo tài khoản
+        public async Task<List<CandidateDto>> _GetListOfCandidatesAndAccounts(){
+            var list = new List<CandidateDto>();
+            using var connection = await _context.Get_MySqlConnection();
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            const string sql = @"
+            SELECT nd.ID_user,nd.HoTen,nd.GioiTinh,nd.NgaySinh,nd.DiaChiLienLac,nd.CCCD,nd.Email,nd.SDT,
+            nd.HinhAnh,nd.PublicID,nd.ID_DanToc,nd.RoleID, ct.ID_ucv 
+            ,tk.TaiKhoan,tk.MatKhau,tk.BiKhoa,tk.LyDoKhoa,tk.NgayTao,tk.SuDung,tk.RoleID 
+            FROM nguoidung nd 
+            INNER JOIN taikhoan tk ON tk.TaiKhoan = nd.SDT 
+            JOIN UngCuVien ct ON ct.ID_user = nd.ID_user";
+            using var command = new MySqlCommand(sql, connection);
+            using var reader = await command.ExecuteReaderAsync();
+            
+            while(await reader.ReadAsync()){
+                list.Add(new CandidateDto{
+                    ID_ucv = reader.GetString(reader.GetOrdinal("ID_ucv")),
+                    ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
+                    HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
+                    GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh")),
+                    NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")).ToString("dd-MM-yyyy"),
+                    DiaChiLienLac = reader.GetString(reader.GetOrdinal("DiaChiLienLac")),
+                    CCCD = reader.GetString(reader.GetOrdinal("CCCD")),
+                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                    SDT = reader.GetString(reader.GetOrdinal("SDT")),
+                    HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
+                    ID_DanToc = reader.GetInt32(reader.GetOrdinal("ID_DanToc")),
+                    RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
+                    PublicID = reader.GetString(reader.GetOrdinal("PublicID")),
+                    TaiKhoan = reader.GetString(reader.GetOrdinal("TaiKhoan")),
+                    MatKhau = reader.GetString(reader.GetOrdinal("MatKhau")),
+                    BiKhoa = reader.GetBoolean(reader.GetOrdinal("BiKhoa")).ToString(),
+                    LyDoKhoa = reader.IsDBNull(reader.GetOrdinal("LyDoKhoa")) ? null : reader.GetString(reader.GetOrdinal("LyDoKhoa")),
+                    NgayTao = reader.GetDateTime(reader.GetOrdinal("NgayTao")).ToString("dd-MM-yyyy HH:mm:ss"),
+                    SuDung = reader.GetInt32(reader.GetOrdinal("SuDung"))
+                });
+            }
+            return list;
+        }
+
+
+    }
+}

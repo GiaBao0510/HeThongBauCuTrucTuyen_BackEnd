@@ -2,10 +2,11 @@ using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using MySql.Data.MySqlClient;
 using BackEnd.src.web_api.DTOs;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
-    public class ElectionsReposistory : IDisposable
+    public class ElectionsReposistory : IDisposable,IElectionsRepository
     {
         private readonly DatabaseContext _context;
 

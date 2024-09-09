@@ -8,6 +8,8 @@ using BackEnd.src.core.Interfaces;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using MySql.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +22,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
+using BackEnd.src.infrastructure.Services;
+using BackEnd.src.web_api.Mappings;
 
 namespace BackEnd
 {
@@ -33,50 +41,80 @@ namespace BackEnd
         //Thường khai báo các services Dependency
         public void ConfigureServices(IServiceCollection services){
             
-            //Đăng ký các dịch vụ MVC
+                //--- Đăng ký các dịch vụ MVC
             services.AddControllersWithViews();
 
+                //--- Kết nối với Mysql
             var serverMysqlVersion = new MySqlServerVersion(new Version(9,0,1));
-
-            //Cấu hình Cloudinary
-            var CloudinaryConfig = Configuration.GetSection("CloudinarySetting");
-            var cloudinary = new Cloudinary(new Account(
-                CloudinaryConfig["CloudName"],
-                CloudinaryConfig["ApiKey"],
-                CloudinaryConfig["ApiSecret"]
-            ));
-            services.AddSingleton(cloudinary);
-
             services.AddControllers();
             services.AddSwaggerGen(c =>{
                 c.SwaggerDoc("v1", new OpenApiInfo {Title="BauCuTrucTuyen", Version="v1"});
+
+                //Cấu hình xử lý IFormFile
+                c.OperationFilter<FileUploadService>();
             });
             services.AddDbContext<ApplicationDbContext>(option =>{
                 option.UseMySql( Configuration.GetConnectionString("MySQL") , serverMysqlVersion);
             });
 
-            // --- Xác thực cookie
-            services.AddRazorPages();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+                // --- Cấu hình để xử lý Multipart/form
+            //Câu hình dịch vụ Controller trong ứng dụng
+            services.AddControllers(options =>{
+                options.EnableEndpointRouting = false;      //Tắt tính năng EndpointRouting tiếp cận cũ hơn dựa trên Route Template
+            })
+            .AddNewtonsoftJson()                        //Sử dụng thư viện NewtonsoftJson để serialize và deserialize Json
+            .ConfigureApiBehaviorOptions(options => {   //Cấu hình hành vi cho api
+                options.SuppressConsumesConstraintForFormFileParameters = true;     //Tắt kiểm tra định dạng media cho các tham số là FormFile
+                options.SuppressInferBindingSourcesForParameters = true;            //Ngăn API xác định nguồn dữ liệu trong request
+                options.SuppressModelStateInvalidFilter = true;                     //Vô hiệu quá bộ lọc trạng thái không hợp lệ
+            });
+
+                // ---- Cấu hình Cloudinary
+            services.AddSingleton<CloudinaryService>();
+
+            services.AddMemoryCache();
+
+                // ---- Đăng ký AutoMapper
+            services.AddControllersWithViews();
+            services.AddAutoMapper(typeof(MappingProfile));
+
+                // --- Xác thực JWT
+            var accessToken = Configuration["AppSettings:AccessToken"];
+            var accessTokenBytes = Encoding.UTF8.GetBytes(accessToken);
+
+            //services.AddRazorPages();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>{
+                opt.TokenValidationParameters = new TokenValidationParameters{
+                    //Tự cấp token
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+
+                    //Ký vào token
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(accessTokenBytes),
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
             
-            //-- Đăng ký dịch vụ tại đây
+                //-- Đăng ký dịch vụ tại đây
             services.AddSingleton<IAppConfig,AppConfig>();
             services.AddScoped<DatabaseContext>();
-            services.AddScoped<RoleReposistory>();
-            services.AddScoped<ProvinceReposistory>();
-            services.AddScoped<DistrictReposistory>();
-            // services.AddScoped<VouterReposistory>();
+            services.AddScoped<IRoleRepository,RoleReposistory>();
+            services.AddScoped<IProvinceRepository,ProvinceReposistory>();
+            services.AddScoped<IDistrictRepository,DistrictReposistory>();
+            services.AddScoped<IVoterRepository, VoterReposistory>();
             // services.AddScoped<CandidateReposistory>();
-            services.AddScoped<ConstituencyReposistory>();
-            services.AddScoped<BoardReposistory>();
-            services.AddScoped<NotificationsReposistory>();
-            services.AddScoped<EducationLevelReposistory>();
-            services.AddScoped<ElectionsReposistory>();
-            services.AddScoped<EthnicityReposistory>();
-            services.AddScoped<PositionReposistory>();
-            services.AddScoped<VoteReposistory>();
-            services.AddScoped<ListOfPositionReposistory>();
-        }
+            services.AddScoped<IConstituencyRepository,ConstituencyReposistory>();
+            services.AddScoped<IBoardRepository,BoardReposistory>();
+            services.AddScoped<INotificationRepository,NotificationsReposistory>();
+            services.AddScoped<IEducationLevelRepository,EducationLevelReposistory>();
+            services.AddScoped<IElectionsRepository,ElectionsReposistory>();
+            services.AddScoped<IEthnicityRepository,EthnicityReposistory>();
+            services.AddScoped<IPositionsRepository,PositionReposistory>();
+            services.AddScoped<IVoteRepository,VoteReposistory>();
+            services.AddScoped<IListOfPositionRepository,ListOfPositionReposistory>();
+            services.AddScoped<IUserRepository,UserRepository>();
+        } 
 
         //Riêng các service muốn call thì sẽ goi trong đây
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env){

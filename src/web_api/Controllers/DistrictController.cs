@@ -13,6 +13,7 @@ using BackEnd.infrastructure.config;
 using BackEnd.src.infrastructure.DataAccess.Repositories;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.web_api.DTOs;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 {
@@ -20,8 +21,8 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
     [ApiController]
     public class DistrictController: ControllerBase
     {
-        private readonly DistrictReposistory _districtReposistory;
-        public DistrictController(DistrictReposistory districtReposistory) => _districtReposistory = districtReposistory;
+        private readonly IDistrictRepository _districtReposistory;
+        public DistrictController(IDistrictRepository districtReposistory) => _districtReposistory = districtReposistory;
 
         //Liệt kê
         [HttpGet]

@@ -1,6 +1,7 @@
 using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -8,10 +9,10 @@ namespace BackEnd.src.web_api.Controllers
     [ApiController]
     public class EducationLevelController : ControllerBase
     { 
-        private readonly EducationLevelReposistory _educationLevelReposistory;
+        private readonly IEducationLevelRepository _educationLevelReposistory;
 
         //Khởi tạo
-        public EducationLevelController(EducationLevelReposistory educationLevelReposistory) => _educationLevelReposistory = educationLevelReposistory;
+        public EducationLevelController(IEducationLevelRepository educationLevelReposistory) => _educationLevelReposistory = educationLevelReposistory;
 
         //Liệt kê
         [HttpGet]

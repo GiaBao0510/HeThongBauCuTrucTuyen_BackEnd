@@ -1,6 +1,7 @@
 using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 
 namespace BackEnd.src.web_api.Controllers
@@ -9,10 +10,10 @@ namespace BackEnd.src.web_api.Controllers
     [ApiController]
     public class BoardController : ControllerBase
     {
-        private readonly BoardReposistory _boardReposistory;
+        private readonly IBoardRepository _boardReposistory;
 
         //Khởi tạo
-        public BoardController(BoardReposistory boardReposistory) => _boardReposistory = boardReposistory;
+        public BoardController(IBoardRepository boardReposistory) => _boardReposistory = boardReposistory;
 
         //Liệt kê
         [HttpGet]

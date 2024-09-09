@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd.src.core.Entities
 {
+    [Table("KhoaCongKhai")]
     public class PublicKey
     {
         [DisplayName("Modulo")]

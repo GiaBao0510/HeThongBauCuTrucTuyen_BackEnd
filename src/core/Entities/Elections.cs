@@ -19,7 +19,7 @@ namespace BackEnd.core.Entities
         [StringLength(50)]
         [DisplayName("Election name")]
         public required string TenKyBauCu {get; set;}
-        [StringLength(50)]
+        [StringLength(255)]
         [DisplayName("Description")]
         public string MoTa { get; set; } = "";
 

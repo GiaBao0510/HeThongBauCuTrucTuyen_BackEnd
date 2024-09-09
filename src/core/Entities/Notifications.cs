@@ -17,7 +17,7 @@ namespace BackEnd.core.Entities
         public required string NoiDungThongBao { set; get; }
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DisplayName("Time")]
-        public DateTime ThoiDiem { set;get; }
+        public DateTime ThoiDiem { set;get; } = DateTime.Now;
 
         //Truy xuất ngược 
         public virtual ICollection<CandidateNoticeDetails>? candidateNoticeDetails{set;get;}

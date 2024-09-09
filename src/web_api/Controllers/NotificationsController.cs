@@ -1,6 +1,7 @@
 using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -8,10 +9,10 @@ namespace BackEnd.src.web_api.Controllers
     [ApiController]
     public class NotificationsController : ControllerBase
     {
-        private readonly NotificationsReposistory _notificationsReposistory;
+        private readonly INotificationRepository _notificationsReposistory;
 
         //Khởi tạo
-        public NotificationsController(NotificationsReposistory notificationsReposistory) => _notificationsReposistory = notificationsReposistory;
+        public NotificationsController(INotificationRepository notificationsReposistory) => _notificationsReposistory = notificationsReposistory;
 
         //Liệt kê
         [HttpGet]

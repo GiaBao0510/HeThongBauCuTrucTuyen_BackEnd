@@ -1,11 +1,12 @@
 using BackEnd.core.Entities;
 using BackEnd.src.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 using MySql.Data.MySqlClient;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
-    public class PositionReposistory : IDisposable
+    public class PositionReposistory : IDisposable, IPositionsRepository
     {
         private readonly DatabaseContext _context;
 

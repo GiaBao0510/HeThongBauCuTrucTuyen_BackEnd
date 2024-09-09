@@ -2,6 +2,7 @@ using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.web_api.DTOs;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -9,10 +10,10 @@ namespace BackEnd.src.web_api.Controllers
     [ApiController]
     public class VoteController : ControllerBase
     {
-        private readonly VoteReposistory _voteReposistory;
+        private readonly IVoteRepository _voteReposistory;
 
         //Khởi tạo
-        public VoteController(VoteReposistory voteReposistory) => _voteReposistory = voteReposistory;
+        public VoteController(IVoteRepository voteReposistory) => _voteReposistory = voteReposistory;
 
         //Liệt kê
         [HttpGet]

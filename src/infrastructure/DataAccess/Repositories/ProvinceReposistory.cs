@@ -1,15 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
-using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
+using MySql.Data.MySqlClient; 
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
-    public class ProvinceReposistory : IDisposable
+    public class ProvinceReposistory : IDisposable, IProvinceRepository
     {
         private readonly DatabaseContext _context;
 

@@ -1,11 +1,11 @@
 using BackEnd.src.infrastructure.DataAccess.Context;
 using MySql.Data.MySqlClient;
-using BackEnd.src.web_api.DTOs;
 using BackEnd.src.core.Entities;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
-    public class EthnicityReposistory : IDisposable
+    public class EthnicityReposistory : IDisposable,IEthnicityRepository
     {
         private readonly DatabaseContext _context;
 

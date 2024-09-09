@@ -1,16 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
-using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
-    public class BoardReposistory : IDisposable
+    public class BoardReposistory : IDisposable,IBoardRepository
     {
         private readonly DatabaseContext _context;
 

@@ -1,27 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
-using System.Data;
-using MySql.Data.MySqlClient;
-using System.Data.Common;
-using BackEnd.src.core.Interfaces;
-using BackEnd.infrastructure.config;
 using BackEnd.src.infrastructure.DataAccess.Repositories;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace BackEnd.src.web_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProvinceController:ControllerBase
+    public class ProvinceController: ControllerBase
     {
-        private readonly ProvinceReposistory _ProvinceReposistory;
+        private readonly IProvinceRepository _ProvinceReposistory;
 
         //Khởi tạo
-        public ProvinceController(ProvinceReposistory provinceReposistory) => _ProvinceReposistory = provinceReposistory;
+        public ProvinceController(IProvinceRepository provinceReposistory) => _ProvinceReposistory = provinceReposistory;
 
         //Liệt kê
         [HttpGet]

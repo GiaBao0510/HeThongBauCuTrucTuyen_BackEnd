@@ -1,6 +1,7 @@
 using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 
 namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 {
@@ -8,10 +9,10 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
     [ApiController]
     public class ConstituencyController: ControllerBase
     {
-        private readonly ConstituencyReposistory _constituencyReposistory;
+        private readonly IConstituencyRepository _constituencyReposistory;
 
         //Khởi tạo
-        public ConstituencyController(ConstituencyReposistory constituencyReposistory) => _constituencyReposistory = constituencyReposistory;
+        public ConstituencyController(IConstituencyRepository constituencyReposistory) => _constituencyReposistory = constituencyReposistory;
 
         //Liệt kê
         [HttpGet]
