@@ -16,10 +16,14 @@ namespace BackEnd.src.core.Entities
         
         //Truy xuất ngược
        public virtual ICollection<WorkPlace>? workPlace{set;get;}
+       public virtual ICollection<VoterDetails> voterDetails {set;get;}
+       public virtual ICollection<CandidateDetails> candidateDetails{set;get;}
 
        //Hàm khởi tạo này chủ yếu dùng để cho các đối tượng được truy xuất ngược là trả về một mảng rỗng
        public Position(){
         workPlace = new List<WorkPlace>(); //Một danh sách rỗng
+        voterDetails = new List<VoterDetails>();
+        candidateDetails = new List<CandidateDetails>();
        }
     }
 }

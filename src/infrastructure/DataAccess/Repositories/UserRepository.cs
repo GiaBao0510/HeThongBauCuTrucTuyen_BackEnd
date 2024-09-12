@@ -564,6 +564,26 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 }
 
                 return ID_user;
+            }
+            catch(MySqlException ex){
+                
+                if(transaction.Connection != null)
+                    await transaction.RollbackAsync();
+
+                //Xử lý để in lỗi cụ thể
+                switch(ex.Number){
+                    case 1062:
+                        if(ex.Message.Contains("CCCD"))
+                            return -2;
+                        else if(ex.Message.Contains("SDT"))
+                            return 0;
+                        else if(ex.Message.Contains("Email"))
+                            return -1;
+                        else
+                            return -100;
+                    default:
+                        return -100; 
+                }
             }catch(Exception){
                 await transaction.RollbackAsync();
                 throw;

@@ -10,6 +10,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         private readonly DatabaseContext _context;
 
         //Khởi tạo
+
         public ListOfPositionReposistory(DatabaseContext context) => _context = context;
 
         //hủy
@@ -124,5 +125,16 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return rowAffected > 0;
         }
 
+        //Kiểm tra mã chức vụ xem có tồn tại chưa
+        public async Task<bool> _CheckIfTheCodeIsInTheListOfPosition(int ID, MySqlConnection connection){
+            
+            const string sql = "SELECT COUNT(ID_Cap) FROM danhmucungcu WHERE ID_Cap=@ID_Cap;";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_Cap",ID);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            }
+        }
     }
 }

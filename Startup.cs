@@ -46,15 +46,40 @@ namespace BackEnd
 
                 //--- Kết nối với Mysql
             var serverMysqlVersion = new MySqlServerVersion(new Version(9,0,1));
+            services.AddDbContext<ApplicationDbContext>(option =>{
+                option.UseMySql( Configuration.GetConnectionString("MySQL") , serverMysqlVersion);
+            });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>{
                 c.SwaggerDoc("v1", new OpenApiInfo {Title="BauCuTrucTuyen", Version="v1"});
 
+                //Cấu hình swagger để hỗ trợ xác thực jwt. Với định nghĩa bảo mật có tên là "Bearer"
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme{
+                    Description=" JWT Authorization header using the Bearer scheme", //Thông tin mô tả
+                    Name="Authorization",
+                    In = ParameterLocation.Header,          //Chỉ định thông tin xác thực là truyền vào trong Header
+                    Type = SecuritySchemeType.ApiKey,       //Loại bảo mật này là Apikey
+                    Scheme = "Bearer"                       //scheme được sử dụng là bearer
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement(){
+                    {   //Thêm yêu cầu bảo mật
+                        new OpenApiSecurityScheme{
+                            Reference = new OpenApiReference{
+                                Type = ReferenceType.SecurityScheme, 
+                                Id = "Bearer"               //Chỉ định xác thực bằng JWT bằng cách sử dụng định nghĩa bảo mật có ID là Bearer
+                            },
+                            Scheme = "oauth2",              //Chỉ định loại scheme là oauth2
+                            Name = "Bearer",                //Thông tin xác thực sẽ truyền trong header có tên là Bearer
+                            In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                    }
+                });
+
                 //Cấu hình xử lý IFormFile
                 c.OperationFilter<FileUploadService>();
-            });
-            services.AddDbContext<ApplicationDbContext>(option =>{
-                option.UseMySql( Configuration.GetConnectionString("MySQL") , serverMysqlVersion);
             });
 
                 // --- Cấu hình để xử lý Multipart/form
@@ -103,7 +128,7 @@ namespace BackEnd
             services.AddScoped<IProvinceRepository,ProvinceReposistory>();
             services.AddScoped<IDistrictRepository,DistrictReposistory>();
             services.AddScoped<IVoterRepository, VoterReposistory>();
-            // services.AddScoped<CandidateReposistory>();
+            services.AddScoped<ICandidateRepository, CandidateRepository>();
             services.AddScoped<IConstituencyRepository,ConstituencyReposistory>();
             services.AddScoped<IBoardRepository,BoardReposistory>();
             services.AddScoped<INotificationRepository,NotificationsReposistory>();
@@ -114,6 +139,10 @@ namespace BackEnd
             services.AddScoped<IVoteRepository,VoteReposistory>();
             services.AddScoped<IListOfPositionRepository,ListOfPositionReposistory>();
             services.AddScoped<IUserRepository,UserRepository>();
+            services.AddScoped<ICadreRepository,CadreRepository>();
+            services.AddScoped<IWorkPlaceRepository,WorkPlaceReposistory>();
+            services.AddScoped<IProfileRepository,ProfileRepository>();
+            
         } 
 
         //Riêng các service muốn call thì sẽ goi trong đây

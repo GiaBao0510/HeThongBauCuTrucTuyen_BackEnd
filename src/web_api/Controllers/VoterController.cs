@@ -252,5 +252,31 @@ namespace BackEnd.src.web_api.Controllers
             }
         }
 
+        //9. Gửi báo cáo
+        [HttpPost("sendReport")]
+        public async Task<IActionResult> VoterSubmitReport([FromBody] SendReportDto sendReportDto){
+            try{
+                //Kiểm tra đầu vào
+                if(string.IsNullOrEmpty(sendReportDto.YKien) || string.IsNullOrEmpty(sendReportDto.IDSender))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền ý kiến và mã người gửi."});
+
+                var result = await _voterReposistory._VoterSubmitReport(sendReportDto);
+                
+                if(result == false)
+                    return BadRequest(new{Status = "False", Message = "Không tìm thấy ID cử tri để gửi báo cáo."});
+
+                return Ok(new{Status = true, Message = "Gửi báo cáo thành công"});
+
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện gửi phản hồi: {ex.Message}"
+                });
+            }
+        }
+
     }
 }

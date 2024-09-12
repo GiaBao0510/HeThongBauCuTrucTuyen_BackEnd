@@ -26,7 +26,10 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<string> GetIDUserBaseOnIDCuTri(string id,  MySqlConnection connection);
         //Lấy thông tin cử tri kèm theo tài khoản
         Task<List<VoterDto>> _GetListOfVotersAndAccounts();
+        //Kiểm tra ID cử tri có tồn tại không
+        Task<bool> _CheckVoterExists(string ID, MySqlConnection connection);
         //Cử tri phản hồi
+        Task<bool> _VoterSubmitReport(SendReportDto reportDto);
         //Cử tri bỏ phiếu
         //Cử tri muốn xác thực lại phiếu đã bỏ trong thời gian bỏ, nhưng không
     }

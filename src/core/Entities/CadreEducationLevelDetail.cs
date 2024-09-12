@@ -10,8 +10,8 @@ namespace BackEnd.src.core.Entities
     [Table("ChiTietTrinhDoHocVanCanBo")] 
     public class CadreEducationLevelDetail
     {
-       public string? ID_CanBo{set;get;} 
-       [ForeignKey("ID_CanBo")] 
+       public string? ID_canbo{set;get;} 
+       [ForeignKey("ID_canbo")] 
        public Cadre cadre{set;get;}
        public string? ID_TrinhDo{set;get;} 
        [ForeignKey("ID_TrinhDo")] 

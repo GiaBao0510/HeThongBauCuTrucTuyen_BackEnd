@@ -50,6 +50,9 @@ namespace BackEnd.src.infrastructure.Data
         public DbSet<WorkPlace> WorkPlaces{set;get;}
         public DbSet<CadreEducationLevelDetail> CadreEducationLevelDetails{set;get;}
         public DbSet<CadreNoiticeDetail> CadreNoiticeDetail{set;get;}
+        public DbSet<VoterDetails> VoterDetails{get;set;}
+        public DbSet<CandidateDetails> CandidateDetails{get;set;}
+        public DbSet<Profiles> Profiles{get;set;}
         #endregion
 
         /*
@@ -111,7 +114,7 @@ namespace BackEnd.src.infrastructure.Data
             });
             modelBuilder.Entity<Cadre>(E=>{
                 E.ToTable("CanBo");
-                E.HasKey(e => e.ID_CanBo);
+                E.HasKey(e => e.ID_canbo);
                 E.Property(e => e.NgayCongTac).IsRequired();
                 E.Property(e => e.GhiChu).HasMaxLength(255);
                 E.HasOne( e => e.user)
@@ -123,7 +126,7 @@ namespace BackEnd.src.infrastructure.Data
                 E.ToTable("ChiTietTrinhDoHocVanCanBo");
                 E.HasOne(e => e.cadre)
                     .WithMany(e => e.cadreEducationLevelDetail)
-                    .HasForeignKey(e => e.ID_CanBo)
+                    .HasForeignKey(e => e.ID_canbo)
                     .HasConstraintName("FK_CTHV_canbo");
                 E.HasOne(e => e.educationLevel)
                     .WithMany(e => e.cadreEducationLevelDetail)
@@ -138,7 +141,7 @@ namespace BackEnd.src.infrastructure.Data
                     .HasConstraintName("FK_thongbao_canbo");
                 E.HasOne(e => e.Cadre)
                     .WithMany(e => e.cadreNoiticeDetail)
-                    .HasForeignKey(e => e.ID_CanBo)
+                    .HasForeignKey(e => e.ID_canbo)
                     .HasConstraintName("FK_CTTB_canbo");
             });
             modelBuilder.Entity<Candidate>(E=>{
@@ -327,7 +330,7 @@ namespace BackEnd.src.infrastructure.Data
                  E.Property(e => e.YKien).IsRequired().HasMaxLength(255);
                 E.HasOne( e => e.Cadre)
                     .WithMany(e => e.responseCadre)
-                    .HasForeignKey(e => e.ID_CanBo)
+                    .HasForeignKey(e => e.ID_canbo)
                     .HasConstraintName("FK_phanhoi_canbo");
             });
             modelBuilder.Entity<ResponseCandidate>(E=>{
@@ -420,8 +423,39 @@ namespace BackEnd.src.infrastructure.Data
                     .HasConstraintName("FK_HoatDongTaiBan");
                 E.HasOne(e => e.cadre)
                     .WithMany(e => e.workPlace)
-                    .HasForeignKey(e => e.ID_CanBo)
+                    .HasForeignKey(e => e.ID_canbo)
                     .HasConstraintName("FK_CanBo_Congtac");
+            });
+            modelBuilder.Entity<VoterDetails>(E=>{
+                E.ToTable("ChiTietCuTri");
+                E.HasOne( e => e.voter)
+                    .WithMany(e => e.voterDetails)
+                    .HasForeignKey(e => e.ID_CuTri)
+                    .HasConstraintName("FK_ChiTiet_Cutri");
+                E.HasOne( e => e.position)
+                    .WithMany(e => e.voterDetails)
+                    .HasForeignKey(e => e.ID_ChucVu)
+                    .HasConstraintName("FK_ChiTiet_ChucVuCuTri");
+            });
+            modelBuilder.Entity<CandidateDetails>(E=>{
+                E.ToTable("ChiTietUngCuVien");
+                E.HasOne( e => e.candidate)
+                    .WithMany(e => e.candidateDetails)
+                    .HasForeignKey(e => e.ID_ucv)
+                    .HasConstraintName("FK_ChiTiet_UngCuVien");
+                E.HasOne( e => e.position)
+                    .WithMany(e => e.candidateDetails)
+                    .HasForeignKey(e => e.ID_ChucVu)
+                    .HasConstraintName("FK_ChiTiet_ChucVuUngCuVien");
+            });
+            modelBuilder.Entity<Profiles>(E=>{
+                E.ToTable("HoSoNguoiDung");
+                E.HasKey(e => e.MaSo);
+                E.Property(e => e.TrangThaiDangKy).HasDefaultValue("0");
+                E.HasOne( e => e.users)
+                    .WithMany(e => e.profile)
+                    .HasForeignKey(e => e.ID_user)
+                    .HasConstraintName("FK_hoSo_NguoiDung");
             });
         }
     }

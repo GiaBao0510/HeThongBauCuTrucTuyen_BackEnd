@@ -14,6 +14,7 @@ namespace BackEnd
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddSwaggerGen(c => {
+                c.ResolveConflictingActions(apiDescription => apiDescription.First());
                 c.SwaggerDoc("v1", new OpenApiInfo{Title="My API", Version="v1" });
                 c.OperationFilter<FileUploadService>();
             });

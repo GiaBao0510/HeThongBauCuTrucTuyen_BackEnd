@@ -11,7 +11,7 @@ namespace BackEnd.src.core.Entities
     {
         [Key]
         [DisplayName("Identify cadre")]
-       public required string ID_CanBo{set; get;}
+       public required string ID_canbo{set; get;}
        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DisplayName("Start date")]
        public DateTime NgayCongTac{set; get;}

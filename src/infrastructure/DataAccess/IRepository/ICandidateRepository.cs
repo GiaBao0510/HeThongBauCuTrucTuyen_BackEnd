@@ -25,9 +25,14 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //Thay đổi mật khẩu - ứng cử viên
         Task<int> _ChangeCandidatePassword(string id, string oldPwd, string newPwd);
         //Lấy ID người dùng dựa trên ID ứng cử viên
-        Task<string> GetIDUserBaseOnIDCuTri(string id,  MySqlConnection connection);
+        Task<string> GetIDUserBaseOnIDUngCuVien(string id,  MySqlConnection connection);
         //Lấy thông tin ứng cử viên kèm theo tài khoản
         Task<List<CandidateDto>> _GetListOfCandidatesAndAccounts();
-        
+        //Kiểm tra ứng cử viên tồn tại
+        Task<bool> _CheckCandidateExists(string ID, MySqlConnection connection);
+        //Ứng cử viên phản hồi
+        Task<bool> _CandidateSubmitReport(SendReportDto reportDto);
+        //Kiểm tra thông tin đầu vào trước khi lưu vào bảng Kết quả 
+        Task<int> _CheckInformationBeforeEnterInTableElectionResults(CandidateDto Candidate, MySqlConnection connection);
     }
 }

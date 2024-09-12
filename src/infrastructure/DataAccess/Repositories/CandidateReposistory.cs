@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.Services;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.core.Common;
+using Isopoh.Cryptography.Argon2;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -12,14 +13,45 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
     {
         private readonly DatabaseContext _context;
         private readonly CloudinaryService _cloudinaryService;
-
+        private readonly IListOfPositionRepository _listOfPositionRepository;
+        private readonly IElectionsRepository _ElectionsRepository;
+        private readonly IProfileRepository _profileRepository;
+        
         //Khởi tạo
-        public CandidateRepository(DatabaseContext context,CloudinaryService cloudinaryService): base(context, cloudinaryService){
+        public CandidateRepository(
+            DatabaseContext context,CloudinaryService cloudinaryService,
+            IListOfPositionRepository listOfPositionRepository,
+            IElectionsRepository electionsRepository,
+            IProfileRepository profileRepository
+        ): base(context, cloudinaryService){
             _context=context;
             _cloudinaryService = cloudinaryService;
+            _listOfPositionRepository = listOfPositionRepository;
+            _ElectionsRepository = electionsRepository;
+            _profileRepository = profileRepository;
         }
         //Hủy
         public new void Dispose() => _context.Dispose();
+
+
+        //-2 .Kiểm tra ID cử tri có tồn tại không
+        public async Task<bool> _CheckCandidateExists(string ID, MySqlConnection connection){
+            const string sqlCount = "SELECT COUNT(ID_ucv) FROM ungcuvien WHERE ID_ucv = @ID_ucv";
+            using(var command = new MySqlCommand(sqlCount, connection)){
+                command.Parameters.AddWithValue("@ID_ucv",ID);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                if(count < 1) return false;
+            }
+            return true;
+        }
+
+        //-1. Kiểm tra điều kiện lưu thông tin vào bảng kết quả bầu cử. (Việc này cũng nhưng việc đăng ký ứng cử viên vào vị trí ứng cử)
+        public async Task<int> _CheckInformationBeforeEnterInTableElectionResults(CandidateDto Candidate, MySqlConnection connection){
+            if(! await _listOfPositionRepository._CheckIfTheCodeIsInTheListOfPosition(Candidate.ID_Cap, connection)) return -5;
+            if(! await _ElectionsRepository._CheckIfElectionTimeExists(Candidate.ngayBD.GetValueOrDefault(), connection)) return -6;
+            return 1;
+        }
 
         //0. Lấy ID người dùng dựa trên ID ứng cử viên
         public async Task<string> GetIDUserBaseOnIDUngCuVien(string id, MySqlConnection connection){
@@ -36,7 +68,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return ID_user;
         }
 
-        //1.Thêm
+        //1.Thêm (Kèm thêm chức vụ cho ứng cử viên)
         public async Task<int> _AddCandidate(CandidateDto Candidate, IFormFile fileAnh){
             using var connect = await _context.Get_MySqlConnection();
 
@@ -45,46 +77,73 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 await connect.OpenAsync();
             
             using var transaction =await connect.BeginTransactionAsync();
+            bool transactionCommitted = false; //Kiểm tra xem đã rolleback chưa
 
             try{
+                Candidate.RoleID = 2;   //Gán vai trò mặc định khi tạo ứng cử viên
+
                 //Thêm thông tin cơ sở
                 var FillInBasicInfo = await _AddUserWithConnect(Candidate, fileAnh, connect, transaction);
                 
-                //Nếu có lỗi thì in ra
-                if(FillInBasicInfo is int result && result <=0){
-                    await transaction.RollbackAsync();
-                    return result;
+                //Kiểm tra đầu vào để đăng ký thông tin ứng cử viên vào bảng kết quả bầu cử (Nếu có lỗi thì quăng ra)
+                int CheckInputInElectionResults = await _CheckInformationBeforeEnterInTableElectionResults(Candidate, connect);
+                if(CheckInputInElectionResults < 0){
+                    return CheckInputInElectionResults;
                 }
 
+                //Nếu có lỗi thì in ra
+                if(FillInBasicInfo is int result && result <=0){
+                    return result;
+                }
                 
                 //Lấy ID người dùng vừa tạo và tạo ID ứng cử viên
                 string ID_ucv = RandomString.CreateID(),
                         ID_user = FillInBasicInfo.ToString();
 
-                //Ngược lại thêm ứng cử viên
-                const string sql = "INSERT INTO UngCuVien(ID_ucv,TrangThai,ID_user) VALUES(@ID_ucv,@TrangThai,@ID_user);";
-                using(var command = new MySqlCommand(sql, connect)){
+                //Ngược lại thêm ứng cử viên, thêm phần vào bảng kết quả bầu cử
+                const string sqlCandidate = "INSERT INTO UngCuVien(ID_ucv,TrangThai,ID_user) VALUES(@ID_ucv,@TrangThai,@ID_user);";
+                const string sqlElectionResult = @"
+                INSERT INTO ketquabaucu(SoLuotBinhChon,ThoiDiemDangKy,TyLeBinhChon,ngayBD,ID_ucv,ID_Cap) 
+                VALUES(@SoLuotBinhChon,@ThoiDiemDangKy,@TyLeBinhChon,@ngayBD,@ID_ucv,@ID_Cap);";
+                
+                using(var command = new MySqlCommand($"{sqlCandidate} {sqlElectionResult}", connect)){
                     command.Parameters.AddWithValue("@ID_ucv", ID_ucv);
                     command.Parameters.AddWithValue("@ID_user", ID_user);
                     command.Parameters.AddWithValue("@TrangThai", Candidate.TrangThai);
+                    command.Parameters.AddWithValue("@SoLuotBinhChon", 0);
+                    command.Parameters.AddWithValue("@ThoiDiemDangKy", DateTime.Now);
+                    command.Parameters.AddWithValue("@TyLeBinhChon", 0f);
+                    command.Parameters.AddWithValue("@ngayBD", Candidate.ngayBD);
+                    command.Parameters.AddWithValue("@ID_Cap", Candidate.ID_Cap);
 
                     await command.ExecuteNonQueryAsync();
                 }
 
-                await transaction.CommitAsync();
-                return 1;
-            }catch(Exception ex){
-                try{
+                //Tạo hồ sơ
+                bool AddProfile = await _profileRepository._AddProfile(ID_user, "1", connect);
+                if(!AddProfile){
+                    Console.WriteLine("Lỗi khi tạo hồ sơ cho cử tri");
                     await transaction.RollbackAsync();
-                }catch(Exception rollbackEx){
-                    // Log lỗi rollback nếu cần thiết
-                    Console.WriteLine($"Rollback Exception Message: {rollbackEx.Message}");
-                    Console.WriteLine($"Rollback Stack Trace: {rollbackEx.StackTrace}");
+                    return -100;
+                }
+
+                await transaction.CommitAsync();
+                transactionCommitted = true;
+                return 1;
+            }
+            catch(Exception ex){
+                if (!transactionCommitted){
+                    try{
+                        await transaction.RollbackAsync();
+                    }
+                    catch (Exception rollbackEx){
+                        Console.WriteLine($"Rollback Exception: {rollbackEx.Message}");
+                    }
                 }
                 // Log lỗi và ném lại exception để controller xử lý
                 Console.WriteLine($"Exception Message: {ex.Message}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                throw;
+                return -100;
             }
         }
 
@@ -161,9 +220,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 UPDATE taikhoan
                 SET taikhoan = @SDT
                 WHERE Taikhoan = @Taikhoan;";
+                const string sqlCandidate = @"UPDATE ungcuvien SET TrangThai = @TrangThai WHERE ID_ucv = @ID_ucv;";
 
-                using(var command1 = new MySqlCommand($"{sqlNguoiDung} {sqlCandidateAccount}", connection)){
+                using(var command1 = new MySqlCommand($"{sqlNguoiDung} {sqlCandidateAccount} {sqlCandidate}", connection)){
                     command1.Parameters.AddWithValue("@ID_user", ID_user);
+                    command1.Parameters.AddWithValue("@ID_ucv", IDCandidate);
+                    command1.Parameters.AddWithValue("@TrangThai", Candidate.TrangThai);
                     command1.Parameters.AddWithValue("@HoTen", Candidate.HoTen);
                     command1.Parameters.AddWithValue("@GioiTinh", Candidate.GioiTinh);
                     command1.Parameters.AddWithValue("@NgaySinh", Candidate.NgaySinh);
@@ -222,7 +284,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             
             while(await reader.ReadAsync()){
                 list.Add(new CandidateDto{
-                    ID_ucv =reader.GetString(reader.GetOrdinal("ID_ucv")), 
+                    ID_ucv =reader.GetString(reader.GetOrdinal("ID_ucv")),
+                    TrangThai =reader.GetString(reader.GetOrdinal("TrangThai")),  
                     ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
                     HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
                     GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh")),
@@ -349,7 +412,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
             const string sql = @"
             SELECT nd.ID_user,nd.HoTen,nd.GioiTinh,nd.NgaySinh,nd.DiaChiLienLac,nd.CCCD,nd.Email,nd.SDT,
-            nd.HinhAnh,nd.PublicID,nd.ID_DanToc,nd.RoleID, ct.ID_ucv 
+            nd.HinhAnh,nd.PublicID,nd.ID_DanToc,nd.RoleID, ct.ID_ucv, ct.TrangThai 
             ,tk.TaiKhoan,tk.MatKhau,tk.BiKhoa,tk.LyDoKhoa,tk.NgayTao,tk.SuDung,tk.RoleID 
             FROM nguoidung nd 
             INNER JOIN taikhoan tk ON tk.TaiKhoan = nd.SDT 
@@ -360,6 +423,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             while(await reader.ReadAsync()){
                 list.Add(new CandidateDto{
                     ID_ucv = reader.GetString(reader.GetOrdinal("ID_ucv")),
+                    TrangThai = reader.GetString(reader.GetOrdinal("TrangThai")),
                     ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
                     HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
                     GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh")),
@@ -383,6 +447,45 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return list;
         }
 
+        //9. ứng cử viên phản hồi
+        public async Task<bool> _CandidateSubmitReport(SendReportDto reportDto){
+            using var connect = await _context.Get_MySqlConnection();
+            using var transaction =await connect.BeginTransactionAsync();
 
+            try{
+                //Kiểm tra cử tri có tồn tại hay không
+                bool CheckExists = await _CheckCandidateExists(reportDto.IDSender, connect);
+                if(!CheckExists) return false;
+
+                //Gửi báo cáo
+                const string sqlSend = @"INSERT INTO phanhoiungcuvien(ID_ucv,ThoiDiem,Ykien) 
+                VALUES(@ID_ucv,@ThoiDiem,@Ykien);";
+
+                using(var command = new MySqlCommand(sqlSend, connect)){
+                    command.Parameters.AddWithValue("@ID_ucv", reportDto.IDSender);
+                    command.Parameters.AddWithValue("@ThoiDiem", reportDto.ThoiDiem);
+                    command.Parameters.AddWithValue("@Ykien", reportDto.YKien);
+                    
+                    await command.ExecuteNonQueryAsync();
+                }
+                await transaction.CommitAsync();
+                return true;
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error in mySQL Message: {ex.Message}");
+                Console.WriteLine($"Error in mySQL StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error in mySQL Code: {ex.Code}");
+
+                await transaction.RollbackAsync();
+                return false;
+            }catch(Exception ex){
+                Console.WriteLine($"Error in mySQL Message: {ex.Message}");
+                Console.WriteLine($"Error in mySQL StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error in mySQL TargetSite: {ex.TargetSite}");
+
+                await transaction.RollbackAsync();
+                return false;
+            }
+        }
     }
 }

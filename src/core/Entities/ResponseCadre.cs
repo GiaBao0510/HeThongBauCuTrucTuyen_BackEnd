@@ -20,8 +20,8 @@ namespace BackEnd.src.core.Entities
         public DateTime ThoiDiem { get; set; } = DateTime.Now;
         
         //Khóa ngoại
-        public string? ID_CanBo { set; get; }
-        [ForeignKey("ID_CanBo")]
+        public string? ID_canbo { set; get; }
+        [ForeignKey("ID_canbo")]
         public Cadre Cadre  { set; get; }
     }
 }

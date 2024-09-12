@@ -1,20 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
-using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using BackEnd.src.web_api.DTOs;
-using BCrypt.Net;
-using System.Data;
-using System.Security.Cryptography;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.Services;
 using BackEnd.src.core.Common;
-using BackEnd.src.core.Entities;
 using Isopoh.Cryptography.Argon2;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
@@ -23,14 +13,31 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
     {
         private readonly DatabaseContext _context;
         private readonly CloudinaryService _cloudinaryService;
+        private readonly IProfileRepository _profileRepository;
 
         //Khởi tạo
-        public VoterReposistory(DatabaseContext context,CloudinaryService cloudinaryService): base(context, cloudinaryService){
+        public VoterReposistory(
+            DatabaseContext context,CloudinaryService cloudinaryService,
+            IProfileRepository profileRepository
+        ): base(context, cloudinaryService){
             _context=context;
             _cloudinaryService = cloudinaryService;
+            _profileRepository = profileRepository;
         }
         //Hủy
         public new void Dispose() => _context.Dispose();
+
+        //-1 .Kiểm tra ID cử tri có tồn tại không
+        public async Task<bool> _CheckVoterExists(string ID, MySqlConnection connection){
+            const string sqlCount = "SELECT COUNT(ID_CuTri) FROM cutri WHERE ID_CuTri = @ID_CuTri";
+            using(var command = new MySqlCommand(sqlCount, connection)){
+                command.Parameters.AddWithValue("@ID_CuTri",ID);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                if(count < 1) return false;
+            }
+            return true;
+        }
 
         //0. Lấy ID người dùng dựa trên ID cử tri
         public async Task<string> GetIDUserBaseOnIDCuTri(string id, MySqlConnection connection){
@@ -58,6 +65,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             using var transaction =await connect.BeginTransactionAsync();
 
             try{
+                voter.RoleID = 5;   //Gán vai trò mặc định khi tạo cử tri
+
                 //Thêm thông tin cơ sở
                 var FillInBasicInfo = await _AddUserWithConnect(voter, fileAnh, connect, transaction);
                 
@@ -66,7 +75,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     await transaction.RollbackAsync();
                     return result;
                 }
-
                 
                 //Lấy ID người dùng vừa tạo và tạo ID cử tri
                 string ID_cutri = RandomString.CreateID(),
@@ -79,6 +87,14 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command.Parameters.AddWithValue("@ID_user", ID_user);
 
                     await command.ExecuteNonQueryAsync();
+                }
+
+                //Tạo hồ sơ
+                bool AddProfile = await _profileRepository._AddProfile(ID_user, "0", connect);
+                if(!AddProfile){
+                    Console.WriteLine("Lỗi khi tạo hồ sơ cho cử tri");
+                    await transaction.RollbackAsync();
+                    return -100;
                 }
 
                 await transaction.CommitAsync();
@@ -393,5 +409,45 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return list;
         }
 
+        //9. Gửi báo cáo
+        public async Task<bool> _VoterSubmitReport(SendReportDto reportDto){
+            using var connect = await _context.Get_MySqlConnection();
+            using var transaction =await connect.BeginTransactionAsync();
+
+            try{
+                //Kiểm tra cử tri có tồn tại hay không
+                bool CheckExists = await _CheckVoterExists(reportDto.IDSender, connect);
+                if(!CheckExists) return false;
+
+                //Gửi báo cáo
+                const string sqlSend = @"INSERT INTO phanhoicutri(ID_CuTri,ThoiDiem,Ykien) 
+                VALUES(@ID_CuTri,@ThoiDiem,@Ykien);";
+
+                using(var command = new MySqlCommand(sqlSend, connect)){
+                    command.Parameters.AddWithValue("@ID_CuTri", reportDto.IDSender);
+                    command.Parameters.AddWithValue("@ThoiDiem", reportDto.ThoiDiem);
+                    command.Parameters.AddWithValue("@Ykien", reportDto.YKien);
+                    
+                    await command.ExecuteNonQueryAsync();
+                }
+                await transaction.CommitAsync();
+                return true;
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error in mySQL Message: {ex.Message}");
+                Console.WriteLine($"Error in mySQL StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error in mySQL Code: {ex.Code}");
+
+                await transaction.RollbackAsync();
+                return false;
+            }catch(Exception ex){
+                Console.WriteLine($"Error in mySQL Message: {ex.Message}");
+                Console.WriteLine($"Error in mySQL StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error in mySQL TargetSite: {ex.TargetSite}");
+
+                await transaction.RollbackAsync();
+                return false;
+            }
+        }
     }
 }

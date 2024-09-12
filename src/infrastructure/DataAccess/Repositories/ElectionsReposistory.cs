@@ -124,5 +124,17 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             int rowAffected = await command.ExecuteNonQueryAsync();
             return rowAffected > 0;
         }
+
+        //Kiểm tra xem ngày bầu cử có tồn tại không
+        public async Task<bool> _CheckIfElectionTimeExists(DateTime ngayBD, MySqlConnection connection){
+            
+            const string sql = "SELECT COUNT(ngayBD) FROM kybaucu WHERE ngayBD=@ngayBD;";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            }
+        }
     }
 }

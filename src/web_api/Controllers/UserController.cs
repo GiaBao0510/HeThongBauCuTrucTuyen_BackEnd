@@ -10,7 +10,7 @@ using BackEnd.src.core.Entities;
 
 namespace BackEnd.src.web_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/admin/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -300,7 +300,7 @@ namespace BackEnd.src.web_api.Controllers
         }
 
         //Chỉnh sửa ảnh của người dùng thông qua ID_user
-        [HttpPut("ChangeUserImage/{id}")]
+        [HttpPut("ChangeUserImage/{id}")] 
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> EditUserImageByID(string id,[FromForm]  IFormFile fileAnh){
             try{
