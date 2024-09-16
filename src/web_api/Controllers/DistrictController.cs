@@ -14,6 +14,7 @@ using BackEnd.src.infrastructure.DataAccess.Repositories;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.web_api.DTOs;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 {
@@ -45,6 +46,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 
         //Thêm
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateDistrict([FromBody] DistrictDto District){
             try{
                 //Kiểm tra đầu vào
@@ -76,6 +78,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetDistrictBy_ID(string id){
             try{
                 var District = await _districtReposistory._GetDistrictBy_ID(id);
@@ -100,6 +103,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> EditDistrictBy_ID(string id, DistrictDto District){
             try{
                 if(District == null || string.IsNullOrEmpty(District.TenQH))
@@ -130,6 +134,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 
         //xóa
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteDistrictBy_ID(string id){
             try{
                 var result = await _districtReposistory._DeleteDistrictBy_ID(id);
@@ -154,6 +159,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
         //Lấy theo danh sách quận huyên theo STT 
         [HttpGet]
         [Route("byTinhThanh")]
+        [Authorize]
         public async Task<IActionResult> GetListOfDistrictBy_STT([FromQuery] string stt){
             try{
                 var District = await _districtReposistory._GetListOfDistrictBy_STT(stt);

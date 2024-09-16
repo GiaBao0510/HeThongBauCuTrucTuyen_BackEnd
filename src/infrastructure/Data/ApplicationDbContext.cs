@@ -53,13 +53,13 @@ namespace BackEnd.src.infrastructure.Data
         public DbSet<VoterDetails> VoterDetails{get;set;}
         public DbSet<CandidateDetails> CandidateDetails{get;set;}
         public DbSet<Profiles> Profiles{get;set;}
+        public DbSet<RefreshToken> RefreshTokens{get;set;}
         #endregion
 
         /*
             Sử dụng các API thích hợp để định nghĩa ra mối quan hệ giữa các bảng
         Cần nạp chồng OnModelCreating của lớp DbContext.
         */
-        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

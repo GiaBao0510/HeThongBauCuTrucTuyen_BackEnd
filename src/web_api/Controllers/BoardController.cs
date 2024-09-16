@@ -2,6 +2,8 @@ using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Caching.Memory;
 
 
 namespace BackEnd.src.web_api.Controllers
@@ -17,6 +19,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Liệt kê
         [HttpGet]
+        [Authorize(Roles = new []{"1","2","3","4","5"})]
         public async Task<IActionResult> GetListOfBoard(){
             try{
                 var result = await _boardReposistory._GetListOfBoard();
@@ -45,6 +48,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Thêm
         [HttpPost]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> CreateBoard([FromBody] Board Board){
             try{
                 //Kiểm tra đầu vào
@@ -79,6 +83,7 @@ namespace BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("{id}")]
+        [Authorize(Roles = new []{"1","2","3","4","5"})]
         public async Task<IActionResult> GetBoardBy_ID(string id){
             try{
                 var Board = await _boardReposistory._GetBoardBy_ID(id);
@@ -106,6 +111,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("{id}")]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> EditBoardBy_ID(string id, Board Board){
             try{
                 if(Board == null || string.IsNullOrEmpty(Board.TenBan))
@@ -139,6 +145,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //xóa
         [HttpDelete("{id}")]
+        [Authorize(Roles ="1")]
         public async Task<IActionResult> DeleteBoardBy_ID(string id){
             try{
                 var result = await _boardReposistory._DeleteBoardBy_ID(id);

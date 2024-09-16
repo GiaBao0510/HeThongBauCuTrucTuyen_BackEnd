@@ -2,6 +2,7 @@
 
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackEnd.src.web_api.Controllers
@@ -17,6 +18,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //1.Cập nhật hồ sơ người dùng
         [HttpPut("UpdateProfileByIdUser/{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateProfileBy_IdUser([FromBody]ProfileDto profileDto, string id){
             try{
                 var result = await _profileRepository._UpdateProfileBy_IdUser(profileDto,id);
@@ -41,6 +43,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //2. Cập nhật hố sơ người dùng - mã hồ sơ
         [HttpPut("UpdateProfileByProfileCode/{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateProfileBy_ProfileCode([FromBody]ProfileDto profileDto, string id){
             try{
                 var result = await _profileRepository._UpdateProfileBy_ProfileCode(profileDto,id);
@@ -65,6 +68,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //3.Lấy danh sách người dùng đã đăng ký
         [HttpGet("ListRegisteredProfiles")]
+        [Authorize]
         public async Task<IActionResult> GetListRegisteredProfiles(){
             try{
                 var result = await _profileRepository._GetListRegisteredProfiles();
@@ -88,6 +92,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //4.Lấy danh sách người dùng chưa đăng ký
         [HttpGet("ListUnregisteredProfiles")]
+        [Authorize]
         public async Task<IActionResult> GetListUnregisteredProfiles(){
             try{
                 var result = await _profileRepository._GetListUnregisteredProfiles();
@@ -111,6 +116,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //5.Lấy danh sách hồ sơ
         [HttpGet("ListProfiles")]
+        [Authorize]
         public async Task<IActionResult> GetListProfiles(){
             try{
                 var result = await _profileRepository._GetListProfiles();
@@ -134,6 +140,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //6.Lấy danh sách cử tri đã đăng ký tài khoản
         [HttpGet("ListRegisteredVoters")]
+        [Authorize]
         public async Task<IActionResult> GetListRegisteredVoter(){
             try{
                 var result = await _profileRepository._GetListRegisteredVoter();
@@ -157,6 +164,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //7.Lấy danh sách cử tri chưa đăng ký tài khoản
         [HttpGet("ListUnregisteredVoters")]
+        [Authorize]
         public async Task<IActionResult> GetListUnregisteredVoter(){
             try{
                 var result = await _profileRepository._GetListUnregisteredVoter();
@@ -180,6 +188,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //8. Xóa hồ sơ dựa trên ID_người dùng
         [HttpDelete("DeleteProfileByUserId/{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteProfileBy_Id_user(string id){
             try{
                 var result = await _profileRepository._DeleteProfileBy_Id_user(id);
@@ -203,6 +212,8 @@ namespace BackEnd.src.web_api.Controllers
         }
 
         //9. Xóa hồ sơ dựa trên Mã hồ sơ
+        [HttpDelete("DeleteProfileByProfileCode/{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteProfileBy_ProfileCode(string id){
             try{
                 var result = await _profileRepository._DeleteProfileBy_ProfileCode(id);
@@ -226,6 +237,8 @@ namespace BackEnd.src.web_api.Controllers
         }
 
         //10.  Xóa hồ sơ dựa trên ID_cử tri
+        [HttpDelete("DeleteProfileByIdVoter/{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteProfileBy_ID_cutri(string id){
             try{
                 var result = await _profileRepository._DeleteProfileBy_ID_cutri(id);
@@ -249,6 +262,8 @@ namespace BackEnd.src.web_api.Controllers
         }
 
         //11. Xóa hồ sơ dựa trên ID_Cán bộ
+        [Authorize]
+        [HttpDelete("DeleteProfileByIdCadre/{id}")]
         public async Task<IActionResult> DeleteProfileBy_ID_canbo(string id){
             try{
                 var result = await _profileRepository._DeleteProfileBy_ID_canbo(id);
@@ -272,6 +287,8 @@ namespace BackEnd.src.web_api.Controllers
         }
 
         //12. Xóa hồ sơ dựa trên ID_ứng cử viên
+        [HttpDelete("DeleteProfileByIdCandidate/{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteProfileBy_ID_ungcuvien(string id){
             try{
                 var result = await _profileRepository._DeleteProfileBy_ID_ungcuvien(id);

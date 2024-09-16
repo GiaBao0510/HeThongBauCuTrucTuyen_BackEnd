@@ -3,6 +3,7 @@ using BackEnd.src.infrastructure.DataAccess.Repositories;
 using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -18,6 +19,7 @@ namespace BackEnd.src.web_api.Controllers
         //1.Thêm
         [HttpPost]
         [Consumes("multipart/form-data")]
+        [Authorize]
         public async Task<IActionResult> CreateVouter([FromForm] VoterDto vouter,  IFormFile fileAnh){
             try{
                 //Kiểm tra đầu vào
@@ -58,6 +60,7 @@ namespace BackEnd.src.web_api.Controllers
         //2.Lấy all cử tri
         [HttpGet]
         [Route("allVoter")]
+        [Authorize]
         public async Task<IActionResult> GetListOfVouter(){
             try{
                 var result = await _voterReposistory._GetListOfVoter();
@@ -78,6 +81,7 @@ namespace BackEnd.src.web_api.Controllers
         //3.Lấy all cử tri - account
         [HttpGet]
         [Route("allVoterAndAccount")]
+        [Authorize]
         public async Task<IActionResult> GetListOfVotersAndAccounts(){
             try{
                 var result = await _voterReposistory._GetListOfVotersAndAccounts();
@@ -97,6 +101,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //4.Lấy theo ID
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetVoterBy_ID(string id){
             try{
                 var District = await _voterReposistory._GetVoterBy_ID(id);
@@ -121,6 +126,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //5.Sửa
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> EditVoterBy_ID(string id,[FromBody] VoterDto cutri){
             try{
                 if(cutri == null || string.IsNullOrEmpty(cutri.HoTen))
@@ -173,6 +179,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //6.xóa
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteVoterBy_ID(string id){
             try{
                 var result = await _voterReposistory._DeleteVoterBy_ID(id);
@@ -196,6 +203,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //7. Đặt lại mật khẩu admin
         [HttpPut("SetVoterPwd/{id}")]
+        [Authorize]
         public async Task<IActionResult> SetVoterPassword(string id,[FromBody] SetPasswordDto setPasswordDto){
             try{
                 if(string.IsNullOrEmpty(setPasswordDto.newPwd) )
@@ -219,6 +227,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //8. thay đổi mật khẩu cử tri
         [HttpPut("ChangeVoterPwd/{id}")]
+        [Authorize]
         public async Task<IActionResult> ChangeVoterPassword(string id,[FromBody] SetPasswordDto setPasswordDto){
             try{
                 if(string.IsNullOrEmpty(setPasswordDto.newPwd) || string.IsNullOrEmpty(setPasswordDto.oldPwd) )
@@ -254,6 +263,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //9. Gửi báo cáo
         [HttpPost("sendReport")]
+        [Authorize]
         public async Task<IActionResult> VoterSubmitReport([FromBody] SendReportDto sendReportDto){
             try{
                 //Kiểm tra đầu vào

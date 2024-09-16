@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -17,8 +19,11 @@ namespace BackEnd.src.web_api.Controllers
 
         //Liệt kê
         [HttpGet]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> GetListOfPosition(){
             try{
+                var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+                Console.WriteLine($"User Role: {userRole}");
                 var result = await _positionReposistory._GetListOfPosition();
                 return Ok(new{
                     Status = "Ok",
@@ -35,6 +40,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Thêm
         [HttpPost]
+        [Authorize(Roles="1")]
         public async Task<IActionResult> CreatePosition([FromBody] Position Position){
             try{
                 //Kiểm tra đầu vào
@@ -66,6 +72,7 @@ namespace BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("{id}")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> GetPositionBy_ID(string id){
             try{
                 var Position = await _positionReposistory._GetPositionBy_ID(id);
@@ -90,6 +97,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("{id}")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> EditPositionBy_ID(string id, Position Position){
             try{
                 if(Position == null || string.IsNullOrEmpty(Position.TenChucVu))
@@ -120,6 +128,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //xóa
         [HttpDelete("{id}")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> DeletePositionBy_ID(string id){
             try{
                 var result = await _positionReposistory._DeletePositionBy_ID(id);

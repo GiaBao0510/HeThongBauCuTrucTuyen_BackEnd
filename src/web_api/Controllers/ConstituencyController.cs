@@ -2,6 +2,7 @@ using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 {
@@ -16,6 +17,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 
         //Liệt kê
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetListOfConstituency(){
             try{
                 var result = await _constituencyReposistory._GetListOfConstituency();
@@ -34,6 +36,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 
         //Thêm
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateConstituency([FromBody] Constituency Constituency){
             try{
                 //Kiểm tra đầu vào
@@ -65,6 +68,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetConstituencyBy_ID(string id){
             try{
                 var Constituency = await _constituencyReposistory._GetConstituencyBy_ID(id);
@@ -89,6 +93,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> EditConstituencyBy_ID(string id, Constituency Constituency){
             try{
                 if(Constituency == null || string.IsNullOrEmpty(Constituency.TenDonViBauCu))
@@ -119,6 +124,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
 
         //xóa
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteConstituencyBy_ID(string id){
             try{
                 var result = await _constituencyReposistory._DeleteConstituencyBy_ID(id);

@@ -57,6 +57,7 @@ namespace BackEnd.src.core.Entities
         public virtual ICollection<TemporaryAddress> temporaryAddress{set; get;}
         public virtual ICollection<PermanentAddress> permanentAddress{set; get;}
         public virtual ICollection<Profiles> profile {set; get;}
+        public virtual ICollection<RefreshToken> refreshToken {set; get;}
 
         //Cho các lớp truy xuất ngược trả về mảng rỗng khi mảng rỗng
         public Users(){
@@ -66,6 +67,7 @@ namespace BackEnd.src.core.Entities
             temporaryAddress = new List<TemporaryAddress>();
             permanentAddress = new List<PermanentAddress>();
             profile = new List<Profiles>();
+            refreshToken = new List<RefreshToken>();
         }
     }
 }

@@ -30,6 +30,9 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _CheckVoterExists(string ID, MySqlConnection connection);
         //Cử tri phản hồi
         Task<bool> _VoterSubmitReport(SendReportDto reportDto);
+        //Cử tri đảm nhận chức vụ gì
+        //Thêm cử tri vào cuộc bầu cử (Cử tri có thể tham gia vào những cuộc bầu cử nào)
+        
         //Cử tri bỏ phiếu
         //Cử tri muốn xác thực lại phiếu đã bỏ trong thời gian bỏ, nhưng không
     }

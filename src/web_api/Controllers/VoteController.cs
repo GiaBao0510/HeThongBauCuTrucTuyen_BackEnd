@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.web_api.DTOs;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -17,6 +18,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Liệt kê
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetListOfVote(){
             try{
                 var result = await _voteReposistory._GetListOfVote();
@@ -46,6 +48,7 @@ namespace BackEnd.src.web_api.Controllers
         //Thêm phiếu bởi số lượng
         [HttpPost]
         [Route("add-vote-by-number")]
+        [Authorize]
         public async Task<IActionResult> CreateVoteByNumber([FromQuery] int number,[FromBody] VoteDto Vote){
             try{
                 //Kiểm tra number
@@ -87,6 +90,7 @@ namespace BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("get-by-id/{id}")]
+        [Authorize]
         public async Task<IActionResult> GetVoteBy_ID(string id){
             try{
                 var Vote = await _voteReposistory._GetVoteBy_ID(id);
@@ -114,6 +118,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Lấy theo ID
         [HttpGet("get-by-time/{time}")]
+        [Authorize]
         public async Task<IActionResult> GetVoteBy_Time(string time){
             try{
                 var Vote = await _voteReposistory._GetVoteBy_Time(time);
@@ -141,6 +146,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("get-by-id/{id}")]
+        [Authorize]
         public async Task<IActionResult> EditVoteBy_ID(string id, VoteDto Vote){
             try{
                 if(Vote == null || string.IsNullOrEmpty(Vote.ngayBD.ToString()))
@@ -174,6 +180,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //xóa
         [HttpDelete("delete-by-id/{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteVoteBy_ID(string id){
             try{
                 var result = await _voteReposistory._DeleteVoteBy_ID(id);
@@ -200,6 +207,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //xóa dựa trên thời điểm
         [HttpDelete("delete-by-time/{thoidiem}")]
+        [Authorize]
         public async Task<IActionResult> DeleteVoteBy_Time(string thoidiem){
             try{
                 var result = await _voteReposistory._DeleteVoteBy_Time(thoidiem);

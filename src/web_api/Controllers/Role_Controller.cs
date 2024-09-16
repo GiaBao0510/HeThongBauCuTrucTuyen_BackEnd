@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -15,6 +16,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Liêt kê
         [HttpGet]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> GetListOfRole(){
             try{
                 var roles = await _roleResposistory._GetListOfRoles();
@@ -35,6 +37,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Thêm
         [HttpPost]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> CreateRole([FromBody] Roles role){
             try{
                 //Kiểm tra đầu vào
@@ -57,6 +60,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //lấy theo ID
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetRoleBy_ID(string id){
             try{
                 var role = await _roleResposistory._GetRoleBy_ID(id);
@@ -81,6 +85,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> EditRoleBy_ID(string id, [FromBody] Roles role){
             try{
                 if(role == null || string.IsNullOrEmpty(role.TenVaiTro))
@@ -108,6 +113,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //xóa 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteRoleBy_ID(string id){
             try{
                 var result = await _roleResposistory._DeleteRoleBy_ID(id);

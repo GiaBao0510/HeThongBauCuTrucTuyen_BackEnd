@@ -21,6 +21,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Context
             _appconfig = appConfig;
         }
 
+        public MySqlConnection CreateConnection(){
+            return new MySqlConnection(_appconfig.GetMySQLConnectionString());
+        }
+
         //Kết nối với MySQL
         public async Task<MySqlConnection> Get_MySqlConnection(){
             

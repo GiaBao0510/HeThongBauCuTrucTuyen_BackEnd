@@ -7,8 +7,9 @@ namespace BackEnd.src.web_api.DTOs
     public class LoginDto
     {
         [Required]
-        public required string account{set; get;}
+        public string account{set; get;}
         [Required]
-        public required string password {set; get;}
+        public string password {set; get;}
+        public string? Role{set; get; }
     }
 }

@@ -2,6 +2,7 @@ using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -16,6 +17,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Liệt kê
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetListOfElections(){
             try{
                 var result = await _electionsReposistory._GetListOfElections();
@@ -37,6 +39,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Thêm
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateElections([FromBody] Elections Elections){
             try{
                 //Kiểm tra đầu vào
@@ -71,6 +74,7 @@ namespace BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetElectionsBy_ID(string id){
             try{
                 var Elections = await _electionsReposistory._GetElectionsBy_ID(id);
@@ -98,6 +102,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> EditElectionsBy_ID(string id, Elections Elections){
             try{
                 if(Elections == null || string.IsNullOrEmpty(Elections.TenKyBauCu))
@@ -131,6 +136,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //xóa
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteElectionsBy_ID(string id){
             try{
                 var result = await _electionsReposistory._DeleteElectionsBy_ID(id);

@@ -7,6 +7,7 @@ using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
 using BackEnd.src.core.Entities;
+using BackEnd.src.core.Models;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -58,8 +59,8 @@ namespace BackEnd.src.web_api.Controllers
                     Message = "Thêm tài khoản người dùng thành công"
                 });
             }catch(Exception ex){
-                return StatusCode(500, new{
-                    Status = "False", 
+                return StatusCode(500, new ApiRespons{
+                    Success = false, 
                     Message = $"Lỗi khi thực hiện thêm tài khoản Người dùng: {ex.Message}"
                 });
             }

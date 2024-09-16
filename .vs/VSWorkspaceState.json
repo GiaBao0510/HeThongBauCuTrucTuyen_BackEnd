@@ -1,9 +1,8 @@
 {
   "ExpandedNodes": [
-    "",
     "\\src",
-    "\\src\\core"
+    "\\src\\core",
+    "\\src\\core\\Entities"
   ],
-  "SelectedNode": "\\src\\core\\Entities",
   "PreviewInSolutionExplorer": false
 }
