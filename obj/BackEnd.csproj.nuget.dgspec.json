@@ -84,6 +84,10 @@
               "target": "Package",
               "version": "[1.0.5, )"
             },
+            "MailKit": {
+              "target": "Package",
+              "version": "[4.7.1.1, )"
+            },
             "Microsoft.AspNetCore.Authentication.Cookies": {
               "target": "Package",
               "version": "[2.2.0, )"
@@ -187,6 +191,10 @@
             "Microsoft.OpenApi": {
               "target": "Package",
               "version": "[1.6.18, )"
+            },
+            "MimeKit": {
+              "target": "Package",
+              "version": "[4.7.1, )"
             },
             "MySql.Data": {
               "target": "Package",

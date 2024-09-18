@@ -19,7 +19,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Liệt kê
         [HttpGet]
-        [Authorize(Roles = new []{"1","2","3","4","5"})]
+        [Authorize(Roles ="1,2,3,4,5")]
         public async Task<IActionResult> GetListOfBoard(){
             try{
                 var result = await _boardReposistory._GetListOfBoard();
@@ -83,7 +83,7 @@ namespace BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("{id}")]
-        [Authorize(Roles = new []{"1","2","3","4","5"})]
+        [Authorize(Roles = "1,2,3,4,5")]
         public async Task<IActionResult> GetBoardBy_ID(string id){
             try{
                 var Board = await _boardReposistory._GetBoardBy_ID(id);

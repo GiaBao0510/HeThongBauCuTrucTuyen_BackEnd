@@ -22,6 +22,9 @@ namespace BackEnd.core.Entities
         [StringLength(255)]
         [DisplayName("Description")]
         public string MoTa { get; set; } = "";
+        public int SoLuongToiDaCuTri { get; set; } = 0;
+        public int SoLuongToiDaUngCuVien { get; set; } = 0;
+        public int SoLuotBinhChonToiDa { get; set; } = 0;
 
         //Truy xuất ngược
         public virtual ICollection<Vote> vote{set;get;}

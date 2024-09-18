@@ -60,7 +60,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //lấy theo ID
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> GetRoleBy_ID(string id){
             try{
                 var role = await _roleResposistory._GetRoleBy_ID(id);
@@ -85,7 +85,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> EditRoleBy_ID(string id, [FromBody] Roles role){
             try{
                 if(role == null || string.IsNullOrEmpty(role.TenVaiTro))
@@ -113,7 +113,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //xóa 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> DeleteRoleBy_ID(string id){
             try{
                 var result = await _roleResposistory._DeleteRoleBy_ID(id);

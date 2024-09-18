@@ -19,7 +19,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //1. Liệt kê các ID ở bảng hoạt động
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> GetWorkplaces(){
             try{
                 var result = await _IWorkPlaceRepository._GetWorkplaces();
@@ -39,7 +39,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //1. Liệt kê các ID ở bảng hoạt động
         [HttpGet("Details")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> GetListOfCadre(){
             try{
                 var result = await _IWorkPlaceRepository._GetWorkplacesDetail();
@@ -59,7 +59,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //3. Thêm
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> AddDataToTheWorkplace([FromBody] WorkPlace workplace){
             try{
                 var result = await _IWorkPlaceRepository._AddDataToTheWorkplace(workplace);
@@ -89,7 +89,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //4. Cập nhật dữ liệu nơi công tác- mã cán bộ
         [HttpPut("ChangeTheBoardWhereCadreWork")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> UpdateWorkplaceBy_IDcadre([FromBody] WorkPlaceDto workPlace){
             try{
                 if(string.IsNullOrEmpty(workPlace.ID_canbo) || string.IsNullOrEmpty(workPlace.ID_Ban.ToString())){
@@ -111,7 +111,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //5. Cập nhật dữ liệu nơi công tác- mã chức vụ
         [HttpPut("ChangeTheWorkplaceByPosition")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> UpdateWorkplaceBy_IDposition([FromBody] WorkPlaceDto workPlace){
             try{
                 if(string.IsNullOrEmpty(workPlace.ID_ChucVu.ToString()) || string.IsNullOrEmpty(workPlace.ID_Ban.ToString())){
@@ -133,7 +133,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //6. Cập nhật dữ liệu chức vụ theo mã ban
         [HttpPut("ChangeThePositionByWorkplace")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> _UpdateWorkplaceBy_IDboard([FromBody] WorkPlaceDto workPlace){
             try{
                 if(string.IsNullOrEmpty(workPlace.ID_ChucVu.ToString()) || string.IsNullOrEmpty(workPlace.ID_Ban.ToString())){
@@ -155,7 +155,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //7. Xóa dữ liệu nơi công tác theo mã cán bộ
         [HttpDelete("DeleteByCadre/{id}")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> DeleteWorkplaceBy_IDcadre(string id){
             try{
                 var result = await _IWorkPlaceRepository._DeleteWorkplaceBy_IDcadre(id);
@@ -173,7 +173,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //8. Xóa dữ liệu nơi công tác theo mã chức vụ
         [HttpDelete("DeleteByPosition/{id}")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> DeleteWorkplaceBy_IDposition(string id){
             try{
                 var result = await _IWorkPlaceRepository._DeleteWorkplaceBy_IDposition( Convert.ToInt32( id));
@@ -191,7 +191,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //9. Xóa dữ liệu nơi công tác theo mã ban
         [HttpDelete("DeleteByBoard/{id}")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> DeleteWorkplaceBy_IDboard(string id){
             try{
                 var result = await _IWorkPlaceRepository._DeleteWorkplaceBy_IDboard( Convert.ToInt32( id));
@@ -209,7 +209,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //10. Đặt lại ban mà cán bộ đã làm việc theo -ID cán bộ
         [HttpPut("SetPositionForCadre")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> SetPositionForCadre([FromBody] WorkPlaceDto workPlace){
             try{
                 if(string.IsNullOrEmpty(workPlace.ID_canbo) || string.IsNullOrEmpty(workPlace.ID_ChucVu.ToString())){
@@ -231,7 +231,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //11. Đặt lại phòng ban làm việc cho cán bộ
         [HttpPut("SetTheOfficeForCadre")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> SetTheOfficeForCadre([FromBody] WorkPlaceDto workPlace){
             try{
                 if(string.IsNullOrEmpty(workPlace.ID_canbo) || string.IsNullOrEmpty(workPlace.ID_Ban.ToString())){

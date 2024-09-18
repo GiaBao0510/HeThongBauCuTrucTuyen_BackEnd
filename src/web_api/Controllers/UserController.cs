@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
 using BackEnd.src.core.Entities;
 using BackEnd.src.core.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -35,6 +36,7 @@ namespace BackEnd.src.web_api.Controllers
         [HttpPost]
         [Route("add-user")]
         [Consumes("multipart/form-data")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> CreateUser([FromForm] UserDto User, IFormFile fileAnh){
             try{
                 if(!ModelState.IsValid)
@@ -59,6 +61,10 @@ namespace BackEnd.src.web_api.Controllers
                     Message = "Thêm tài khoản người dùng thành công"
                 });
             }catch(Exception ex){
+                Console.WriteLine($"Error Message: {ex.Message}");
+                Console.WriteLine($"Error Data: {ex.Data}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
                 return StatusCode(500, new ApiRespons{
                     Success = false, 
                     Message = $"Lỗi khi thực hiện thêm tài khoản Người dùng: {ex.Message}"
@@ -69,6 +75,7 @@ namespace BackEnd.src.web_api.Controllers
         //Lấy all người dùng
         [HttpGet]
         [Route("AllUser")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> GetListOfUsers(){
             try{
                 if(!_cache.TryGetValue("AllUsers", out List<Users> result)){
@@ -97,6 +104,7 @@ namespace BackEnd.src.web_api.Controllers
         //Lấy all người dùng - tài khoản
         [HttpGet]
         [Route("AllUserAndAccount")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> GetListOfUsersAndAccounts(){
             try{
                 if(!_cache.TryGetValue("AllUsersAndAccounts", out List<UserDto> result)){
@@ -124,6 +132,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Lấy all người dùng theo role - admin, cử tri, cán bộ
         [HttpGet("ListUserRole/{id}")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> GetListOfUsersWithRole(string id){
             try{
                 var result = await _userRepository._GetListOfUsersWithRole(int.Parse(id));
@@ -145,6 +154,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Lấy thông tin người dùng theo ID -admin, user
         [HttpGet("user{id}")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> GetVouterBy_ID(string id){
             try{
                 var District = await _userRepository._GetUserBy_ID(id);
@@ -172,6 +182,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Sửa - admin
         [HttpPut("EditUserForAdmin/{id}")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> EditUserBy_ID_ForAdmin(string id,[FromBody] UserDto user){
             try{
                 if(user == null || string.IsNullOrEmpty(user.HoTen))
@@ -212,6 +223,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Cập nhật Pwd người dùng dựa trên ID người dùng - admin
         [HttpPut("SetUserPwd/{id}")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> SetUserPassword(string id,[FromBody] SetPasswordDto setPasswordDto){
             try{
                 if(string.IsNullOrEmpty(setPasswordDto.newPwd) )
@@ -238,6 +250,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Cập nhật Pwd người dùng dựa trên ID người dùng - người dùng: cử tri, cán bộ, ứng cử viên
         [HttpPut("ChangeUserPwd/{id}")]
+        [Authorize(Roles= "1,2,5,8")]
         public async Task<IActionResult> ChangeUserPassword(string id,[FromBody] SetPasswordDto setPasswordDto){
             try{
                 if(string.IsNullOrEmpty(setPasswordDto.newPwd) || string.IsNullOrEmpty(setPasswordDto.oldPwd))
@@ -279,6 +292,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Xóa người dùng theo ID người dùng
         [HttpDelete("{id}")]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> DeleteUserBy_ID(string id){
             try{
                 var result = await _userRepository._DeleteUserBy_ID(id);
@@ -303,7 +317,8 @@ namespace BackEnd.src.web_api.Controllers
         //Chỉnh sửa ảnh của người dùng thông qua ID_user
         [HttpPut("ChangeUserImage/{id}")] 
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> EditUserImageByID(string id,[FromForm]  IFormFile fileAnh){
+        [Authorize(Roles= "1")]
+        public async Task<IActionResult> EditUserImageByID(string id,[FromForm] IFormFile fileAnh){
             try{
                 var result = await _userRepository._EditUserImageByID(id, fileAnh);
                 if( result == false)

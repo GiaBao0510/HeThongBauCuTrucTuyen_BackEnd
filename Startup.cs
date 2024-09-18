@@ -1,26 +1,28 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using BackEnd.infrastructure.config;
-using BackEnd.src.core.Interfaces;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using BackEnd.src.infrastructure.DataAccess.Context;
-using BackEnd.src.infrastructure.DataAccess.Repositories;
-using BackEnd.src.infrastructure.Data;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using BackEnd.src.infrastructure.DataAccess.Context;
+using BackEnd.src.infrastructure.DataAccess.Repositories;
+using BackEnd.src.infrastructure.Data;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.infrastructure.Services;
 using BackEnd.src.web_api.Mappings;
 using BackEnd.src.core.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
+using BackEnd.infrastructure.config;
+using BackEnd.src.core.Interfaces;
+
+using Newtonsoft.Json;
 
 namespace BackEnd
 {
@@ -35,24 +37,11 @@ namespace BackEnd
 
         public void ConfigureServices(IServiceCollection services){
             
-            // --- ??
-            //services.AddIdentity<ApplicationU>
-
-                //--- 1. Đăng ký các dịch vụ MVC
-            services.AddControllersWithViews();
-
-                //--- 2. Kết nối với Mysql
-            var serverMysqlVersion = new MySqlServerVersion(new Version(9,0,1));
-            services.AddDbContext<ApplicationDbContext>(option =>{
-                option.UseMySql( Configuration.GetConnectionString("MySQL") , serverMysqlVersion);
-            });
-
             services.AddControllers();
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
 
-                // --- 3. Cấu hình với Appsetting để lấy SecreteKey
-            services.Configure<AppSetting>(Configuration.GetSection("AppSettings"));
-
-                // --- 4. Cấu hình khi test trên Swagger
+                // --- 0. Cấu hình khi test trên Swagger
             services.AddSwaggerGen(c =>{
                 c.SwaggerDoc("v1", new OpenApiInfo {Title="BauCuTrucTuyen", Version="v1"});
 
@@ -76,13 +65,50 @@ namespace BackEnd
                             Name = "Bearer",                //Thông tin xác thực sẽ truyền trong header có tên là Bearer
                             In = ParameterLocation.Header,
                         },
-                        new List<string>()
+                        new string[]{}
                     }
                 });
 
                 //Cấu hình xử lý IFormFile
                 c.OperationFilter<FileUploadService>();
             });
+
+                // --- 1 Thêm dịch vụ MemoryCache để lưu dữ liệu không thay đổi trên bộ nhớ đệm
+            services.AddMemoryCache();
+
+                // --- 2. Thêm dịch vụ Redis cache
+            services.AddStackExchangeRedisCache(options =>{
+                options.Configuration = Configuration["ConnectionStrings:Redis"];   //Chuỗi kết nối đến máy chủ
+                options.InstanceName = "SampleInstance";                            //Đặt tên cho instance Redis đang kết nối đến
+            });
+
+                // --- 3. Cấu hình Controller với Newtonsoft Json
+            services.AddControllers().AddNewtonsoftJson(options =>{
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;    //Cấu hình như này giúp tránh lỗi serialization 
+            });
+
+            services.AddOptions();
+
+                //--- 5. Đăng ký các dịch vụ MVC
+            services.AddControllersWithViews();
+
+                //--- 6. Kết nối với Mysql
+            var serverMysqlVersion = new MySqlServerVersion(new Version(8,0,39));
+            services.AddDbContext<ApplicationDbContext>(option =>{
+                option.UseMySql( Configuration.GetConnectionString("MySQL") , serverMysqlVersion);
+            });
+
+                // --- 7 Đăng ký dịch vụ Identity vào trong hệ thống<<<<<Test
+            // services.AddIdentity<AppUser, IdentityRole>(options =>{
+            //     options.Password.RequireDigit = false;
+            //     options.Password.RequiredLength = 6;
+            //     options.User.RequireUniqueEmail = true;
+            // })
+            // .AddEntityFrameworkStores<ApplicationDbContext>()
+            // .AddDefaultTokenProviders();
+
+                // --- 3. Cấu hình với Appsetting để lấy SecreteKey
+            services.Configure<AppSetting>(Configuration.GetSection("AppSettings"));
 
                 // --- 5. Cấu hình để xử lý Multipart/form
             //Câu hình dịch vụ Controller trong ứng dụng  
@@ -97,48 +123,9 @@ namespace BackEnd
                 // ---- 6. Cấu hình Cloudinary
             services.AddSingleton<CloudinaryService>();
 
-            //     // ---- 7. Thiết lập giá trị cơ chế xác thực mặc định trên Cookie
-            // services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            //     .AddCookie("SecurityBauCuTrucTuyen", options =>{
-            //         options.AccessDeniedPath = new PathString("/");         //Đặt đường dẫn khi truy cập bị từ chối
-            //         options.Cookie = new CookieBuilder{                     // -- Cấu hình chi tiết cho cookie
-            //             //Tên miền
-            //             HttpOnly = true,                                    //Chỉ truy cập cookie thông qua http ,chứ không thông qua JS
-            //             Name = ".aspNetCoreDemo.Security.Cookie",           //Tên của Cookie
-            //             Path = "/",                                         //Cookie có hiệu lực cho toàn bộ trang
-            //             SameSite = SameSiteMode.Lax,                        //Cấu hình bảo mật SameSite
-            //             SecurePolicy = CookieSecurePolicy.SameAsRequest     //Cookie sẽ gửi qua Https nếu yêu cầu là Https
-            //         };
-            //         options.Events = new CookieAuthenticationEvents{        // -- cấu hình sự kiện xác thực
-            //             OnSignedIn = context =>{                            //Ghi log nếu người dùng đăng nhập
-            //                 Console.WriteLine($"{DateTime.Now} OnSignedIn, {context.Principal.Identity.Name}");
-            //                 return Task.CompletedTask;
-            //             },
-            //             OnSigningOut = context =>{                          //Ghi log nếu người dùng đăng xuất
-            //                 Console.WriteLine($"{DateTime.Now} OnSigningOut, {context.HttpContext.User.Identity.Name}");
-            //                 return Task.CompletedTask;
-            //             },
-            //             OnValidatePrincipal = context => {                  //Ghi log xác thực người dùng
-            //                 Console.WriteLine($"{DateTime.Now} OnValidatePrincipal, {context.Principal.Identity.Name}");
-            //                 return Task.CompletedTask;
-            //             }
-            //         }; 
-            //         options.LoginPath = new PathString("/api/Account/login");   //Đặt đường dẫn trang đăng nhập
-            //         options.ReturnUrlParameter = "RequestPath";                 //Đặt tham số url chuyển hướng sau khi đăng nhập
-            //         options.SlidingExpiration = true;                           //Cho phép gia hạn thời gian của cookie mỗi khi người dùng tương tác
-            // });
-
-            services.AddMemoryCache();
-
                 // ---- 8. Đăng ký AutoMapper
             services.AddControllersWithViews();
             services.AddAutoMapper(typeof(MappingProfile));
-
-                // --- 9. Đăng ký các dịch vụ Identity vào hệ thống
-            // services.AddIdentity<LoginModel, IdentityRole>()
-            //     .AddEntityFrameworkStores<ApplicationDbContext>()
-            //     .AddDefaultTokenProviders();
-            //  services.AddRazorPages();
 
                 // ---- 10. Xác thực JWT
             /*
@@ -178,6 +165,8 @@ namespace BackEnd
                     },
                     OnTokenValidated =  context => {
                         Console.WriteLine($"OnTokenValidated: {context.SecurityToken}");
+                        Console.WriteLine($"HttpContext: {context.HttpContext}");
+                        Console.WriteLine($"Request: {context.Request}");
                         return Task.CompletedTask;
                     },
                 };      
@@ -187,34 +176,37 @@ namespace BackEnd
             services.AddCors(options => options.AddDefaultPolicy(policy => 
                 policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
             ));
+            
+             services.AddRazorPages();
 
                 // --- 11. Thiết lập thay đổi câu hình mặc định của Identity
-            // services.Configure<IdentityOptions>(options =>{
-            //     //11.1 thiết lập về Password
-            //     options.Password.RequireDigit = false; //Không bắt buộc phải có số
-            //     options.Password.RequireLowercase = false; //Không bắt buộc phải có chữ thường
-            //     options.Password.RequireUppercase = false; //Không bắt buộc phải có chữ in
-            //     options.Password.RequireNonAlphanumeric = false; //Không bắt buộc có ký tự đặc biệt
-            //     options.Password.RequiredLength = 6; //Bắt buộc phải có ít nhất 6 ký tự
-            //     options.Password.RequiredUniqueChars = 1; //Không bắt buộc phải có ký tự đặc biệt duy nhất
+            services.Configure<IdentityOptions>(options =>{
+                //11.1 thiết lập về Password
+                options.Password.RequireDigit = false; //Không bắt buộc phải có số
+                options.Password.RequireLowercase = false; //Không bắt buộc phải có chữ thường
+                options.Password.RequireUppercase = false; //Không bắt buộc phải có chữ in
+                options.Password.RequireNonAlphanumeric = false; //Không bắt buộc có ký tự đặc biệt
+                options.Password.RequiredLength = 6; //Bắt buộc phải có ít nhất 6 ký tự
+                options.Password.RequiredUniqueChars = 1; //Không bắt buộc phải có ký tự đặc biệt duy nhất
 
-            //     //11.2 Cấu hình LockOut - khóa người dùng
-            //     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); //Thời lượng khóa 5 phút
-            //     options.Lockout.MaxFailedAccessAttempts = 8; //Quy định số lần đăng nhập thất bại. Nếu trên 8 lần thì khóa
-            //     options.Lockout.AllowedForNewUsers = true; //Cho phép khóa người dùng mới tạo
+                //11.2 Cấu hình LockOut - khóa người dùng
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); //Thời lượng khóa 5 phút
+                options.Lockout.MaxFailedAccessAttempts = 8; //Quy định số lần đăng nhập thất bại. Nếu trên 8 lần thì khóa
+                options.Lockout.AllowedForNewUsers = true; //Cho phép khóa người dùng mới tạo
 
-            //     //11.3 Cấu hình về User
-            //     options.User.AllowedUserNameCharacters = //Các ký tự đặt tên user
-            //         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-            //     options.User.RequireUniqueEmail = true; //Không cho phép người dùng có địa chỉ email trùng lặp
+                //11.3 Cấu hình về User
+                options.User.AllowedUserNameCharacters = //Các ký tự đặt tên user
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = true; //Không cho phép người dùng có địa chỉ email trùng lặp
                 
-            //     //11.4 Cấu hình đăng nhập
-            //     options.SignIn.RequireConfirmedPhoneNumber = false; //Khong cho xác thực bằng số điện thoại
-            //     options.SignIn.RequireConfirmedPhoneNumber = true; //Cấu hình chỉ xác thực bằng Email
-            // });
+                //11.4 Cấu hình đăng nhập
+                options.SignIn.RequireConfirmedPhoneNumber = false; //Khong cho xác thực bằng số điện thoại
+                options.SignIn.RequireConfirmedPhoneNumber = true; //Cấu hình chỉ xác thực bằng Email
+            });
             
                 //-- Đăng ký dịch vụ tại đây
             services.AddScoped<DatabaseContext>();
+            services.AddScoped<IEmailSender, EmailServices>();
             services.AddSingleton<IAppConfig,AppConfig>();
             services.AddScoped<IRoleRepository,RoleReposistory>();
             services.AddScoped<IProvinceRepository,ProvinceReposistory>();
@@ -235,6 +227,7 @@ namespace BackEnd
             services.AddScoped<IWorkPlaceRepository,WorkPlaceReposistory>();
             services.AddScoped<IProfileRepository,ProfileRepository>();
             services.AddScoped<IUserServices,UserServices>();
+            services.AddScoped<IToken,TokenServices>();
             
         } 
 
@@ -242,7 +235,7 @@ namespace BackEnd
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env){
             
             //Cấu hình pipline của ứng dụng
-            if(env.EnvironmentName == "Development"){
+            if(env.IsDevelopment()){
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI( c => c.SwaggerEndpoint("/swagger/v1/swagger.json","BauCuTrucTuyen v1"));
@@ -269,18 +262,18 @@ namespace BackEnd
             });
 
             //Cấu hình các middleware khác
-            app.UseStaticFiles();
             app.UseHttpsRedirection();
+            //app.UseStaticFiles();               //Thêm StaticFileMiddleware - nếu request yêu câu truy cập file tĩnh thì nó response nội dung file
             app.UseRouting();
-            app.UseCors("BauCuTrucTuyen");
+            app.UseCors();
+            
             app.UseAuthentication();            //Phục hồi thông tin đăng nhập(xác thực)
             app.UseAuthorization();             //Phục hồi thông tin về quyền của User
+    
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-                //endpoints.MapRazorPages();
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
             });
         }
 

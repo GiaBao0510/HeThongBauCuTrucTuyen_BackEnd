@@ -17,7 +17,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Liệt kê
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "1,2,5")]
         public async Task<IActionResult> GetListOfElections(){
             try{
                 var result = await _electionsReposistory._GetListOfElections();
@@ -39,7 +39,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Thêm
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> CreateElections([FromBody] Elections Elections){
             try{
                 //Kiểm tra đầu vào
@@ -74,7 +74,7 @@ namespace BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "1,2,8")]
         public async Task<IActionResult> GetElectionsBy_ID(string id){
             try{
                 var Elections = await _electionsReposistory._GetElectionsBy_ID(id);
@@ -102,7 +102,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> EditElectionsBy_ID(string id, Elections Elections){
             try{
                 if(Elections == null || string.IsNullOrEmpty(Elections.TenKyBauCu))
@@ -136,7 +136,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //xóa
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> DeleteElectionsBy_ID(string id){
             try{
                 var result = await _electionsReposistory._DeleteElectionsBy_ID(id);

@@ -3,6 +3,7 @@ using BackEnd.src.infrastructure.DataAccess.Context;
 using MySql.Data.MySqlClient;
 using BackEnd.src.web_api.DTOs;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using System.Data;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -45,15 +46,18 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             
             //Thực hiện thêm            
             string Input = @"
-                INSERT INTO kybaucu(ngayBD,ngayKT,TenKyBauCu,MoTa) 
-                VALUES(@ngayBD,@ngayKT,@TenKyBauCu,@MoTa);";
+                INSERT INTO kybaucu(ngayBD,ngayKT,TenKyBauCu,MoTa,SoLuongToiDaCuTri,SoLuongToiDaUngCuVien,SoLuotBinhChonToiDa) 
+                VALUES(@ngayBD,@ngayKT,@TenKyBauCu,@MoTa,@SoLuongToiDaCuTri,@SoLuongToiDaUngCuVien,@SoLuotBinhChonToiDa);";
             
             using (var commandAdd = new MySqlCommand(Input, connection)){
                 commandAdd.Parameters.AddWithValue("@ngayBD",kybaucu.ngayBD);
                 commandAdd.Parameters.AddWithValue("@ngayKT",kybaucu.ngayKT);
                 commandAdd.Parameters.AddWithValue("@TenKyBauCu",kybaucu.TenKyBauCu);
                 commandAdd.Parameters.AddWithValue("@MoTa",kybaucu.MoTa);
-                
+                commandAdd.Parameters.AddWithValue("@SoLuongToiDaCuTri",kybaucu.SoLuongToiDaCuTri);
+                commandAdd.Parameters.AddWithValue("@SoLuongToiDaUngCuVien",kybaucu.SoLuongToiDaUngCuVien);
+                commandAdd.Parameters.AddWithValue("@SoLuotBinhChonToiDa",kybaucu.SoLuotBinhChonToiDa);
+
                 await commandAdd.ExecuteNonQueryAsync();
             } 
 
@@ -77,7 +81,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")).ToString("dd/MM/yyyy HH:mm:ss"),
                     ngayKT = reader.GetDateTime(reader.GetOrdinal("ngayKT")).ToString("dd/MM/yyyy HH:mm:ss"),
                     TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
-                    MoTa = reader.GetString(reader.GetOrdinal("MoTa"))
+                    MoTa = reader.GetString(reader.GetOrdinal("MoTa")),
+                    SoLuongToiDaCuTri = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaCuTri")),
+                    SoLuongToiDaUngCuVien = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
+                    SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuotBinhChonToiDa"))
                 };
             }
 
@@ -93,7 +100,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             SET ngayBD = @ngayBDMoi, 
             TenKyBauCu = @TenKyBauCu, 
             ngayKT = @ngayKT, 
-            MoTa = @MoTa
+            MoTa = @MoTa,
+            SoLuongToiDaCuTri = @SoLuongToiDaCuTri,
+            SoLuongToiDaUngCuVien = @SoLuongToiDaUngCuVien,
+            SoLuotBinhChonToiDa = @SoLuotBinhChonToiDa
             WHERE ngayBD = @ngayBDCu;";
 
             using( var command = new MySqlCommand(sqlupdate, connection)){
@@ -102,6 +112,9 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 command.Parameters.AddWithValue("@ngayKT",Elections.ngayKT);
                 command.Parameters.AddWithValue("@MoTa",Elections.MoTa);
                 command.Parameters.AddWithValue("@ngayBDCu",ID);
+                command.Parameters.AddWithValue("@SoLuongToiDaCuTri",Elections.SoLuongToiDaCuTri);
+                command.Parameters.AddWithValue("@SoLuongToiDaUngCuVien",Elections.SoLuongToiDaUngCuVien);
+                command.Parameters.AddWithValue("@SoLuotBinhChonToiDa",Elections.SoLuotBinhChonToiDa);
                 //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
                 int rowAffected = await command.ExecuteNonQueryAsync();
                 return rowAffected > 0;

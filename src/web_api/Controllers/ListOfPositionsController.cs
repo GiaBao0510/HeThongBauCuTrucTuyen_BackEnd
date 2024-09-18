@@ -17,7 +17,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Liệt kê
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles= "1,2,5,8")]
         public async Task<IActionResult> GetListOfListOfPositions(){
             try{
                 var result = await _listOfPositionReposistory._GetListOfListOfPositions();
@@ -46,7 +46,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Thêm
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> CreateListOfPositions([FromBody] ListOfPositions ListOfPositions){
             try{
                 //Kiểm tra đầu vào
@@ -81,7 +81,7 @@ namespace BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles= "1,2,5,8")]
         public async Task<IActionResult> GetListOfPositionsBy_ID(string id){
             try{
                 var ListOfPositions = await _listOfPositionReposistory._GetListOfPositionsBy_ID(id);
@@ -109,7 +109,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles= "1,2,5,8")]
         public async Task<IActionResult> EditListOfPositionsBy_ID(string id, ListOfPositions ListOfPositions){
             try{
                 if(ListOfPositions == null || string.IsNullOrEmpty(ListOfPositions.TenCapUngCu))
@@ -143,7 +143,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //xóa
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles= "1,2,5,8")]
         public async Task<IActionResult> DeleteListOfPositionsBy_ID(string id){
             try{
                 var result = await _listOfPositionReposistory._DeleteListOfPositionsBy_ID(id);

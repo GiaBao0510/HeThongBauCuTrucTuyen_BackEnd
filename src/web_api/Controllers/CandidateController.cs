@@ -19,7 +19,7 @@ namespace BackEnd.src.web_api.Controllers
         //1. Thêm
         [HttpPost]
         [Consumes("multipart/form-data")]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> CreateCandidate([FromForm] CandidateDto Candidate,IFormFile fileAnh){
             try{
                 //Kiểm tra đầu vào
@@ -62,7 +62,7 @@ namespace BackEnd.src.web_api.Controllers
         //2. Lấy all ứng cử viên
         [HttpGet]
         [Route("allCandidate")]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> GetListOfCandidate(){
             try{
                 var result = await _candidateReposistory._GetListOfCandidate();
@@ -83,7 +83,7 @@ namespace BackEnd.src.web_api.Controllers
         //Lấy all ứng cử viên - account
         [HttpGet]
         [Route("allCandidateAndAccount")]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> GetListOfCandidateAndAccount(){
             try{
                 var result = await _candidateReposistory._GetListOfCandidatesAndAccounts();
@@ -103,7 +103,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //4. Lấy theo ID
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "1,2")]
         public async Task<IActionResult> GetCandidateBy_ID(string id){
             try{
                 var District = await _candidateReposistory._GetCandidateBy_ID(id);
@@ -128,7 +128,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //5.Sửa
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "1,2")]
         public async Task<IActionResult> EditCandidateBy_ID(string id,[FromBody] CandidateDto UngCuVien){
             try{
                 if(UngCuVien == null || string.IsNullOrEmpty(UngCuVien.HoTen))
@@ -181,7 +181,7 @@ namespace BackEnd.src.web_api.Controllers
         
         //6.xóa
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> DeleteCandidateBy_ID(string id){
             try{
                 var result = await _candidateReposistory._DeleteCandidateBy_ID(id);
@@ -205,7 +205,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //7. Đặt lại mật khẩu - admin
         [HttpPut("SetCandidatePwd/{id}")]
-        [Authorize]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> SetCandidatePassword(string id,[FromBody] SetPasswordDto setPasswordDto){
             try{
                 if(string.IsNullOrEmpty(setPasswordDto.newPwd) )
@@ -229,7 +229,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //8. Thay đổi mật khẩu - ứng cử viên
         [HttpPut("ChangeCandidatePwd/{id}")]
-        [Authorize]
+        [Authorize(Roles = "1,2")]
         public async Task<IActionResult> ChangeCandidatePassword(string id,[FromBody] SetPasswordDto setPasswordDto){
             try{
                 if(string.IsNullOrEmpty(setPasswordDto.newPwd) || string.IsNullOrEmpty(setPasswordDto.oldPwd) )
@@ -265,7 +265,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //9. Gửi báo cáo
         [HttpPost("sendReport")]
-        [Authorize]
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> VoterSubmitReport([FromBody] SendReportDto sendReportDto){
             try{
                 //Kiểm tra đầu vào

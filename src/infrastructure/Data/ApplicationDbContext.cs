@@ -1,20 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using BackEnd.src.core.Models;
 using BackEnd.core.Entities;
 using BackEnd.src.core.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.src.infrastructure.Data
 {
-    public class ApplicationDbContext: DbContext
+    public class ApplicationDbContext: IdentityDbContext<AppUser>
     {
         public ApplicationDbContext(DbContextOptions options): base(options){}
 
         //Thêm DbSet cho các thực thể khác, Mỗi DbSet là đại diện cho một tập các thực thể
         #region DbSet
-        public DbSet<Roles> Roles{set; get;}    //Đại diện cho tập thực thể Roles, có thể thêm sửa xóa trực tiếp trên đây
+        public DbSet<Roles> roles{set; get;}    //Đại diện cho tập thực thể Roles, có thể thêm sửa xóa trực tiếp trên đây
         public DbSet<Account> Accounts{set;get;}
         public DbSet<Board> Boards{set;get;}
         public DbSet<Candidate> Candidates{set;get;}
@@ -457,6 +456,17 @@ namespace BackEnd.src.infrastructure.Data
                     .HasForeignKey(e => e.ID_user)
                     .HasConstraintName("FK_hoSo_NguoiDung");
             });
+
+            //Danh sách vai trò người dùng
+            List<IdentityRole> roles = new List<IdentityRole>{
+                new IdentityRole {Name = "Admin", NormalizedName = "ADMIN" },
+                new IdentityRole {Name = "Voter", NormalizedName = "VOTER" },
+                new IdentityRole {Name = "Candidate", NormalizedName = "CANDIDATE" },
+                new IdentityRole {Name = "Cadre", NormalizedName = "CADRE" }
+            };
+            modelBuilder.Entity<IdentityRole>().HasData(roles);
+
+            
         }
     }
 }

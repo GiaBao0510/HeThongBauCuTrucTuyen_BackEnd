@@ -75,7 +75,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             using(var Command = new MySqlCommand(sql_check, connection)){
                 Command.Parameters.AddWithValue("@RoleID",role);
                 int count = Convert.ToInt32(await Command.ExecuteScalarAsync());
-                if(count < 0)
+                if(count < 1)
                     return false;       //Không tồn tại
             }
             return true;
@@ -226,7 +226,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 throw;
             }
         }
-
 
         //9. Lấy thông tin người dùng theo ID
         public async Task<Users> _GetUserBy_ID(string id){
@@ -590,7 +589,94 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
-        //17. Xóa thông tin người dùng theo ID
+        //17. Thêm người cử tri có Connection
+        public async Task<object> _AddVoterWithConnect(UserDto user ,IFormFile fileAnh ,MySqlConnection connection, MySqlTransaction transaction){
+
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+            
+            try{
+                //Kiểm tra đầu vào là không được null và giá trị hợp lệ
+                if(CheckUserInformationIsNotEmpty(user) == false)
+                    return -4;
+
+                //Kiểm tra điều kiện đầu vào sao cho SDT, email, cccd không được trùng nhau mới được phép thêm vào
+                int KiemTraTrungNhau = await CheckForDuplicateUserInformation(0, user, connection);
+                if(KiemTraTrungNhau <= 0)
+                    return KiemTraTrungNhau;
+
+                //Lấy ID tự động
+                string ID_user = RandomString.CreateID_User();
+
+                //Kiểm tra xem nếu ảnh có tồn tại thì lưu thông tin
+                if(fileAnh != null && fileAnh.Length > 0){
+                    //Đưa file ảnh lên cloudinary
+                    var uploadResult = await _cloudinaryService.UploadImage(fileAnh);
+                    user.PublicID = uploadResult.PublicId;
+                    user.HinhAnh = uploadResult.Url.ToString();
+                }
+
+                //Đặt mật khẩu mặt định, có băm
+                string hashedPwd = Argon2.Hash("8888888");
+
+                //Thêm thông tin người dùng - tài khoản
+                string Input = @"INSERT INTO nguoidung(ID_user,HoTen,GioiTinh,NgaySinh,DiaChiLienLac,CCCD,SDT,HinhAnh,PublicID,RoleID,ID_DanToc,Email) 
+                VALUES(@ID_user,@HoTen,@GioiTinh,@NgaySinh,@DiaChiLienLac,@CCCD,@SDT,@HinhAnh,@PublicID,@RoleID,@ID_DanToc,@Email);";
+                string inputAccount = @"INSERT INTO taikhoan(TaiKhoan,MatKhau,BiKhoa,LyDoKhoa,NgayTao,SuDung,RoleID)
+                VALUES(@TaiKhoan,@MatKhau,@BiKhoa,@LyDoKhoa,@NgayTao,@SuDung,@RoleID);";
+
+                using(var command = new MySqlCommand($"{Input} {inputAccount}", connection, transaction)){
+                    command.Parameters.AddWithValue("@ID_user", ID_user);
+                    command.Parameters.AddWithValue("@HoTen", user.HoTen);
+                    command.Parameters.AddWithValue("@GioiTinh", user.GioiTinh);
+                    command.Parameters.AddWithValue("@NgaySinh", user.NgaySinh);
+                    command.Parameters.AddWithValue("@DiaChiLienLac", user.DiaChiLienLac);
+                    command.Parameters.AddWithValue("@CCCD", user.CCCD);
+                    command.Parameters.AddWithValue("@SDT", user.SDT);
+                    command.Parameters.AddWithValue("@HinhAnh", user.HinhAnh);
+                    command.Parameters.AddWithValue("@PublicID", user.PublicID);
+                    command.Parameters.AddWithValue("@RoleID", user.RoleID);
+                    command.Parameters.AddWithValue("@ID_DanToc", user.ID_DanToc);
+                    command.Parameters.AddWithValue("@TaiKhoan",user.SDT);
+                    command.Parameters.AddWithValue("@MatKhau",hashedPwd);     //Để mặc định vậy.  Sau đó cử tri đăng nhập sẽ yêu cầu cử tri đặt lại mật khẩu
+                    command.Parameters.AddWithValue("@BiKhoa",0);
+                    command.Parameters.AddWithValue("@LyDoKhoa","null");
+                    command.Parameters.AddWithValue("@NgayTao",DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                    command.Parameters.AddWithValue("@SuDung",1);
+                    command.Parameters.AddWithValue("@Email",user.Email);
+                
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                return ID_user;
+            }
+            catch(MySqlException ex){
+                
+                if(transaction.Connection != null)
+                    await transaction.RollbackAsync();
+
+                //Xử lý để in lỗi cụ thể
+                switch(ex.Number){
+                    case 1062:
+                        if(ex.Message.Contains("CCCD"))
+                            return -2;
+                        else if(ex.Message.Contains("SDT"))
+                            return 0;
+                        else if(ex.Message.Contains("Email"))
+                            return -1;
+                        else
+                            return -100;
+                    default:
+                        return -100; 
+                }
+            }catch(Exception){
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        //18. Xóa thông tin người dùng theo ID
         public async Task<bool> _DeleteUserBy_ID_withConnection(string ID, MySqlConnection connection){
 
             //Tìm số điện thoại theo ID người dùng

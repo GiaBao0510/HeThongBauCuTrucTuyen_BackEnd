@@ -11,5 +11,8 @@ namespace BackEnd.src.web_api.DTOs
         public string? ngayKT { get; set; }
         public string? TenKyBauCu {get; set;}
         public string? MoTa { get; set; }
+        public int SoLuongToiDaCuTri { get; set; }
+        public int SoLuongToiDaUngCuVien { get; set; }
+        public int SoLuotBinhChonToiDa { get; set; }
     }
 }

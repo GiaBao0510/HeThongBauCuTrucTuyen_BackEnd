@@ -101,7 +101,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //4. Lấy theo ID
         [HttpGet("{id}")]
-        [Authorize(Roles = "1,2,3,4" )]
+        [Authorize(Roles = "1,8,3,4" )]
         public async Task<IActionResult> GetCadreBy_ID(string id){
             try{
                 var District = await _CadreRepository._GetCadreBy_ID(id);
@@ -126,7 +126,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //5.Sửa
         [HttpPut("{id}")]
-        [Authorize(Roles = "1,2,3,4")]
+        [Authorize(Roles = "1,8,3,4")]
         public async Task<IActionResult> EditCadreBy_ID(string id,[FromBody] CadreDto UngCuVien){
             try{
                 if(UngCuVien == null || string.IsNullOrEmpty(UngCuVien.HoTen))
@@ -227,7 +227,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //8. Thay đổi mật khẩu - cán bộ
         [HttpPut("ChangeCadrePwd/{id}")]
-        [Authorize(Roles = "1,2,3,4")]
+        [Authorize(Roles = "1,8,3,4")]
         public async Task<IActionResult> ChangeCadrePassword(string id,[FromBody] SetPasswordDto setPasswordDto){
             try{
                 if(string.IsNullOrEmpty(setPasswordDto.newPwd) || string.IsNullOrEmpty(setPasswordDto.oldPwd) )
@@ -263,7 +263,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //9. Gửi báo cáo
         [HttpPost("sendReport")]
-        [Authorize="1,2,3,4"]
+        [Authorize(Roles = "1,8")]
         public async Task<IActionResult> VoterSubmitReport([FromBody] SendReportDto sendReportDto){
             try{
                 //Kiểm tra đầu vào

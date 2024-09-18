@@ -108,5 +108,9 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             int rowAffected = await command.ExecuteNonQueryAsync();
             return rowAffected > 0;
         }
+
+        //Lấy danh sách thông báo theo ứng cử viên
+        //Lấy danh sách thông báo theo cử tri
+        //lấy danh sách thông báo theo cán bộ
     }
 }

@@ -150,3 +150,5 @@ D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_Ba
 D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\Microsoft.Extensions.Identity.Core.dll
 D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\Microsoft.Extensions.Identity.Stores.dll
+D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\MailKit.dll
+D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\MimeKit.dll

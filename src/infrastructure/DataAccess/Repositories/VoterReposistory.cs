@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.Services;
 using BackEnd.src.core.Common;
 using Isopoh.Cryptography.Argon2;
+using System.Data;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -68,7 +69,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 voter.RoleID = 5;   //Gán vai trò mặc định khi tạo cử tri
 
                 //Thêm thông tin cơ sở
-                var FillInBasicInfo = await _AddUserWithConnect(voter, fileAnh, connect, transaction);
+                var FillInBasicInfo = await _AddVoterWithConnect(voter, fileAnh, connect, transaction);
                 
                 //Nếu có lỗi thì in ra
                 if(FillInBasicInfo is int result && result <=0){
@@ -255,12 +256,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")).ToString("dd-MM-yyyy"),
                     DiaChiLienLac = reader.GetString(reader.GetOrdinal("DiaChiLienLac")),
                     CCCD = reader.GetString(reader.GetOrdinal("CCCD")),
-                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                    Email = reader.IsDBNull(reader.GetOrdinal("Email"))? null: reader.GetString(reader.GetOrdinal("Email")),
                     SDT = reader.GetString(reader.GetOrdinal("SDT")),
-                    HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
+                    HinhAnh = reader.IsDBNull(reader.GetOrdinal("HinhAnh"))? null:reader.GetString(reader.GetOrdinal("HinhAnh")),
                     ID_DanToc = reader.GetInt32(reader.GetOrdinal("ID_DanToc")),
                     RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
-                    PublicID = reader.GetString(reader.GetOrdinal("PublicID"))
+                    PublicID = reader.IsDBNull(reader.GetOrdinal("PublicID"))? null :reader.GetString(reader.GetOrdinal("PublicID"))
                 });
             }
             return list;

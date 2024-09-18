@@ -1,9 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using BackEnd.src.core.Models;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
+using BackEnd.src.core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -13,9 +15,11 @@ using log4net;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using MySql.Data.MySqlClient;
 using System.Web;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -26,17 +30,26 @@ namespace BackEnd.src.web_api.Controllers
         private readonly IUserServices _userServices;
         private readonly AppSetting _appSettings;
         private readonly DatabaseContext _context;
+        private readonly IMemoryCache _cache;
+        private readonly IEmailSender _emailSender;
+        private readonly IToken _token;
         private static readonly ILog _log = LogManager.GetLogger(typeof(AccountController));
 
         //Khởi tạo
         public AccountController(
             IUserServices userServices,
             IOptionsMonitor<AppSetting> optionsMonitor,
-            DatabaseContext context
+            DatabaseContext context,
+            IMemoryCache cache,
+            IEmailSender emailSender,
+            IToken token
         ){
             _userServices = userServices;
             _context = context;    
             _appSettings = optionsMonitor.CurrentValue;     //Lấy giá trị đã định nghĩa trong file appsettings
+            _cache = cache;
+            _emailSender = emailSender;
+            _token = token;
         }
 
         //0.Chuyển số thực sang thời gian
@@ -45,114 +58,11 @@ namespace BackEnd.src.web_api.Controllers
             return dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
         }
 
-        //0.1.Hàm này tạo ra refresh token
-        private string GenerateRefreshToken(){
-            var random = new byte[32];
-
-            //Tạo random cho mảng byte
-            using(var x = RandomNumberGenerator.Create()){
-                x.GetBytes(random);
-
-                return Convert.ToBase64String(random);
-            }
-        }
-
-        //0.2.Hàm này tạo ra token
-        private async Task<TokenModel> GenerateToken(LoginModel loginModel){
-            if(loginModel == null){
-                Console.WriteLine("Lỗi vì loginModel null");
-            }
-            Console.WriteLine($"account: {loginModel.account}");
-            Console.WriteLine($"Block: {loginModel.BiKhoa}");
-            Console.WriteLine($"Role: {loginModel.Role}");
-            Console.WriteLine($"SuDung: {loginModel.SuDung}");
-
-            //Lấy mảng byte giống bên biến SecretKeyBytes trong file Starup.cs
-            var secretKeyByte = new SymmetricSecurityKey( Encoding.UTF8.GetBytes(_appSettings.SecretKey));
-            var creds = new SigningCredentials(secretKeyByte, SecurityAlgorithms.HmacSha512Signature);
-
-            //Chỉ định các Claims cho nguoiwg dùng
-            var Claims = new List<Claim>(){
-                new Claim("SDT", loginModel.account),
-                new Claim(ClaimTypes.Role, loginModel.Role),
-                new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("SuDung", loginModel.SuDung.ToString()),
-                new Claim("BiKhoa", loginModel.BiKhoa)
-            };
-
-            var Token = new JwtSecurityToken(
-                claims: Claims,
-                expires: DateTime.UtcNow.AddHours(5),   //Thời gian hết hạn
-                signingCredentials: creds               //Cấu hình ký mã hóa token
-
-            );
-
-            var AccessToken = new JwtSecurityTokenHandler().WriteToken(Token);
-            var RefreshToken = GenerateRefreshToken();
-
-            //Lưu vào DB nếu người dùng chưa có refreshtoken, ngược lại thì cập nhật lại
-            await SaveOrUpdateRefreshToken(Token.Id, RefreshToken, loginModel.account);
-            
-            return new TokenModel{
-                accessToken = AccessToken,
-                refreshToken = RefreshToken
-            };
-        }
-        
-        //0.3. Hàm này lưu trữ hoặc cập nhật lại refreshtoken(Nếu trong bảng refreshtoken đã có người dùng rồi)
-        private async Task SaveOrUpdateRefreshToken(string jwtId, string refreshToken, string account){
-            using(var connection = _context.CreateConnection()){
-                await connection.OpenAsync();
-                
-                //Câu lệnh mysql sẽ kiểm tra nếu chưa có thì Tạo mới. Ngược lại nếu người dùng có refreshtoken thì cập nhật và lưu lại 
-                const string sql = @"
-                INSERT INTO refreshtoken(token, JwtId, IsUsed, IsRevoked, IssuedAt, ExpiredAt, TaiKhoan)
-                VALUES(@token, @JwtId, @IsUsed, @IsRevoked, @IssuedAt, @ExpiredAt, @TaiKhoan)
-                ON DUPLICATE KEY UPDATE 
-                token = VALUES(token),
-                JwtId = VALUES(JwtId),
-                IsUsed = VALUES(IsUsed),
-                IsRevoked = VALUES(IsRevoked),
-                IssuedAt = VALUES(IssuedAt),
-                ExpiredAt = VALUES(ExpiredAt);";    
-                
-                using (var command = new MySqlCommand(sql, connection)){
-                    command.Parameters.AddWithValue("@token", refreshToken);
-                    command.Parameters.AddWithValue("@JwtId", jwtId);
-                    command.Parameters.AddWithValue("@IsUsed", 0);
-                    command.Parameters.AddWithValue("@IsRevoked", 0);
-                    command.Parameters.AddWithValue("@IssuedAt", DateTime.UtcNow);
-                    command.Parameters.AddWithValue("@ExpiredAt", DateTime.UtcNow.AddHours(10));
-                    command.Parameters.AddWithValue("@TaiKhoan", account);
-
-                    await command.ExecuteNonQueryAsync();
-                }
-            }
-        }
-
-        //0.4 Vô hiệu hóa refresh token khi người dùng đăng xuất
-        private async Task InvalidateRefreshTokenForUser(string TaiKhoan){
-            using(var connection = _context.CreateConnection()){
-                await connection.OpenAsync();
-                
-                //Đánh dấu tài khoản đã được thu hồi và sử dụng
-                const string sql = @"
-                UPDATE refreshtoken
-                SET IsUsed = 1, IsRevoked = 1
-                WHERE TaiKhoan = @TaiKhoan;";
-                
-                using (var command = new MySqlCommand(sql, connection)){
-                    command.Parameters.AddWithValue("@TaiKhoan", TaiKhoan);
-                    await command.ExecuteNonQueryAsync();
-                }
-            }
-        }
-
         //1.Đăng nhập
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]LoginModel loginModel){
             try{
-                //Nếu không điển cũng quăng ra lỗi luôn
+                //1.Nếu không điển cũng quăng ra lỗi luôn
                 if(string.IsNullOrEmpty(loginModel.account) || string.IsNullOrEmpty(loginModel.password))
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin đăng nhập."});
 
@@ -162,14 +72,13 @@ namespace BackEnd.src.web_api.Controllers
                         new ApiRespons{Success = false, Message = "Tài khoản hoặc mật khẩu không chính xác."}
                     );
 
-                //Đăng nhập thành công
-                var token = await GenerateToken(result);
+                //2.Gửi mã otp xác nhận
+                await _userServices._SendVerificationOTPcodeAfterLogin(result.Email);
 
-                return Ok(new
-                    ApiRespons{
-                        Success = true, 
-                        Message = "Đăng nhập thành công", 
-                        Data = token
+                return Ok(new {
+                        Success = true,
+                        VaiTro =  result.Role,
+                        Message = "Tài khoản hợp lệ. Vui lòng xác nhận mã otp chúng tôi gửi trên mail để hoàn thành bước đăng nhận."
                     }
                 );
             }
@@ -314,7 +223,7 @@ namespace BackEnd.src.web_api.Controllers
                     }
                 }
             
-                var token = await GenerateToken(loginMedel1);
+                var token = await _token.GenerateToken(loginMedel1);
                 return Ok(new
                     ApiRespons{
                         Success = true, 
@@ -342,7 +251,7 @@ namespace BackEnd.src.web_api.Controllers
             await HttpContext.SignOutAsync(scheme: "SecurityBauCuTrucTuyen");
 
             //Vô hiệu hóa refreshtoken
-            await InvalidateRefreshTokenForUser(sdt);
+            await _token.InvalidateRefreshTokenForUser(sdt);
 
             return Ok(new ApiRespons
             {
@@ -350,6 +259,64 @@ namespace BackEnd.src.web_api.Controllers
                 Message = "Đăng xuất thành công",
                 Data = null
             });
+        }
+
+        //4. Xác thực khi đăng ký
+        //5.Xác thực mã otp sau khi đăng nhập
+        [HttpPost("verify-otp-after-login")]
+        public async Task<IActionResult> VerifyOtpCodeAfterLogin([FromBody]VerifyOtpDto verify){
+            try{
+                if(string.IsNullOrEmpty(verify.Email) || string.IsNullOrEmpty(verify.Otp))
+                    return BadRequest(new ApiRespons{ Success = false, Message = "Email và mã otp không được để trống"});
+                
+                var result = await _userServices._VerifyOtpCodeAfterLogin(verify);
+                if(result == null)
+                    return BadRequest(new ApiRespons{ Success = false, Message = "Mã otp xác nhận không chính xác"});
+                
+                return Ok(new ApiRespons{
+                    Success = true, 
+                    Message = "Mã OTP xác nhận thành công",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error message:{ex.Message}");
+                Console.WriteLine($"Error TargetSite:{ex.TargetSite}");
+                Console.WriteLine($"Error StackTrace:{ex.StackTrace}");
+                Console.WriteLine($"Error Data:{ex.Data}");
+                return StatusCode(500,new ApiRespons{
+                    Success = false, 
+                    Message = "Lỗi khi xác nhận mã otp. Sau khi đăng  nhập"
+                });
+            }
+        }
+        
+        //6. Xác thực khi quên mật khẩu
+        //7. Xác thực khi đăng ký
+        //8. Gửi lại mã OTP
+        [HttpPost("resend-otp")]
+        public async Task<IActionResult> ResendOtpAsync([FromBody] EmailDTO emailDTO){
+            try{
+                if(string.IsNullOrEmpty(emailDTO.Email))
+                    return StatusCode(400, new ApiRespons{ Success = false, Message = "Vui lòng điền Email để xác thực"});
+                var result = await _userServices._ResendOtpAsync(emailDTO);
+                if(result == false){
+                    return StatusCode(400, new ApiRespons{ Success = false, Message = "Email này không tồn tại"});
+                }
+
+                return Ok(new ApiRespons{
+                    Success = true, 
+                    Message = "Gửi mã OTP thành công"
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error message:{ex.Message}");
+                Console.WriteLine($"Error TargetSite:{ex.TargetSite}");
+                Console.WriteLine($"Error StackTrace:{ex.StackTrace}");
+                Console.WriteLine($"Error Data:{ex.Data}");
+                return StatusCode(500,new ApiRespons{
+                    Success = false, 
+                    Message = "Lỗi khi gửi mã otp"
+                });
+            }
         }
 
     }

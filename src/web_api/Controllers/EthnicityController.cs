@@ -1,4 +1,3 @@
-using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.src.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
@@ -18,7 +17,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Liệt kê
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles= "1,2,5,8")]
         public async Task<IActionResult> GetListOfEthnicity(){
             try{
                 var result = await _ethnicityReposistory._GetListOfEthnicity();
@@ -40,7 +39,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Thêm
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> CreateEthnicity([FromBody] Ethnicity Ethnicity){
             try{
                 //Kiểm tra đầu vào
@@ -75,7 +74,7 @@ namespace BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles= "1,2,5,8")]
         public async Task<IActionResult> GetEthnicityBy_ID(string id){
             try{
                 var Ethnicity = await _ethnicityReposistory._GetEthnicityBy_ID(id);
@@ -103,7 +102,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Sửa
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> EditEthnicityBy_ID(string id, Ethnicity Ethnicity){
             try{
                 if(Ethnicity == null || string.IsNullOrEmpty(Ethnicity.TenDanToc))
@@ -137,7 +136,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //xóa
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles= "1")]
         public async Task<IActionResult> DeleteEthnicityBy_ID(string id){
             try{
                 var result = await _ethnicityReposistory._DeleteEthnicityBy_ID(id);

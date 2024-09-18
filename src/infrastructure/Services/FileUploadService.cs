@@ -16,26 +16,17 @@ namespace BackEnd.src.infrastructure.Services
         //Hàm này được gọi khi ánh xạ hoạt động trong OpenAPI document. Hàm này có thêm các tham số tượng ứng cho việc upload file
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            var parameters = operation.Parameters;
-            var request = context.ApiDescription.ParameterDescriptions
-                .FirstOrDefault(p => p.ModelMetadata?.ModelType == typeof(IFormFile));
-                
-            if (request != null){
-                parameters.Clear();
-                operation.RequestBody = new OpenApiRequestBody{
-                    Content = new Dictionary<string, OpenApiMediaType>{
-                        ["multipart/form-data"] = new OpenApiMediaType{
-                            Schema = new OpenApiSchema{
-                                Type = "object",
-                                Properties = new Dictionary<string, OpenApiSchema>
-                                {
-                                    ["file"] = new OpenApiSchema { Type = "string", Format = "binary" }
-                                }
-                            }
-                        }
-                    }
-                };
-            }
+            var fileUploadMime = "multipart/form-data";
+            if (operation.RequestBody == null || !operation.RequestBody.Content.Any(x => x.Key.Equals(fileUploadMime, StringComparison.InvariantCultureIgnoreCase)))
+                return;
+
+            var fileParams = context.MethodInfo.GetParameters().Where(p => p.ParameterType == typeof(IFormFile));
+            operation.RequestBody.Content[fileUploadMime].Schema.Properties =
+                fileParams.ToDictionary(k => k.Name, v => new OpenApiSchema()
+                {
+                    Type = "string",
+                    Format = "binary"
+                });
         }
     }
 }
