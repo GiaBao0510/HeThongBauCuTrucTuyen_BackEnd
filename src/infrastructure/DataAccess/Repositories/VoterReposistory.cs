@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.Services;
 using BackEnd.src.core.Common;
 using Isopoh.Cryptography.Argon2;
-using System.Data;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -15,15 +14,21 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         private readonly DatabaseContext _context;
         private readonly CloudinaryService _cloudinaryService;
         private readonly IProfileRepository _profileRepository;
+        private readonly IElectionsRepository _electionsRepository;
+        private readonly IConstituencyRepository _constituencyRepository;
 
         //Khởi tạo
         public VoterReposistory(
             DatabaseContext context,CloudinaryService cloudinaryService,
-            IProfileRepository profileRepository
+            IProfileRepository profileRepository, 
+            IElectionsRepository electionsRepository,
+            IConstituencyRepository constituencyRepository
         ): base(context, cloudinaryService){
             _context=context;
             _cloudinaryService = cloudinaryService;
             _profileRepository = profileRepository;
+            _electionsRepository = electionsRepository;
+            _constituencyRepository = constituencyRepository;
         }
         //Hủy
         public new void Dispose() => _context.Dispose();
@@ -66,6 +71,13 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             using var transaction =await connect.BeginTransactionAsync();
 
             try{
+                //Kiểm tra mã chức vụ có tồn tại không
+                bool checkPosition = await _CheckPositionExist(voter.ID_ChucVu, connect, transaction);
+                if(!checkPosition){
+                    await transaction.RollbackAsync();
+                    return -6;
+                }
+
                 voter.RoleID = 5;   //Gán vai trò mặc định khi tạo cử tri
 
                 //Thêm thông tin cơ sở
@@ -95,8 +107,11 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 if(!AddProfile){
                     Console.WriteLine("Lỗi khi tạo hồ sơ cho cử tri");
                     await transaction.RollbackAsync();
-                    return -100;
+                    return -5;
                 }
+
+                //Tạo chức vụ cho cử tri
+                int AddPosition = await _VoterTakePosition(ID_cutri, voter.ID_ChucVu, connect,transaction);
 
                 await transaction.CommitAsync();
                 return 1;
@@ -450,5 +465,244 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 return false;
             }
         }
+
+        //10.Hiển thị mã cử tri sau khi người dùng quét mã
+        public async Task<VoterDto> _DisplayUserInformationAfterScanningTheCode(string ID){
+            using var connect = await _context.Get_MySqlConnection();
+            
+            //Kiểm tra xem thông tin cử tri đã đăng ký chưa .Nếu chưa thì hiển thị
+            int checkRegisteredVoter = await _CheckRegisteredVoter( ID, connect);
+            if(checkRegisteredVoter == -1 || checkRegisteredVoter == 1) return null;
+            
+            var voter = new VoterDto();
+
+            const string sql = @"
+            SELECT nd.HoTen, nd.GioiTinh, nd.NgaySinh, nd.DiaChiLienLac, 
+            nd.Email, nd.SDT, nd.HinhAnh,dt.TenDanToc 
+            FROM nguoidung nd 
+            JOIN cutri ct ON nd.ID_user = ct.ID_user
+            JOIN dantoc dt ON dt.ID_DanToc = nd.ID_DanToc
+            WHERE ct.ID_CuTri = @ID_CuTri;";
+
+            using (var command = new MySqlCommand(sql, connect)){
+                command.Parameters.AddWithValue("@ID_CuTri", ID);
+
+                using var reader = await command.ExecuteReaderAsync();
+                if(await reader.ReadAsync()){
+                    voter.HoTen = reader.GetString(reader.GetOrdinal("HoTen"));
+                    voter.GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh"));
+                    voter.NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")).ToString("dd-MM-yyyy");
+                    voter.DiaChiLienLac = reader.GetString(reader.GetOrdinal("DiaChiLienLac"));
+                    voter.Email = reader.GetString(reader.GetOrdinal("Email"));
+                    voter.SDT = reader.GetString(reader.GetOrdinal("SDT"));
+                    voter.HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh"));
+                    voter.TenDanToc = reader.GetString(reader.GetOrdinal("TenDanToc"));
+                }
+            }
+            return voter;
+        }
+
+        //11.Kiểm tra xem thông tin cử tri đã đăng ký hay chưa
+        public async Task<int> _CheckRegisteredVoter(string ID_cutri,MySqlConnection connect){
+
+            //Kiểm tra xem ID người dùng có tồn tại không
+            bool checkUserExists = await _CheckVoterExists(ID_cutri, connect);
+            if(!checkUserExists) return -1;
+
+            string trangThai = "0";
+
+            //Kiểm tra xem người dùng đã đăng ký chưa
+            const string sql = @"SELECT TrangThaiDangKy 
+            FROM hosonguoidung hs JOIN cutri ct ON ct.ID_user = hs.ID_user
+            WHERE ct.ID_CuTri = @ID_CuTri";
+            using(var command = new MySqlCommand(sql, connect)){
+                command.Parameters.AddWithValue("@ID_CuTri", ID_cutri);
+
+                using var reader = await command.ExecuteReaderAsync();
+                if(await reader.ReadAsync())
+                    trangThai =  reader.GetString(reader.GetOrdinal("TrangThaiDangKy"));
+            }
+            return Convert.ToInt32(trangThai);
+        }
+
+        //12. Cử tri đảm nhận vị trí
+        public async Task<int> _VoterTakePosition(string ID_voter, int ID_ChucVu, MySqlConnection connect ,MySqlTransaction? transaction){
+            
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connect.State != System.Data.ConnectionState.Open)
+                await connect.OpenAsync();
+
+            try{
+                //Kiểm tra xem mã chức vụ có tồn tại không
+                bool checkPositionExists = await _CheckPositionExist(ID_ChucVu, connect, transaction);
+                if(!checkPositionExists) return -1;
+
+                //thêm chức vụ cho cử tri
+                const string sql = @"INSERT INTO chitietcutri(ID_CuTri,ID_ChucVu) VALUES(@ID_CuTri,@ID_ChucVu);";
+                using(var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@ID_CuTri", ID_voter);
+                    command.Parameters.AddWithValue("@ID_ChucVu", ID_ChucVu);
+                    
+                    await  command.ExecuteNonQueryAsync(); 
+                }
+                return 1;
+            }catch(Exception ex){
+                Console.WriteLine($"Error in mySQL Message: {ex.Message}");
+                Console.WriteLine($"Error in mySQL StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error in mySQL TargetSite: {ex.TargetSite}");
+
+                await transaction.RollbackAsync();
+                return -2;
+            }
+        }
+
+        //13. Thay đổi chức vụ của cử tri
+        public async Task<bool> _ChangeOfVoterPosition(string ID_voter, int ID_ChucVu){
+            using var connect = await _context.Get_MySqlConnection();
+
+            //Kiểm tra xem ID chức vụ có tồn tại không
+            bool checkPositionExists = await _CheckPositionExist(ID_ChucVu, connect);
+            if(!checkPositionExists) return false;
+
+            const string sql = @"UPDATE chitietcutri SET ID_ChucVu =@ID_ChucVu WHERE ID_CuTri =@ID_CuTri; ";
+            using (var command = new MySqlCommand(sql, connect)){
+                command.Parameters.AddWithValue("@ID_CuTri", ID_voter);
+                command.Parameters.AddWithValue("@ID_ChucVu", ID_ChucVu);
+                
+                int affect = await command.ExecuteNonQueryAsync();
+                if(affect < 1 ) return false;
+            }
+
+            return true;
+        }
+
+        //14. Cử tri đặt mật khẩu, CCCD khi đăng ký
+        public async Task<bool> _SetVoterCCCD_SetVoterPwd(string id, string newCCCD, string pwd){
+            using var connect = await _context.Get_MySqlConnection();
+            
+            //Băm mật khẩu
+            pwd = Argon2.Hash(pwd);
+            
+            const string sql = @"
+            UPDATE nguoidung nd
+            JOIN cutri ct ON ct.ID_user = nd.ID_user
+            JOIN taikhoan tk ON tk.TaiKhoan = nd.SDT
+            SET nd.CCCD = @CCCD, tk.MatKhau = @MatKhau
+            WHERE ct.ID_CuTri = @ID_CuTri;";
+
+            using(var command = new MySqlCommand(sql, connect)){
+                command.Parameters.AddWithValue("@ID_CuTri", id);
+                command.Parameters.AddWithValue("@CCCD", newCCCD);
+                command.Parameters.AddWithValue("@MatKhau", pwd);
+                
+                int affect = await command.ExecuteNonQueryAsync();
+                if(affect < 1 ) return false;
+            }
+            return true;
+        }
+
+
+        //15.Thêm danh sách cử tri vào cuộc bầu cử
+        public async Task<int> _AddListVotersToTheElection(VoterListInElectionDto voterListInElectionDto){
+            using var connect = await _context.Get_MySqlConnection();
+            
+            //Kiểm tra xem ngày bầu cử có tồn tại không
+            bool checkElectionExist = await _electionsRepository._CheckIfElectionTimeExists(voterListInElectionDto.ngayBD, connect);
+            if(!checkElectionExist) return 0;
+
+            //Kiểm tra xem đơn vị bầu cử có hợp lệ không
+            bool checkConstituencyExist = await _constituencyRepository._CheckIfConstituencyExists(voterListInElectionDto.ID_DonViBauCu, connect);
+            if(!checkConstituencyExist) return -1;
+
+            //Nếu danh sách cử tri vượt quá số lượt bình chọn tối đa đặt cho nó thì báo lỗi
+            int sl_cuTriToiDa = await  _electionsRepository._MaximumNumberOfVoters(voterListInElectionDto.ngayBD, connect);
+            if(sl_cuTriToiDa < 0) return -2;
+
+            //Lấy số lượng cử tri trong kỳ bầu cử này ở hiện tại
+            int sl_cuTriHienTai = await  _electionsRepository._GetCurrentVoterCountByElection(voterListInElectionDto.ngayBD, connect);
+            if(sl_cuTriToiDa < 0) return -4;
+
+            if((sl_cuTriHienTai + voterListInElectionDto.listIDVoter.Count) > sl_cuTriToiDa) return -3;
+
+            //thêm từng cử tri trong danh sách vào cuộc bầu cử
+            const string sql = @"
+                INSERT INTO trangthaibaucu(ID_CuTri,ID_DonViBauCu,ngayBD,GhiNhan)
+                VALUES(@ID_CuTri,@ID_DonViBauCu,@ngayBD,@GhiNhan);";
+
+            foreach(string voter in voterListInElectionDto.listIDVoter){
+                
+                //Kiểm tra xem nếu cử tri đã tồn tại trong cuộc bầu cử này thì bỏ qua hoặc cử tri này không tồn tại trong danh sách thì bỏ qua
+                bool checkVoterJoined = await _VoterCheckInElection(voter,voterListInElectionDto.ngayBD,connect);
+                bool checVoterExists = await _CheckVoterExists(voter, connect);
+                if(!checkVoterJoined && checVoterExists){
+                    using(var command = new MySqlCommand(sql, connect)){
+                        command.Parameters.AddWithValue("@ID_CuTri", voter);
+                        command.Parameters.AddWithValue("@ID_DonViBauCu", voterListInElectionDto.ID_DonViBauCu);
+                        command.Parameters.AddWithValue("@ngayBD", voterListInElectionDto.ngayBD);
+                        command.Parameters.AddWithValue("@GhiNhan", "0");
+                        
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            return 1;
+        }
+
+        //16. Kiểm tra xem cử tri có tồn tại trong kỳ bầu cử không
+        public async Task<bool> _VoterCheckInElection(string ID_cutri, DateTime ngayBD, MySqlConnection connection){
+            
+            const string sql = @"
+            SELECT COUNT(ct.ID_CuTri)
+            FROM trangthaibaucu tt 
+            JOIN cutri ct ON ct.ID_CuTri = tt.ID_CuTri
+            WHERE tt.ngayBD = @ngayBD AND ct.ID_CuTri =@ID_CuTri;";
+
+            using (var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                command.Parameters.AddWithValue("@ID_CuTri", ID_cutri);
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+
+                return count > 0;
+            }
+        }
+
+        //17. Cử tri bỏ phiếu
+            //-- lên kê hoạch tạo chức năng bỏ phiếu từ cử tri
+            //17.1 Thay đổi giá trị phiếu bầu điều tiên có giá trị bằng 0 được tìm thấy và phiếu bầu đó phải trong kỳ bầu cử của người bầu cử
+            //17.2 Khóa bí mật sẽ được mã hóa bằng giải thuật RSA và lưu khóa ngoại và khóa bí mật bên 2 tệp tin
+
+        //18. Danh sách các kỳ bầu cử mà cử tri có thể tham gia
+        public async Task<List<ElectionsDto>> _ListElectionsVotersHavePaticipated(string ID_cutri){
+            
+            using var connection = await _context.Get_MySqlConnection();
+            var list = new List<ElectionsDto>();
+
+            //Kiểm tra xem cử tri có tồn tại không
+            bool checkVoterExists = await _CheckVoterExists(ID_cutri, connection);
+            if(!checkVoterExists) return null;
+
+            //lấy danh sách kỳ bầu cử có mặc cử tri
+            const string sql = @"
+            SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, kbc.MoTa
+            FROM trangthaibaucu tt
+            JOIN kybaucu kbc ON kbc.ngayBD = tt.ngayBD
+            JOIN cutri ct ON tt.ID_CuTri = ct.ID_CuTri
+            WHERE ct.ID_CuTri =@ID_CuTri; ";
+            using (var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_CuTri",ID_cutri);
+
+                using var reader = await command.ExecuteReaderAsync();
+                while(await reader.ReadAsync()){
+                    list.Add(new ElectionsDto{
+                        ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")),
+                        ngayKt =  reader.GetDateTime(reader.GetOrdinal("ngayBD")),
+                        TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
+                        Mota = reader.GetString(reader.GetOrdinal("Mota")),
+                    });
+                }        
+            }
+
+            return list;
+        } 
     }
 }

@@ -149,5 +149,83 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 return count > 0;
             }
         }
+
+        //Lấy số lượng cử tri tối đa theo kỳ bầu cử
+        public async Task<int> _MaximumNumberOfVoters(DateTime ngayBD, MySqlConnection connection){
+            const string sql = "SELECT SoLuongToiDaCuTri FROM kybaucu WHERE ngayBD =@ngayBD; ";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                using var reader = await command.ExecuteReaderAsync();
+
+                if(await reader.ReadAsync())
+                    return reader.GetInt32(reader.GetOrdinal("SoLuongToiDaCuTri"));
+            }
+            return -1;
+        }
+
+        //Lấy số lượng ứng cử viên tối đa theo kỳ bầu cử
+        public async Task<int> _MaximumNumberOfCandidates(DateTime ngayBD, MySqlConnection connection){
+            const string sql = "SELECT SoLuongToiDaUngCuVien FROM kybaucu WHERE ngayBD =@ngayBD; ";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                using var reader = await command.ExecuteReaderAsync();
+
+                if(await reader.ReadAsync())
+                    return reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien"));
+            }
+            return -1;
+        }
+
+        //Lấy số lượt bình chọn tối đa theo kỳ bầu cử
+        public async Task<int> _MaximumNumberOfVotes(DateTime ngayBD, MySqlConnection connection){
+            const string sql = "SELECT SoLuotBinhChonToiDa FROM kybaucu WHERE ngayBD =@ngayBD; ";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                using var reader = await command.ExecuteReaderAsync();
+
+                if(await reader.ReadAsync())
+                    return reader.GetInt32(reader.GetOrdinal("SoLuotBinhChonToiDa"));
+            }
+            return -1;
+        }
+        
+         //Lấy số lượng cử tri hiện tại đang có trong kỳ bầu cử
+        public async Task<int> _GetCurrentVoterCountByElection(DateTime ngayBD, MySqlConnection connection){
+            const string sql = @"
+            SELECT COUNT(ct.ID_CuTri) SoLuongHienTai
+            FROM trangthaibaucu tt 
+            JOIN cutri ct ON ct.ID_CuTri = tt.ID_CuTri
+            JOIN kybaucu ky ON ky.ngayBD = tt.ngayBD
+            WHERE ky.ngayBD = @ngayBD;";
+            
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                using var reader = await command.ExecuteReaderAsync();
+
+                if(await reader.ReadAsync())
+                    return reader.GetInt32(reader.GetOrdinal("SoLuongHienTai"));
+            }
+            return -1;
+        }
+
+        //Lấy số lượng ứng cử viên hiện tại đang có trong kỳ bầu cử
+        public async Task<int> _GetCurrentCandidateCountByElection(DateTime ngayBD, MySqlConnection connection){
+            const string sql = @"
+            SELECT COUNT(ct.ID_CuTri) SoLuongHienTai
+            FROM ketquabaucu kq  
+            JOIN ungcuvien ucv on kq.ID_ucv = ucv.ID_ucv
+            JOIN kybaucu ky ON  ky.ngayBD = kq.ngayBD
+            WHERE ky.ngayBD = @ngayBD;";
+            
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                using var reader = await command.ExecuteReaderAsync();
+
+                if(await reader.ReadAsync())
+                    return reader.GetInt32(reader.GetOrdinal("SoLuongHienTai"));
+            }
+            return -1;
+        }
+    
     }
 }

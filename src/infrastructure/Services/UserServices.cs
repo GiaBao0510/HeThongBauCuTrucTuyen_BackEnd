@@ -10,7 +10,6 @@ using log4net.Util;
 using BackEnd.src.core.Common;
 using BackEnd.src.core.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
-using HeThongBauCuTrucTuyen_BackEnd.src.core.Container;
 using BackEnd.src.core.Container;
 
 namespace BackEnd.src.infrastructure.Services
@@ -67,6 +66,7 @@ namespace BackEnd.src.infrastructure.Services
             
             if(!await reader.ReadAsync()){
                 _log.WarnExt("Đăng nhập thất bại vì không tìm thấy số điện thoại");
+                Console.WriteLine("Đăng nhập thất bại vì không tìm thấy số điện thoại");
                 return null;
             }
 
@@ -78,12 +78,14 @@ namespace BackEnd.src.infrastructure.Services
 
             if(string.IsNullOrEmpty(role) || string.IsNullOrEmpty(HashedPwd)){
                 _log.WarnExt("Đăng nhập thất bại vì không tìm thấy số điện thoại");
+                Console.WriteLine("Đăng nhập thất bại vì không tìm thấy số điện thoại");
                 return null;
             }
 
             //Thực hiện vệc xác thực mật khẩu. Nếu không đúng thì không đăng nhập được
             if(!Argon2.Verify(HashedPwd, loginDto.password)){
                 _log.WarnExt("Đăng nhập thất bại: Sai mật khẩu");
+                Console.WriteLine("Đăng nhập thất bại: Sai mật khẩu");
                 return null;
             }
 
@@ -175,27 +177,41 @@ namespace BackEnd.src.infrastructure.Services
         }
 
         //4. Gửi mã otp cũng với tiêu đề
-        public async Task _SendOtpCodeWithTitle(string email, string title){
+        public async Task<bool> _SendOtpCodeWithTitle(string email, string title){
+            
+            //Check email có tồn tại không
+            using var connection = await _context.Get_MySqlConnection();
+            bool checkEmailExists = await _CheckEmailExists(email, connection);
+            if(!checkEmailExists) return false;
+
             string opt = RandomString.ChuoiNgauNhien(6);        //Chuỗi ngẫu nhiên
-            EmailOTP emailopt = new EmailOTP();
-            var emailBody = emailopt.GenerateOtpEmail(opt);     //Nội dung email
+            EmailOTP_Verify emailopt = new EmailOTP_Verify();
+            var emailBody = emailopt.GenerateOtpEmailVerify(opt);     //Nội dung email
             var cacheKey = $"OTP_{email}";                      //Đặt Key lưu vào bộ nhớ đệm
             _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
             await _emailSender.SendEmailAsync(email, title, emailBody); //Gửi
+            return true;
         }
 
         //5. Xác thực mã otp
-        public bool _VerifyOtp(VerifyOtpDto verifyOtpDto){
+        public async Task<int> _VerifyOtp(VerifyOtpDto verifyOtpDto){
+            using var connection = await _context.Get_MySqlConnection();
+            
+            //Kiểm tra Email có tồn tại không
+            bool checkEmailExists = await _CheckEmailExists(verifyOtpDto.Email, connection);
+            if(!checkEmailExists)
+                return -1; 
+
             var cacheKey = $"OTP_{verifyOtpDto.Email}";
             
             //Lấy giá trị từ CacheKey
             if(_cache.TryGetValue(cacheKey, out string cacheOTP)){
                 if(cacheOTP == verifyOtpDto.Otp){
                     _cache.Remove(cacheKey);
-                    return true;
+                    return 1;
                 }
             }
-            return false;   //Mã xác minh không hợp lệ
+            return 0;   //Mã xác minh không hợp lệ
         }
         
         //6. Xác thực mã otp khi quên mật khẩu
@@ -208,7 +224,13 @@ namespace BackEnd.src.infrastructure.Services
                 return false;
 
             //Gửi mã opt cùng với tiêu đề đặt lại mật khẩu
-            await _SendOtpCodeWithTitle(emailDTO.Email,"Đặt lại mật khẩu");
+            string title = "Đặt lại mật khẩu";
+            string opt = RandomString.ChuoiNgauNhien(6);        //Chuỗi ngẫu nhiên
+            EmailOTP_password emailopt = new EmailOTP_password();
+            var emailBody = emailopt.GenerateOtpEmail(opt);     //Nội dung email
+            var cacheKey = $"OTP_{emailDTO.Email}";                      //Đặt Key lưu vào bộ nhớ đệm
+            _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
+            await _emailSender.SendEmailAsync(emailDTO.Email, title, emailBody); //Gửi
             return true;
         }
 

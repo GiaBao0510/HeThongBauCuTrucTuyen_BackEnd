@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackEnd.src.core.Container
 {
-    public class EmailOTP_password
+    public class EmailOTP_Verify
     {
-        public string GenerateOtpEmail(string otp){
+        public string GenerateOtpEmailVerify(string otp){
             var body = $@"
                 <!DOCTYPE html>
                 <html lang='vi'>
@@ -134,7 +130,7 @@ namespace BackEnd.src.core.Container
                 <body>
                     <div class='container'>
                         <h1>VoteSecure</h1>
-                        <p>Để hoàn tất quá trình đặt lại mật khẩu, vui lòng nhập mã OTP dưới đây:</p>
+                        <p> Dưới đây là mã xác thực (OTP) của bạn:</p>
                         <div class='otp-display'>{otp}</div>
                         <p>Lưu ý rằng mã OTP này chỉ có hiệu lực trong vòng 5 phút kể từ khi email được gửi. Sau thời gian này, mã sẽ hết hạn và bạn cần yêu cầu một mã mới nếu vẫn chưa hoàn thành đăng nhập.</p>
                         <p>Đây là email tự động được gửi từ hệ thống, vui lòng không trả lời trực tiếp vào email này.</p>

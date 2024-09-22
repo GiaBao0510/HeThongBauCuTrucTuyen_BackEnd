@@ -33,7 +33,9 @@ namespace BackEnd.src.web_api.DTOs
         public string? NgayTao { get; set; } = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"); 
         [FromForm(Name ="SuDung")]
         public int SuDung { get; set; } = 1;
-
+        [FromForm(Name ="ID_ChucVu")]
+        public int ID_ChucVu { get; set; } = 0;
+ 
         //Khóa ngoại
         [FromForm(Name ="ID_DanToc")]
         public int ID_DanToc{set; get;}

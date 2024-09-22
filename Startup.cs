@@ -23,6 +23,7 @@ using BackEnd.infrastructure.config;
 using BackEnd.src.core.Interfaces;
 
 using Newtonsoft.Json;
+using BackEnd.core.Entities;
 
 namespace BackEnd
 {
@@ -228,6 +229,7 @@ namespace BackEnd
             services.AddScoped<IProfileRepository,ProfileRepository>();
             services.AddScoped<IUserServices,UserServices>();
             services.AddScoped<IToken,TokenServices>();
+            services.AddScoped<ILoginHistoryRepository,LoginHistoryRepository>();
             
         } 
 
@@ -262,11 +264,11 @@ namespace BackEnd
             });
 
             //Cấu hình các middleware khác
+            app.UseHsts();
             app.UseHttpsRedirection();
-            //app.UseStaticFiles();               //Thêm StaticFileMiddleware - nếu request yêu câu truy cập file tĩnh thì nó response nội dung file
+            app.UseStaticFiles();               //Thêm StaticFileMiddleware - nếu request yêu câu truy cập file tĩnh thì nó response nội dung file
             app.UseRouting();
             app.UseCors();
-            
             app.UseAuthentication();            //Phục hồi thông tin đăng nhập(xác thực)
             app.UseAuthorization();             //Phục hồi thông tin về quyền của User
     

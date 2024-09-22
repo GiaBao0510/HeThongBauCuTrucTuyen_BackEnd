@@ -4,6 +4,7 @@ using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Authorization;
+using BackEnd.src.core.Models;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -38,9 +39,15 @@ namespace BackEnd.src.web_api.Controllers
                         -2 => "Căn cước công dân thoại đã bị trùng",
                         -3 =>"Vai trò người dùng không tồn tại",
                         -4 =>"Đầu vào không hợp lệ hoặc bị để trống trường nào đó",
+                        -5 => "Lỗi khi tạo hồ sơ cho cử tri",
+                        -6 => "Lỗi ID chức vụ không tồn tại",
                         _ => "Lỗi không xác định"
                     };
-                    return BadRequest(new {Status = "False", Message = errorMessage});
+                    int status = result switch{
+                        0 => 400, -1 => 400, -2 => 400, -3 =>400, -4 => 400,
+                        -5=> 500, -6 => 400, _ => 500
+                    };
+                    return StatusCode(status,new {Status = "False", Message = errorMessage});
                 }
                 
                 return Ok(new{
@@ -288,5 +295,156 @@ namespace BackEnd.src.web_api.Controllers
             }
         }
 
+        //10. Thay đổi chức vụ của cử tri
+        [HttpPut("change-of-voter-position")]
+        [Authorize(Roles= "1")]
+        public async Task<IActionResult> ChangeOfVoterPosition([FromQuery] string id_cutri, [FromQuery] string id_chucvu){
+            try{
+                if(string.IsNullOrEmpty(id_cutri) || string.IsNullOrEmpty(id_chucvu))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền mã cử tri và mã chức vụ."});
+                
+                var result = await _voterReposistory._ChangeOfVoterPosition(id_cutri, Convert.ToInt32(id_chucvu));
+                if(result == false)
+                    return BadRequest(new{Status = "False", Message = "Mã chức vụ hoặc mã cử tri không tồn tại"});
+                
+                return Ok(new{Status = true, Message = "Thay đổi chức vụ cử tri thành công"});
+
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện gửi phản hồi: {ex.Message}"
+                });
+            }
+        }
+
+        //11.HIển thị thông tin cử tri sau khi quét mã QR
+        [HttpGet("show-information-before-registration")]
+        public async Task<IActionResult> DisplayUserInformationAfterScanningTheCode([FromQuery] string id_cutri){
+            try{
+                if(string.IsNullOrEmpty(id_cutri))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền mã cử tri."});
+
+                var result = await _voterReposistory._DisplayUserInformationAfterScanningTheCode(id_cutri);
+                if(result == null)
+                    return BadRequest(new{Status = "False", Message = "Cử tri này đã đăng ký tài khoản rồi."});
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Thông tin cử tri",
+                    Data = result
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy thông tin cử tri trước khi đăng ký: {ex.Message}"
+                });
+            }
+        }
+
+        //12. đặt mật khẩu, CCCD của cử tri trước khi đăng ký
+        [HttpPost("register-and-set-password")]
+        public async Task<IActionResult> RegisterAndSetPassword([FromQuery] string id_cutri,[FromBody] RegisterDto registerDto){
+            try{
+                // Kiểm tra đầu vào
+                if(string.IsNullOrEmpty(registerDto.pwd) || string.IsNullOrEmpty(registerDto.CCCD))
+                    return BadRequest(new{Status = "False", Message = "Mật khẩu và số căn cước công dân không được bỏ trống."});
+                
+                var result = await _voterReposistory._SetVoterCCCD_SetVoterPwd(id_cutri, registerDto.CCCD, registerDto.pwd);
+                if(result ==false)
+                    return BadRequest(new{Status = "False", Message = "Mã cử tri không tồn tại"});
+
+                return Ok(new{Status = true, Message = "Đăng ký thành công. Mật khẩu đã được đặt."});
+
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy thông tin cử tri trước khi đăng ký: {ex.Message}"
+                });
+            }
+        }
+
+        //13.Thêm danh sách cử tri vào cuộc bầu cử nào đó
+        [HttpPost("add-vote-list-to-election")]
+        [Authorize(Roles= "1")]
+        public async Task<IActionResult> AddListVotersToTheElection([FromBody]VoterListInElectionDto voterListInElectionDto){
+            try{
+                //Kiểm tra đầu vào
+                if(
+                   voterListInElectionDto.listIDVoter.Count == 0 ||
+                   string.IsNullOrEmpty(voterListInElectionDto.ngayBD.ToString()) ||
+                     string.IsNullOrEmpty(voterListInElectionDto.ID_DonViBauCu)
+                )
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin."});
+                
+                var result = await _voterReposistory._AddListVotersToTheElection(voterListInElectionDto);
+                if(result <=0){
+                    int status = result switch{
+                        0 => 400, -1 => 400, -2 => 500, -3 => 400, -4 => 500, _ => 500
+                    };
+                    string errorMessage = result switch{
+                        0 => "Không tìm thấy được ngày tổ chức cuộc bầu cử",
+                        -1 => "Không tìm thấy ID đơn vị bầu cử",
+                        -2 => "Lỗi khi thực hiện lấy số lượng cử tri tối đa",
+                        -3 => "Lỗi, số lượng cử tri tham gia vào kỳ bầu cử không lớn hơn số lượng quy định trước đó",
+                        -4 => "Lỗi khi lấy số lượng cử tri hiện tại",
+                        _ =>"Lỗi không xác định"
+                    };
+
+                    Console.WriteLine($"result: {result}");
+
+                    return StatusCode(status ,new{Status = "False", Message = errorMessage}); 
+                }
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Thêm danh sách cử tri vào cuộc bầu cử thành công"
+                });
+
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy thông tin cử tri trước khi đăng ký: {ex.Message}"
+                });
+            }
+        } 
+
+        [HttpGet("list-pf-elections-voters-have-paticipated")]
+        [Authorize(Roles= "1,5")]
+        public async Task<IActionResult> ListElectionsVotersHavePaticipated([FromQuery]string ID_cutri){
+            try{
+                if(string.IsNullOrEmpty(ID_cutri))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền mã cử tri."});
+
+                var result = await _voterReposistory._ListElectionsVotersHavePaticipated(ID_cutri);
+                if(result == null)
+                    return BadRequest(new{Status = "False", Message = "Không tìm thấy ID cử tri."});
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Danh sách các kỳ bầu cử mà cử tri đã tham gia",
+                    Data = result
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy thông tin cử tri trước khi đăng ký: {ex.Message}"
+                });
+            }
+        }
     }
 }

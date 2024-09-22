@@ -21,14 +21,14 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //5.Xác nhận mã otp sau khi đăng nhập
         Task<object> _VerifyOtpCodeAfterLogin(VerifyOtpDto verifyOtpDto);//
         //6. Xác thực mã OTP
-        bool _VerifyOtp(VerifyOtpDto verifyOtpDto);//
+        Task<int> _VerifyOtp(VerifyOtpDto verifyOtpDto);//
         //7. Gửi mã OTP cùng với tiêu đề
-        Task _SendOtpCodeWithTitle(string email, string title);//
+        Task<bool> _SendOtpCodeWithTitle(string email, string title);//
         //8. Kiểm tra Email có tồn tại không
         Task<bool> _CheckEmailExists(string email, MySqlConnection connection);//
         //9. Đặt lại mật khẩu dựa trên email người dùng
         Task<bool> _ResetUserPassword(string email, string newPwd);//
         //10.Gửi mã OTP khi người dùng gửi bỏ phiếu
-        Task<bool>  _SendOtpCodeAfterUserVoted(EmailDTO emailDTO, MySqlConnection connection);
+        Task<bool> _SendOtpCodeAfterUserVoted(EmailDTO emailDTO, MySqlConnection connection);
     }
 }

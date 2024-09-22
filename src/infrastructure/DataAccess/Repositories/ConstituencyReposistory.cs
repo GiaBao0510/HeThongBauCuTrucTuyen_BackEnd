@@ -133,5 +133,17 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return rowAffected > 0;
         }
 
+        //Kiểm tra xem đơn vj bầu cử có tồn tại không
+        public async Task<bool> _CheckIfConstituencyExists(string ID_DonViBauCu, MySqlConnection connection){
+            const string sql = "SELECT COUNT(ID_DonViBauCu) FROM donvibaucu WHERE ID_DonViBauCu =@ID_DonViBauCu;";
+            
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_DonViBauCu",ID_DonViBauCu);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            }
+        }
+
     }
 }

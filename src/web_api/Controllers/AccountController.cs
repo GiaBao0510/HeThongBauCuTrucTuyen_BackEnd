@@ -33,6 +33,7 @@ namespace BackEnd.src.web_api.Controllers
         private readonly IMemoryCache _cache;
         private readonly IEmailSender _emailSender;
         private readonly IToken _token;
+        private readonly ILoginHistoryRepository _loginHistory;
         private static readonly ILog _log = LogManager.GetLogger(typeof(AccountController));
 
         //Khởi tạo
@@ -42,7 +43,8 @@ namespace BackEnd.src.web_api.Controllers
             DatabaseContext context,
             IMemoryCache cache,
             IEmailSender emailSender,
-            IToken token
+            IToken token,
+            ILoginHistoryRepository loginHistory
         ){
             _userServices = userServices;
             _context = context;    
@@ -50,6 +52,7 @@ namespace BackEnd.src.web_api.Controllers
             _cache = cache;
             _emailSender = emailSender;
             _token = token;
+            _loginHistory = loginHistory;
         }
 
         //0.Chuyển số thực sang thời gian
@@ -78,7 +81,7 @@ namespace BackEnd.src.web_api.Controllers
                 return Ok(new {
                         Success = true,
                         VaiTro =  result.Role,
-                        Message = "Tài khoản hợp lệ. Vui lòng xác nhận mã otp chúng tôi gửi trên mail để hoàn thành bước đăng nhận."
+                        Message = "Tài khoản hợp lệ. Vui lòng xác nhận mã otp chúng tôi gửi trên mail để hoàn thành bước đăng nhập."
                     }
                 );
             }
@@ -122,7 +125,7 @@ namespace BackEnd.src.web_api.Controllers
                 //Check2: kiểm tra thuật toán mã hóa. Nếu không đúng thuật toán mã hóa thì báo lỗi
                 if(validatedToken is JwtSecurityToken jwtSecurityToken){
                     var result = jwtSecurityToken.Header.Alg.Equals //So sánh kiểm tra có đúng thuật toán này có dùng để mã hóa khồn
-                        (SecurityAlgorithms.HmacSha512, StringComparison.InvariantCultureIgnoreCase);
+                        (SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
                     
                     //Nếu không hợp lệ
                     if(!result)
@@ -261,17 +264,26 @@ namespace BackEnd.src.web_api.Controllers
             });
         }
 
-        //4. Xác thực khi đăng ký
-        //5.Xác thực mã otp sau khi đăng nhập
+        //4.Xác thực mã otp sau khi đăng nhập
         [HttpPost("verify-otp-after-login")]
         public async Task<IActionResult> VerifyOtpCodeAfterLogin([FromBody]VerifyOtpDto verify){
             try{
-                if(string.IsNullOrEmpty(verify.Email) || string.IsNullOrEmpty(verify.Otp))
-                    return BadRequest(new ApiRespons{ Success = false, Message = "Email và mã otp không được để trống"});
+                if(string.IsNullOrEmpty(verify.Email) || string.IsNullOrEmpty(verify.Otp) || string.IsNullOrEmpty(verify.Phone))
+                    return BadRequest(new ApiRespons{ Success = false, Message = "Email, số điện thoại và mã otp không được để trống"});
                 
                 var result = await _userServices._VerifyOtpCodeAfterLogin(verify);
                 if(result == null)
                     return BadRequest(new ApiRespons{ Success = false, Message = "Mã otp xác nhận không chính xác"});
+                
+                //Lưu lịch sử đăng nhập
+                var clientIpAddress = HttpContext.Connection.RemoteIpAddress;
+                string ipv4 = clientIpAddress!=null? clientIpAddress.MapToIPv4().ToString():"null";     //Lấy địan chỉ IPv4
+                bool checkSaveLogin = await _loginHistory._SaveLoginHistory(ipv4,verify.Phone);
+                if(checkSaveLogin == false)
+                return StatusCode(500, new ApiRespons{
+                    Success = false, 
+                    Message = "Lưu lịch sử đăng nhập thất bại"
+                });
                 
                 return Ok(new ApiRespons{
                     Success = true, 
@@ -289,10 +301,8 @@ namespace BackEnd.src.web_api.Controllers
                 });
             }
         }
-        
-        //6. Xác thực khi quên mật khẩu
-        //7. Xác thực khi đăng ký
-        //8. Gửi lại mã OTP
+
+        //5. Gửi lại mã OTP
         [HttpPost("resend-otp")]
         public async Task<IActionResult> ResendOtpAsync([FromBody] EmailDTO emailDTO){
             try{
@@ -318,6 +328,200 @@ namespace BackEnd.src.web_api.Controllers
                 });
             }
         }
+
+        //6. Xác nhận mã OTP
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody]VerifyOtpDto verifyOtpDto){
+            try{
+                if(string.IsNullOrEmpty(verifyOtpDto.Email) || string.IsNullOrEmpty(verifyOtpDto.Otp))
+                    return BadRequest(new ApiRespons{ Success = false, Message = "Email và mã otp không được để trống"});
+                
+                int result = await _userServices._VerifyOtp(verifyOtpDto);
+                if(result <= 0){
+                    string errorMessage = result switch{
+                        0 => "Mã xác minh Otp không hợp lệ",
+                        -1 => "Email không tồn tại",
+                        _ => "Lỗi không xác định"
+                    };
+
+                    return BadRequest(new ApiRespons{
+                        Success = false, 
+                        Message = errorMessage
+                    });
+                }
+
+                 return Ok(new ApiRespons{
+                    Success = true, 
+                    Message = "Mã OTP xác nhận thành công",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error message:{ex.Message}");
+                Console.WriteLine($"Error TargetSite:{ex.TargetSite}");
+                Console.WriteLine($"Error StackTrace:{ex.StackTrace}");
+                Console.WriteLine($"Error Data:{ex.Data}");
+                return StatusCode(500,new ApiRespons{
+                    Success = false, 
+                    Message = "Lỗi khi xác nhận mã otp"
+                });
+            }
+        }
+
+        //7. Gửi mã otp khi muốn đặt lại mậu khẩu
+        [HttpPost("send-otp-forgotpassword")]
+        public async Task<IActionResult> SendOtpCodeWhenForgotPwd([FromBody]EmailDTO emailDTO){
+            try{
+                if(string.IsNullOrEmpty(emailDTO.Email))
+                    return BadRequest(new ApiRespons{ Success = false, Message = "Vui lòng nhập Email để thay đổi mật khẩu"});
+                
+                bool result = await _userServices._SendOtpCodeWhenForgotPwd(emailDTO);
+                if(result == false)
+                    return BadRequest(new ApiRespons{ Success = false, Message = "Email người dùng không tồn tại"});
+                
+                return Ok(new ApiRespons{
+                    Success = true, 
+                    Message = "Xác thực hợp lệ. Đến phần thay đổi mật khẩu",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error message:{ex.Message}");
+                Console.WriteLine($"Error TargetSite:{ex.TargetSite}");
+                Console.WriteLine($"Error StackTrace:{ex.StackTrace}");
+                Console.WriteLine($"Error Data:{ex.Data}");
+                return StatusCode(500,new ApiRespons{
+                    Success = false, 
+                    Message = "Lỗi khi gửi mã otp"
+                });
+            }
+        }
+
+        //8. Đặt lại mật khẩu
+        [HttpPost("reset-pwd")]
+        public async Task<IActionResult> ResetUserPassword([FromBody] VerifyOtpDto verifyOtpDto){
+            try{
+                if(string.IsNullOrEmpty(verifyOtpDto.Email) || string.IsNullOrEmpty(verifyOtpDto.NewPwd))
+                    return BadRequest(new ApiRespons{ Success = false, Message = "Email và mật khẩu mới không được để trống"});
+                
+                var result = await _userServices._ResetUserPassword(verifyOtpDto.Email, verifyOtpDto.NewPwd);
+                if(result == false)
+                    return BadRequest(new ApiRespons{ Success = false, Message = "Không tìm thấy Email của người dùng để đặt lại mật khẩu"});
+                
+                return Ok(new ApiRespons{
+                    Success = true, 
+                    Message = "Đặt lại mật khẩu thành công",
+                    Data = result
+                });
+
+            }catch(Exception ex){
+                Console.WriteLine($"Error message:{ex.Message}");
+                Console.WriteLine($"Error TargetSite:{ex.TargetSite}");
+                Console.WriteLine($"Error StackTrace:{ex.StackTrace}");
+                Console.WriteLine($"Error Data:{ex.Data}");
+                return StatusCode(500,new ApiRespons{
+                    Success = false, 
+                    Message = "Lỗi khi đặt lại mã cho người dùng"
+                });
+            }
+        }
+
+        //9.Gửi mã Otp trước khi người dùng gửi phiếu bầu
+        [HttpPost("send-otp-before-sending")]
+        public async Task<IActionResult> SendOtpBeforeApply([FromBody] EmailDTO emailDTO){
+            try{
+                if(string.IsNullOrEmpty(emailDTO.Email))
+                    return StatusCode(400, new ApiRespons{ Success = false, Message = "Vui lòng điền Email gửi thông tin xác thực"});
+                
+                var result = await _userServices._SendOtpCodeWithTitle(emailDTO.Email, "Xác thực bỏ phiếu");
+                if(result == false)
+                    return StatusCode(400, new ApiRespons{ Success = false, Message = "Email người dùng không tồn tại"});
+
+                 return Ok(new ApiRespons{
+                    Success = true, 
+                    Message = "Xác thực thông tin người dùng thành công",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error message:{ex.Message}");
+                Console.WriteLine($"Error TargetSite:{ex.TargetSite}");
+                Console.WriteLine($"Error StackTrace:{ex.StackTrace}");
+                Console.WriteLine($"Error Data:{ex.Data}");
+                return StatusCode(500,new ApiRespons{
+                    Success = false, 
+                    Message = "Lỗi khi gửi mã otp"
+                });
+            }
+        }
+
+        //10. Gửi mã Otp sau khi người dùng cử tri đăng ký tài khoản
+        [HttpPost("send-otp-after-registration")]
+        public async Task<IActionResult> SendOtpÀterRegistration([FromBody] EmailDTO emailDTO){
+            try{
+                if(string.IsNullOrEmpty(emailDTO.Email))
+                    return StatusCode(400, new ApiRespons{ Success = false, Message = "Vui lòng điền Email gửi thông tin xác thực"});
+                
+                var result = await _userServices._SendOtpCodeWithTitle(emailDTO.Email, "Xác thực đăng ký");
+                if(result == false)
+                    return StatusCode(400, new ApiRespons{ Success = false, Message = "Email người dùng không tồn tại"});
+
+                 return Ok(new ApiRespons{
+                    Success = true, 
+                    Message = "Xác thực thông tin người dùng thành công",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error message:{ex.Message}");
+                Console.WriteLine($"Error TargetSite:{ex.TargetSite}");
+                Console.WriteLine($"Error StackTrace:{ex.StackTrace}");
+                Console.WriteLine($"Error Data:{ex.Data}");
+                return StatusCode(500,new ApiRespons{
+                    Success = false, 
+                    Message = "Lỗi khi gửi mã otp"
+                });
+            }
+        }
+
+        //11. Kiểm tra xem token hợp lệ không
+        [HttpGet("check-logined")]
+        public async Task<IActionResult> CheckLogined([FromHeader] string token){
+            try{
+                if(string.IsNullOrEmpty(token))
+                    return StatusCode(400, new ApiRespons{ Success = false, Message = "Vui lòng điền token để kiểm tra"});
+                
+                var result = _token._CheckLogined(token);
+                if(result <= 0){
+                    string errorMessage = result switch{
+                        0 => "Lỗi. Thuật toán mã hóa token không hợp lệ ",
+                        -1 => "Token đã hết hạn hoặc không tồn tại",
+                        _ => "Lỗi không xác định"
+                    };
+                    int status = result switch{
+                        0 => 400,
+                        -1 => 400,
+                        _ => 500
+                    };
+                    return StatusCode(status, new ApiRespons{
+                        Success = false, 
+                        Message = errorMessage
+                    });
+                }
+
+                return Ok(new ApiRespons{
+                    Success = true, 
+                    Message = "Token hợp lệ",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error message:{ex.Message}");
+                Console.WriteLine($"Error TargetSite:{ex.TargetSite}");
+                Console.WriteLine($"Error StackTrace:{ex.StackTrace}");
+                Console.WriteLine($"Error Data:{ex.Data}");
+                return StatusCode(500,new ApiRespons{
+                    Success = false, 
+                    Message = "Lỗi khi xác thực token"
+                });
+            }
+        }
+
 
     }
 }

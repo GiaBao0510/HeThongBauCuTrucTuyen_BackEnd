@@ -1,5 +1,3 @@
-using BackEnd.core.Entities;
-using BackEnd.src.core.Entities;
 using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Http;
 using MySql.Data.MySqlClient;
@@ -23,17 +21,33 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //Thay đổi mật khẩu - cử tri
         Task<int> _ChangeVoterPassword(string id, string oldPwd, string newPwd);
         //Lấy ID người dùng dựa trên ID cử tri
-        Task<string> GetIDUserBaseOnIDCuTri(string id,  MySqlConnection connection);
+        Task<string> GetIDUserBaseOnIDCuTri(string id, MySqlConnection connection);
         //Lấy thông tin cử tri kèm theo tài khoản
         Task<List<VoterDto>> _GetListOfVotersAndAccounts();
         //Kiểm tra ID cử tri có tồn tại không
         Task<bool> _CheckVoterExists(string ID, MySqlConnection connection);
         //Cử tri phản hồi
         Task<bool> _VoterSubmitReport(SendReportDto reportDto);
+        //Cử tri đăng ký khi quét mã(Hiển thị thông tin đăng ký của cử tri và cử tri phải điền mật khẩu)
+        Task<VoterDto> _DisplayUserInformationAfterScanningTheCode(string ID);
+        //Kiểm tra xem tài khoản cử tri đã đăng ký hay chưa
+        Task<int> _CheckRegisteredVoter(string ID, MySqlConnection connection); 
+        //Cử tri đặt mật khẩu, CCCD khi đăng ký
+        Task<bool> _SetVoterCCCD_SetVoterPwd(string id, string newCCCD, string pwd);
         //Cử tri đảm nhận chức vụ gì
-        //Thêm cử tri vào cuộc bầu cử (Cử tri có thể tham gia vào những cuộc bầu cử nào)
-        
-        //Cử tri bỏ phiếu
+        Task<int> _VoterTakePosition(string ID_voter, int ID_ChucVu, MySqlConnection connection, MySqlTransaction transaction);
+        //Thay đổi chức vụ của cử tri
+        Task<bool> _ChangeOfVoterPosition(string ID_voter, int ID_ChucVu);
+        //Thêm danh sách cử tri vào cuộc bầu cử (Cử tri có thể tham gia vào những cuộc bầu cử nào)
+        Task<int> _AddListVotersToTheElection(VoterListInElectionDto voterListInElectionDto);
+        //Kiểm tra xem cử tri có tồn tại trong kỳ bầu cử không
+        Task<bool> _VoterCheckInElection(string ID_cutri, DateTime ngayBD,  MySqlConnection connection);
+        //Cử tri bỏ phiếu(chưa mã hóa giá trị phiếu khi cử tri đã bỏ phiếu)
+        //Task<bool> _VotersVote();
+        //Danh sách các kỳ bầu cử mà cử tri có thể tham gia
+
+
         //Cử tri muốn xác thực lại phiếu đã bỏ trong thời gian bỏ, nhưng không
+        Task<List<ElectionsDto>> _ListElectionsVotersHavePaticipated(string ID_cutri);
     }
 }

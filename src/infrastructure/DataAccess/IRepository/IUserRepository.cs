@@ -28,6 +28,12 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<string> _GetUserProperties(string ID_user, string attribute, MySqlConnection connection);
         Task<bool> _DeleteUserBy_ID_withConnection(string ID, MySqlConnection connection);  //Xóa người dùng với connection
         Task<List<UserDto>> _GetListOfUsersAndAccounts(); //Lấy thông tin người dùng kèm theo tài khoản người dùng
-        
+        //Kiểm tra thông tin cử tri trước kh thêm vào
+        bool _CheckVoterInformationIsNotEmpty(UserDto user);
+        //Kiểm tra chức vụ có tồn tại không
+        Task<bool> _CheckPositionExist(int roleID, MySqlConnection connection, MySqlTransaction transaction);
+        Task<bool> _CheckPositionExist(int roleID, MySqlConnection connection);
+        //Kiểm tra xem tài khoản người dùng đã đăng ký chưa
+        Task<int> _CheckRegisteredUser(string ID);
     }
 }

@@ -598,7 +598,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             
             try{
                 //Kiểm tra đầu vào là không được null và giá trị hợp lệ
-                if(CheckUserInformationIsNotEmpty(user) == false)
+                if(_CheckVoterInformationIsNotEmpty(user) == false)
                     return -4;
 
                 //Kiểm tra điều kiện đầu vào sao cho SDT, email, cccd không được trùng nhau mới được phép thêm vào
@@ -618,11 +618,11 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 }
 
                 //Đặt mật khẩu mặt định, có băm
-                string hashedPwd = Argon2.Hash("8888888");
+                string hashedPwd = Argon2.Hash("88888888");
 
                 //Thêm thông tin người dùng - tài khoản
-                string Input = @"INSERT INTO nguoidung(ID_user,HoTen,GioiTinh,NgaySinh,DiaChiLienLac,CCCD,SDT,HinhAnh,PublicID,RoleID,ID_DanToc,Email) 
-                VALUES(@ID_user,@HoTen,@GioiTinh,@NgaySinh,@DiaChiLienLac,@CCCD,@SDT,@HinhAnh,@PublicID,@RoleID,@ID_DanToc,@Email);";
+                string Input = @"INSERT INTO nguoidung(ID_user,HoTen,GioiTinh,NgaySinh,DiaChiLienLac,SDT,HinhAnh,PublicID,RoleID,ID_DanToc,Email) 
+                VALUES(@ID_user,@HoTen,@GioiTinh,@NgaySinh,@DiaChiLienLac,@SDT,@HinhAnh,@PublicID,@RoleID,@ID_DanToc,@Email);";
                 string inputAccount = @"INSERT INTO taikhoan(TaiKhoan,MatKhau,BiKhoa,LyDoKhoa,NgayTao,SuDung,RoleID)
                 VALUES(@TaiKhoan,@MatKhau,@BiKhoa,@LyDoKhoa,@NgayTao,@SuDung,@RoleID);";
 
@@ -632,7 +632,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command.Parameters.AddWithValue("@GioiTinh", user.GioiTinh);
                     command.Parameters.AddWithValue("@NgaySinh", user.NgaySinh);
                     command.Parameters.AddWithValue("@DiaChiLienLac", user.DiaChiLienLac);
-                    command.Parameters.AddWithValue("@CCCD", user.CCCD);
                     command.Parameters.AddWithValue("@SDT", user.SDT);
                     command.Parameters.AddWithValue("@HinhAnh", user.HinhAnh);
                     command.Parameters.AddWithValue("@PublicID", user.PublicID);
@@ -719,7 +718,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return true;
         }
 
-        //18.Liệt kê all -account
+        //19.Liệt kê all -account
         public async Task<List<UserDto>> _GetListOfUsersAndAccounts(){
             var list = new List<UserDto>();
             using var connection = await _context.Get_MySqlConnection();
@@ -752,6 +751,68 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 });
             }
             return list;
+        }
+
+        //20. Kiểm tra xem có thông tin nào bỏ trống của cử tri không, nếu có thì trả về false
+        public bool _CheckVoterInformationIsNotEmpty(UserDto user){
+            if(user.HoTen == null ||user.GioiTinh == null ||user.NgaySinh == null ||user.DiaChiLienLac == null ||
+            user.Email == null ||user.SDT == null ||user.ID_DanToc == null || user.RoleID == null)
+                return false;
+            return true;
+        }
+
+        //21. Kiểm tra xem thông tin chức vụ có tồn tại không
+        public async Task<bool> _CheckPositionExist(int ID_chucvu, MySqlConnection connection, MySqlTransaction transaction){
+            try{
+                const string sql = "SELECT * FROM chucvu WHERE ID_chucvu = @ID_chucvu";
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ID_chucvu", ID_chucvu);
+
+                    int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                    if(count < 1)
+                        return false;       //Không tồn tại
+                }
+                return true;
+            }catch(Exception){
+                await transaction.RollbackAsync();
+                return false;
+            }
+        }
+
+        //21 - 2. Kiểm tra xem thông tin chức vụ có tồn tại không
+        public async Task<bool> _CheckPositionExist(int ID_chucvu, MySqlConnection connection){
+
+            const string sql = "SELECT * FROM chucvu WHERE ID_chucvu = @ID_chucvu";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_chucvu", ID_chucvu);
+
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                if(count < 1)
+                    return false;       //Không tồn tại
+            }
+            return true;
+        }
+
+        //22. kiểm tra xem người dù đã có tài khoản hay chưa
+        public async Task<int> _CheckRegisteredUser(string ID){
+            using var connect = await _context.Get_MySqlConnection();
+
+            //Kiểm tra xem ID người dùng có tồn tại không
+            bool checkUserExists = await _CheckUserExists(ID, connect);
+            if(!checkUserExists) return -1;
+
+            string trangThai = "0";
+
+            //Kiểm tra xem người dùng đã đăng ký chưa
+            const string sql = "SELECT TrangThaiDangKy FROM hosonguoidung WHERE ID_user =@ID_user;";
+            using(var command = new MySqlCommand(sql, connect)){
+                command.Parameters.AddWithValue("@ID_user", ID);
+
+                using var reader = await command.ExecuteReaderAsync();
+                if(await reader.ReadAsync())
+                    trangThai =  reader.GetString(reader.GetOrdinal("TrangThaiDangKy"));
+            }
+            return Convert.ToInt32(trangThai);
         }
 
     }

@@ -12,7 +12,7 @@ namespace BackEnd.core.Entities
 		[Key]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DisplayName("Start date")]
-        public DateTime? ngayBD { get; set; }
+        public DateTime ngayBD { get; set; } = DateTime.Now.ToLocalTime();
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DisplayName("End date")]
         public DateTime ngayKT { get; set; }
