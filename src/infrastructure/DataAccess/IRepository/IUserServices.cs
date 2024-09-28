@@ -19,7 +19,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //4. Gửi mã OTP khi đăng nhập
         Task _SendVerificationOTPcodeAfterLogin(string email);//
         //5.Xác nhận mã otp sau khi đăng nhập
-        Task<object> _VerifyOtpCodeAfterLogin(VerifyOtpDto verifyOtpDto);//
+        Task<TokenModel> _VerifyOtpCodeAfterLogin(VerifyOtpDto verifyOtpDto);//
         //6. Xác thực mã OTP
         Task<int> _VerifyOtp(VerifyOtpDto verifyOtpDto);//
         //7. Gửi mã OTP cùng với tiêu đề

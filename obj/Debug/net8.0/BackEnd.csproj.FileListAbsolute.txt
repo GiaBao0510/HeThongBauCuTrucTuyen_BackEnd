@@ -152,3 +152,5 @@ D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_Ba
 D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\Microsoft.Extensions.Identity.Stores.dll
 D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\MailKit.dll
 D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\MimeKit.dll
+D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\Microsoft.AspNet.SignalR.Client.dll
+D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\System.Net.WebSockets.WebSocketProtocol.dll

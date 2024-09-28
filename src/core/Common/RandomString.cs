@@ -10,6 +10,14 @@ namespace BackEnd.src.core.Common
     {
         //Tạo chuỗi ngẫu nhiên
         private static Random random = new Random();
+        public static string DaySoNgauNhien(int lenght){
+            const string chars = "0123456789";
+            return new string(
+                Enumerable.Repeat(chars, lenght).
+                Select(s=>s[random.Next(s.Length)]).ToArray()
+            );
+        }
+
         public static string ChuoiNgauNhien(int lenght){
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(

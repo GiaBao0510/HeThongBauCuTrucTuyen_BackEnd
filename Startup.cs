@@ -24,6 +24,7 @@ using BackEnd.src.core.Interfaces;
 
 using Newtonsoft.Json;
 using BackEnd.core.Entities;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace BackEnd
 {
@@ -142,7 +143,11 @@ namespace BackEnd
                     JwtBearerDefaults.AuthenticationScheme: tên loại xác thực được sử dụng để
                 phân biệt với các loại xác thực khác
             */
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>{     //Cấu hình chi tiết cho việc xác thực
+            services.AddAuthentication(options =>{
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(opt =>{     //Cấu hình chi tiết cho việc xác thực
                 opt.TokenValidationParameters = new TokenValidationParameters{
                     //Tự cấp token
                     ValidateIssuer = false,     //Không kiểm tra nguoiwg phát hành token
@@ -174,8 +179,9 @@ namespace BackEnd
             });
 
                 // --- 12 Thiết lập Endpoint cho các thiết bị khác sử dụng
-            services.AddCors(options => options.AddDefaultPolicy(policy => 
-                policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
+            services.AddCors(options => 
+                options.AddDefaultPolicy(policy => 
+                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
             ));
             
              services.AddRazorPages();

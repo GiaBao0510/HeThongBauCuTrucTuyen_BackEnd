@@ -5,6 +5,7 @@ using System.Text;
 using BackEnd.src.core.Interfaces;
 using BackEnd.src.core.Models;
 using BackEnd.src.infrastructure.DataAccess.Context;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MySql.Data.MySqlClient;
@@ -15,73 +16,28 @@ namespace BackEnd.src.infrastructure.Services
     {
         private readonly DatabaseContext _context;
         private readonly AppSetting _appSettings;
+        private readonly IConfiguration _configuration;
 
         //Khởi tạo
         public TokenServices(
             DatabaseContext context,
-            IOptionsMonitor<AppSetting> optionsMonitor
+            IOptionsMonitor<AppSetting> optionsMonitor,
+            IConfiguration configuration
         ){
             _context = context;    
-            _appSettings = optionsMonitor.CurrentValue;     
+            _appSettings = optionsMonitor.CurrentValue;
+            _configuration = configuration;     
         }
 
-        //-1.Chuyển số thực sang thời gian
+        //1.Chuyển số thực sang thời gian
         private DateTime ConvertUnixTimeToDateTime(long utcExpireDate){
             var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             return dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
         } 
 
-        //0. Tạo ra RefreshToken
-        public string GenerateRefreshToken(){
-            var random = new byte[32];
-
-            //Tạo random cho mảng byte
-            using(var x = RandomNumberGenerator.Create()){
-                x.GetBytes(random);
-
-                return Convert.ToBase64String(random);
-            }
-        }
-
-        //1. Hàm này lưu trữ hoặc cập nhật lại refreshtoken(Nếu trong bảng refreshtoken đã có người dùng rồi)
-        public async Task SaveOrUpdateRefreshToken(string jwtId, string refreshToken, string account){
-            using(var connection = _context.CreateConnection()){
-                await connection.OpenAsync();
-                
-                //Câu lệnh mysql sẽ kiểm tra nếu chưa có thì Tạo mới. Ngược lại nếu người dùng có refreshtoken thì cập nhật và lưu lại 
-                const string sql = @"
-                INSERT INTO refreshtoken(token, JwtId, IsUsed, IsRevoked, IssuedAt, ExpiredAt, TaiKhoan)
-                VALUES(@token, @JwtId, @IsUsed, @IsRevoked, @IssuedAt, @ExpiredAt, @TaiKhoan)
-                ON DUPLICATE KEY UPDATE 
-                token = VALUES(token),
-                JwtId = VALUES(JwtId),
-                IsUsed = VALUES(IsUsed),
-                IsRevoked = VALUES(IsRevoked),
-                IssuedAt = VALUES(IssuedAt),
-                ExpiredAt = VALUES(ExpiredAt);";    
-                
-                using (var command = new MySqlCommand(sql, connection)){
-                    command.Parameters.AddWithValue("@token", refreshToken);
-                    command.Parameters.AddWithValue("@JwtId", jwtId);
-                    command.Parameters.AddWithValue("@IsUsed", 0);
-                    command.Parameters.AddWithValue("@IsRevoked", 0);
-                    command.Parameters.AddWithValue("@IssuedAt", DateTime.UtcNow);
-                    command.Parameters.AddWithValue("@ExpiredAt", DateTime.UtcNow.AddHours(10));
-                    command.Parameters.AddWithValue("@TaiKhoan", account);
-
-                    await command.ExecuteNonQueryAsync();
-                }
-            }
-        }
-
         //2.Tạo ra token
         public async Task<TokenModel> GenerateToken(LoginModel loginModel)
         {
-            if (loginModel == null)
-            {
-                Console.WriteLine("Lỗi vì loginModel null");
-            }
-
             // Lấy mảng byte giống bên biến SecretKeyBytes trong file Startup.cs
             var secretKeyByte = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.SecretKey));
             var creds = new SigningCredentials(secretKeyByte, SecurityAlgorithms.HmacSha256Signature);
@@ -97,41 +53,32 @@ namespace BackEnd.src.infrastructure.Services
                 new Claim("BiKhoa", loginModel.BiKhoa)
             };
 
+            // Tạo Accesstoken
             var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:Issuer"],
+                audience: _configuration["JWT:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(5),   // Thời gian hết hạn
+                expires: DateTime.UtcNow.AddHours(3),   // Thời gian hết hạn
+                signingCredentials: creds               // Cấu hình ký mã hóa token
+            );
+
+            //Tạo RefreshToken
+            var token2 = new JwtSecurityToken(
+                issuer: _configuration["JWT:Issuer"],
+                audience: _configuration["JWT:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(14),   // Thời gian hết hạn
                 signingCredentials: creds               // Cấu hình ký mã hóa token
             );
 
             var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
-            var refreshToken = GenerateRefreshToken();
-
-            // Lưu vào DB nếu người dùng chưa có refresh token, ngược lại thì cập nhật lại
-            await SaveOrUpdateRefreshToken(token.Id, refreshToken, loginModel.account);
+            var refreshToken = new JwtSecurityTokenHandler().WriteToken(token2);
 
             return new TokenModel
             {
                 accessToken = accessToken,
                 refreshToken = refreshToken
             };
-        }
-
-        //4 Vô hiệu hóa refresh token khi người dùng đăng xuất
-        public async Task InvalidateRefreshTokenForUser(string TaiKhoan){
-            using(var connection = _context.CreateConnection()){
-                await connection.OpenAsync();
-                
-                //Đánh dấu tài khoản đã được thu hồi và sử dụng
-                const string sql = @"
-                UPDATE refreshtoken
-                SET IsUsed = 1, IsRevoked = 1
-                WHERE TaiKhoan = @TaiKhoan;";
-                
-                using (var command = new MySqlCommand(sql, connection)){
-                    command.Parameters.AddWithValue("@TaiKhoan", TaiKhoan);
-                    await command.ExecuteNonQueryAsync();
-                }
-            }
         }
 
         //5.kiểm tra xem token có hợp lệ không
@@ -179,7 +126,44 @@ namespace BackEnd.src.infrastructure.Services
             }
 
             return 1;
-            
         }
+
+        //Làm mới tại accesstoken cho người dùng
+        public async Task<TokenModel> _RenewToken(LoginModel loginModel){
+            // Lấy mảng byte giống bên biến SecretKeyBytes trong file Startup.cs
+            var secretKeyByte = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.SecretKey));
+            var creds = new SigningCredentials(secretKeyByte, SecurityAlgorithms.HmacSha256Signature);
+
+            // Chỉ định các Claims cho người dùng
+            var claims = new List<Claim>()
+            {
+                new Claim("SDT", loginModel.account),
+                new Claim(ClaimTypes.Role, loginModel.Role),
+                new Claim(ClaimTypes.Email, loginModel.Email),
+                new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("SuDung", loginModel.SuDung.ToString()),
+                new Claim("BiKhoa", loginModel.BiKhoa)
+            };
+
+            // Tạo Accesstoken
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:Issuer"],
+                audience: _configuration["JWT:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(3),   // Thời gian hết hạn
+                signingCredentials: creds               // Cấu hình ký mã hóa token
+            );
+
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
+            
+            return new TokenModel
+            {
+                accessToken = accessToken
+            };
+        }
+    
+
+
+
     }
 }

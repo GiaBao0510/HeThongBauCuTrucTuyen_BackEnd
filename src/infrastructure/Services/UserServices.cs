@@ -115,7 +115,7 @@ namespace BackEnd.src.infrastructure.Services
 
             // --- Thực hiển gửi mã
             string title = "Mã xác thực đã gửi lại";
-            string opt = RandomString.ChuoiNgauNhien(6);        //Chuỗi ngẫu nhiên
+            string opt = RandomString.DaySoNgauNhien(6);        //Chuỗi ngẫu nhiên
             EmailOTP emailopt = new EmailOTP();
             var emailBody = emailopt.GenerateOtpEmail(opt);     //Nội dung email
             var cacheKey = $"OTP_{emailDTO.Email}";                      //Đặt Key lưu vào bộ nhớ đệm
@@ -129,7 +129,7 @@ namespace BackEnd.src.infrastructure.Services
         public async Task _SendVerificationOTPcodeAfterLogin(string email){
             // --- Thực hiển gửi mã
             string title = "Xác thực mã otp sau khi đăng nhập";
-            string opt = RandomString.ChuoiNgauNhien(6);        //Chuỗi ngẫu nhiên
+            string opt = RandomString.DaySoNgauNhien(6);        //Chuỗi ngẫu nhiên
             EmailOTP emailopt = new EmailOTP();
             var emailBody = emailopt.GenerateOtpEmail(opt);     //Nội dung email
             var cacheKey = $"OTP_{email}";                      //Đặt Key lưu vào bộ nhớ đệm
@@ -138,7 +138,7 @@ namespace BackEnd.src.infrastructure.Services
         }
 
         //3. Xác thực mã otp sau khi đăng nhập
-        public async Task<object> _VerifyOtpCodeAfterLogin(VerifyOtpDto verifyOtpDto){
+        public async Task<TokenModel> _VerifyOtpCodeAfterLogin(VerifyOtpDto verifyOtpDto){
             var cacheKey = $"OTP_{verifyOtpDto.Email}";
 
             //Kiểm tra trong bộ nhớ cache có chứa OTP không
@@ -184,7 +184,7 @@ namespace BackEnd.src.infrastructure.Services
             bool checkEmailExists = await _CheckEmailExists(email, connection);
             if(!checkEmailExists) return false;
 
-            string opt = RandomString.ChuoiNgauNhien(6);        //Chuỗi ngẫu nhiên
+            string opt = RandomString.DaySoNgauNhien(6);        //Chuỗi ngẫu nhiên
             EmailOTP_Verify emailopt = new EmailOTP_Verify();
             var emailBody = emailopt.GenerateOtpEmailVerify(opt);     //Nội dung email
             var cacheKey = $"OTP_{email}";                      //Đặt Key lưu vào bộ nhớ đệm
@@ -225,7 +225,7 @@ namespace BackEnd.src.infrastructure.Services
 
             //Gửi mã opt cùng với tiêu đề đặt lại mật khẩu
             string title = "Đặt lại mật khẩu";
-            string opt = RandomString.ChuoiNgauNhien(6);        //Chuỗi ngẫu nhiên
+            string opt = RandomString.DaySoNgauNhien(6);        //Chuỗi ngẫu nhiên
             EmailOTP_password emailopt = new EmailOTP_password();
             var emailBody = emailopt.GenerateOtpEmail(opt);     //Nội dung email
             var cacheKey = $"OTP_{emailDTO.Email}";                      //Đặt Key lưu vào bộ nhớ đệm
@@ -269,7 +269,7 @@ namespace BackEnd.src.infrastructure.Services
             await _SendOtpCodeWithTitle(emailDTO.Email,"Xác thực bỏ phiếu");
             return true;
         }
-        
+
     }
     
 }
