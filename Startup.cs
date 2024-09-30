@@ -21,14 +21,15 @@ using BackEnd.src.web_api.Mappings;
 using BackEnd.src.core.Models;
 using BackEnd.infrastructure.config;
 using BackEnd.src.core.Interfaces;
-
 using Newtonsoft.Json;
 using BackEnd.core.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackEnd
 {
-    public class Startup
+    public class Startup 
     {
         public IConfiguration Configuration{get;}
 
@@ -42,6 +43,7 @@ namespace BackEnd
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+            services.AddHttpContextAccessor();
 
                 // --- 0. Cấu hình khi test trên Swagger
             services.AddSwaggerGen(c =>{
@@ -74,7 +76,7 @@ namespace BackEnd
                 //Cấu hình xử lý IFormFile
                 c.OperationFilter<FileUploadService>();
             });
-
+            
                 // --- 1 Thêm dịch vụ MemoryCache để lưu dữ liệu không thay đổi trên bộ nhớ đệm
             services.AddMemoryCache();
 
@@ -99,15 +101,6 @@ namespace BackEnd
             services.AddDbContext<ApplicationDbContext>(option =>{
                 option.UseMySql( Configuration.GetConnectionString("MySQL") , serverMysqlVersion);
             });
-
-                // --- 7 Đăng ký dịch vụ Identity vào trong hệ thống<<<<<Test
-            // services.AddIdentity<AppUser, IdentityRole>(options =>{
-            //     options.Password.RequireDigit = false;
-            //     options.Password.RequiredLength = 6;
-            //     options.User.RequireUniqueEmail = true;
-            // })
-            // .AddEntityFrameworkStores<ApplicationDbContext>()
-            // .AddDefaultTokenProviders();
 
                 // --- 3. Cấu hình với Appsetting để lấy SecreteKey
             services.Configure<AppSetting>(Configuration.GetSection("AppSettings"));
@@ -179,10 +172,16 @@ namespace BackEnd
             });
 
                 // --- 12 Thiết lập Endpoint cho các thiết bị khác sử dụng
-            services.AddCors(options => 
-                options.AddDefaultPolicy(policy => 
-                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
-            ));
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    policy =>
+                    {
+                        policy.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+                    });
+            });
+
+            services.AddEndpointsApiExplorer();
             
              services.AddRazorPages();
 
@@ -210,6 +209,39 @@ namespace BackEnd
                 options.SignIn.RequireConfirmedPhoneNumber = false; //Khong cho xác thực bằng số điện thoại
                 options.SignIn.RequireConfirmedPhoneNumber = true; //Cấu hình chỉ xác thực bằng Email
             });
+
+            //12. Cấu hình giới hạn tốc độ(Cho phép người dùng có thể tương tác với api nào đó bao nhiêu lần trong mỗi khoảng thời gian)
+            services.AddInMemoryRateLimiting();
+            services.AddRateLimiter(options =>{
+                options.AddFixedWindowLimiter("FixedWindowLimiter", opt =>{     //"FixedWindowLimiter": Đây là tên duy nhất của RateLimiter
+                    opt.Window = TimeSpan.FromMinutes(1);                       //Đếm số lượng yêu cầu trong 1 phút
+                    opt.PermitLimit = 10;                                       //Thiết lập giới hạn cho phép 10 yêu caaud trong 1 phút
+                    opt.QueueLimit = 20;                                        //THiết lập hàng đợi là 20 yêu cầu. Nếu số lượng yêu cầu vượt quá 10 sẽ vào hàng đợi
+                    opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;  //Thiết lập thứ tự xử lý các yêu cầu trong hàng đợi là "OldestFirst"
+                }).RejectionStatusCode = 429;   //Too many Request
+
+                //Dùng cử xổ trượt để tính toán giới hạn
+                options.AddSlidingWindowLimiter("SlidingWindowLimiter", opt =>{
+                    opt.Window = TimeSpan.FromMinutes(1);       //Thiết lập thời gian của cửa số trượt là 1 phút
+                    opt.PermitLimit = 10;                       //Thiết lập giới hạn yêu cầu là 10 trong mỗi 1 phút
+                    opt.QueueLimit = 20;                        //THiết lập hàng đợi là 20 yêu cầu. Nếu số lượng yêu cầu vượt quá 10 sẽ vào hàng đợi
+                    opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;  //Thiết lập quy trình xử lý là đến sớm sẽ được xử lý sớm
+                    opt.SegmentsPerWindow = 3;                  //THiết lập số lượng phân đoạn là 3 (Tức là 1 phút/3 = 20s).Rate limiter sẽ đếm số lượt yêu cầu trong mỗi phân đoạn và tổng hợp kết quả lại để quyết định có chặn yêu cầu này không
+                }).RejectionStatusCode = 429;
+
+                //Giới hạn số lượng yêu cầu đồng thời được xử lý bởi hệ thống. Giúp bảo vệ hệ thống không bị quá tải
+                options.AddConcurrencyLimiter("ConcurrencyLimiter",opt =>{
+                    opt.PermitLimit = 10;                       //chỉ có tối đa 10 yêu cầu được xử lý cùng một lúc.
+                    opt.QueueLimit = 20;                        //hiết lập giới hạn cho hàng đợi là 20 yêu cầu. Nếu số lượng yêu cầu vượt quá 10
+                    opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;  //Thiết lập quy trình xử lý là đến sớm sẽ được xử lý sớm
+                }).RejectionStatusCode = 429;
+            });
+            
+            services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
             
                 //-- Đăng ký dịch vụ tại đây
             services.AddScoped<DatabaseContext>();
@@ -236,7 +268,6 @@ namespace BackEnd
             services.AddScoped<IUserServices,UserServices>();
             services.AddScoped<IToken,TokenServices>();
             services.AddScoped<ILoginHistoryRepository,LoginHistoryRepository>();
-            
         } 
 
         //Riêng các service muốn call thì sẽ goi trong đây
@@ -273,11 +304,13 @@ namespace BackEnd
             app.UseHsts();
             app.UseHttpsRedirection();
             app.UseStaticFiles();               //Thêm StaticFileMiddleware - nếu request yêu câu truy cập file tĩnh thì nó response nội dung file
+            app.UseRateLimiter();
+            app.UseIpRateLimiting();       //Thêm middleware giới hạn tốc độ của người dùng
             app.UseRouting();
-            app.UseCors();
+            app.UseCors("AllowAll");
             app.UseAuthentication();            //Phục hồi thông tin đăng nhập(xác thực)
             app.UseAuthorization();             //Phục hồi thông tin về quyền của User
-    
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

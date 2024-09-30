@@ -18,13 +18,16 @@ using System.Web;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackEnd.src.web_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableRateLimiting("FixedWindowLimiter")]
     public class AccountController: ControllerBase
     {
         private readonly IUserServices _userServices;
@@ -62,9 +65,12 @@ namespace BackEnd.src.web_api.Controllers
         }
 
         //1.Đăng nhập
-        [HttpPost("login")]
+        [HttpPost("login")]   
+        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> Login([FromBody]LoginModel loginModel){
             try{
+                
+
                 //1.Nếu không điển cũng quăng ra lỗi luôn
                 if(string.IsNullOrEmpty(loginModel.account) || string.IsNullOrEmpty(loginModel.password))
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin đăng nhập."});
@@ -98,13 +104,13 @@ namespace BackEnd.src.web_api.Controllers
             }
         }
 
-        //2.Giai hạn lại token
+        //2.Giai hạn lại accesstoken khi refreshtoke còn hạn dựa trên thông tin người dùng
         [HttpPost("renewtoken")]
         public async Task<IActionResult> RenewToken([FromBody] LoginModel loginModel){
             try{
                 //1.Nếu không điển cũng quăng ra lỗi luôn
-                if(string.IsNullOrEmpty(loginModel.account) || string.IsNullOrEmpty(loginModel.password))
-                    return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin đăng nhập."});
+                if(string.IsNullOrEmpty(loginModel.account))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin khi làm mới token."});
 
                 //2. Lấy thông tin tài khoản và làm mới lại token
                 var result = await _token._RenewToken(loginModel);
@@ -345,6 +351,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //9.Gửi mã Otp trước khi người dùng gửi phiếu bầu
         [HttpPost("send-otp-before-sending")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> SendOtpBeforeApply([FromBody] EmailDTO emailDTO){
             try{
                 if(string.IsNullOrEmpty(emailDTO.Email))
@@ -373,6 +380,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //10. Gửi mã Otp sau khi người dùng cử tri đăng ký tài khoản
         [HttpPost("send-otp-after-registration")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> SendOtpÀterRegistration([FromBody] EmailDTO emailDTO){
             try{
                 if(string.IsNullOrEmpty(emailDTO.Email))
@@ -443,6 +451,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //12. Gửi  mã OTP
         [HttpPost("send-otp")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> SendOtpAsync([FromBody] EmailDTO emailDTO){
             try{
                 if(string.IsNullOrEmpty(emailDTO.Email))
@@ -464,6 +473,34 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500,new ApiRespons{
                     Success = false, 
                     Message = "Lỗi khi gửi mã otp"
+                });
+            }
+        }
+
+        //13. Kiểm tra email có tồn tại không trước khi đăng nhập
+        [HttpGet("check-email-exists")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
+        public async Task<IActionResult> CheckEmailExists([FromQuery] string email){
+            try{
+                if(string.IsNullOrEmpty(email))
+                    return StatusCode(400, new ApiRespons{ Success = false, Message = "Vui lòng điền Email để xác thực"});
+                var result = await _userServices._CheckUserEmail(email);
+                if(result == false){
+                    return StatusCode(400, new ApiRespons{ Success = false, Message = "Email này không tồn tại"});
+                }
+
+                return Ok(new ApiRespons{
+                    Success = true, 
+                    Message = "Email đã tồn tại"
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error message:{ex.Message}");
+                Console.WriteLine($"Error TargetSite:{ex.TargetSite}");
+                Console.WriteLine($"Error StackTrace:{ex.StackTrace}");
+                Console.WriteLine($"Error Data:{ex.Data}");
+                return StatusCode(500,new ApiRespons{
+                    Success = false, 
+                    Message = "Lỗi khi kiểm tra email người dùng."
                 });
             }
         }

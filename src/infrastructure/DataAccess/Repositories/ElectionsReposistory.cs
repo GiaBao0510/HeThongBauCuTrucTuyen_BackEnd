@@ -226,6 +226,28 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
             return -1;
         }
+
+        //Trả về ngày kết thúc của kỳ bầu cử dựa trên thời điểm bắt đầu
+        public async Task<TimeOfTheElectionDTO> _GetTimeOfElection(DateTime ngayBD, MySqlConnection connection){
+            TimeOfTheElectionDTO result = new TimeOfTheElectionDTO();
+
+            const string sql = @"
+            SELECT ngayBD, ngayKT FROM kybaucu 
+            WHERE ngayBD = @ngayBD";
+
+            using (var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                using var reader = await command.ExecuteReaderAsync();
+                
+                if(await reader.ReadAsync()){
+                    result.ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD"));
+                    result.ngayKT = reader.GetDateTime(reader.GetOrdinal("ngayKT"));
+                    return result;
+                }
+            }
+
+            return null;// Không tồn tại
+        }
     
     }
 }

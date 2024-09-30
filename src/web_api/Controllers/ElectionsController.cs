@@ -48,6 +48,13 @@ namespace BackEnd.src.web_api.Controllers
                         Status = "false",
                         Message=$"Lỗi khi đầu vào không được rỗng"
                     });
+
+                //Nếu ngày bắt đầu lớn hơn ngày kết thúc thì trả về lỗi
+                if(Elections.ngayBD > Elections.ngayKT)
+                    return StatusCode(400,new{
+                        Status = "false",
+                        Message=$"Lỗi ngày bắt đầu kỳ bầu cử không được lớn hơn ngày kết thúc"
+                    });
                 
                 //lấy kết quả thêm vào được hay không
                 var result = await _electionsReposistory._AddElections(Elections);
@@ -74,7 +81,7 @@ namespace BackEnd.src.web_api.Controllers
     
         //Lấy theo ID
         [HttpGet("{id}")]
-        [Authorize(Roles = "1,2,8")]
+        [Authorize(Roles = "1,2,5,8")]
         public async Task<IActionResult> GetElectionsBy_ID(string id){
             try{
                 var Elections = await _electionsReposistory._GetElectionsBy_ID(id);

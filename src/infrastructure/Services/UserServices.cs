@@ -270,6 +270,16 @@ namespace BackEnd.src.infrastructure.Services
             return true;
         }
 
+        //9. Kiểm tra xem email có tồn tại không
+        public async Task<bool> _CheckUserEmail(string email){
+            using var connection = await _context.Get_MySqlConnection();
+            //Kiểm tra xem email có tồn tại không
+            bool CheckExistsEmail = await _CheckEmailExists(email, connection);
+            if(!CheckExistsEmail)
+                return false;
+            return true;
+        }
+
     }
     
 }

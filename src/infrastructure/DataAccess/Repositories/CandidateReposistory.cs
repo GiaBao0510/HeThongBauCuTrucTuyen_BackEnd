@@ -34,7 +34,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         public new void Dispose() => _context.Dispose();
 
 
-        //-2 .Kiểm tra ID cử tri có tồn tại không
+        //-2 .Kiểm tra ID ứng cử viên có tồn tại không
         public async Task<bool> _CheckCandidateExists(string ID, MySqlConnection connection){
             const string sqlCount = "SELECT COUNT(ID_ucv) FROM ungcuvien WHERE ID_ucv = @ID_ucv";
             using(var command = new MySqlCommand(sqlCount, connection)){
@@ -122,7 +122,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 //Tạo hồ sơ
                 bool AddProfile = await _profileRepository._AddProfile(ID_user, "1", connect);
                 if(!AddProfile){
-                    Console.WriteLine("Lỗi khi tạo hồ sơ cho cử tri");
+                    Console.WriteLine("Lỗi khi tạo hồ sơ cho ứng cử viên");
                     await transaction.RollbackAsync();
                     return -100;
                 }
@@ -453,7 +453,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             using var transaction =await connect.BeginTransactionAsync();
 
             try{
-                //Kiểm tra cử tri có tồn tại hay không
+                //Kiểm tra ứng cử viên có tồn tại hay không
                 bool CheckExists = await _CheckCandidateExists(reportDto.IDSender, connect);
                 if(!CheckExists) return false;
 
@@ -487,5 +487,102 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 return false;
             }
         }
+
+        //10. Kiểm tra xem ứng cử viên đã tham giá bầu cử tại thời điểm đó chưa .Dựa trên mã ứng cử viên
+        public async Task<bool> _CheckCandidatForA_ParicularElection(string ID_ucv, DateTime ngayBD ,MySqlConnection connection){
+            
+            //kiểm tra xem ứng cử viên có tồn tại không
+            bool checkCandidateExist = await _CheckCandidateExists(ID_ucv, connection);
+            if(!checkCandidateExist) return false;
+
+            //Kiểm tra xem ứng cử viên đã tham gia chưa
+            const string sql = @"
+            SELECT COUNT(ID_ucv) FROM ketquabaucu 
+            WHERE ngayBD = @ngayBD and ID_ucv = @ID_ucv;";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                command.Parameters.AddWithValue("@ID_ucv", ID_ucv);
+
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                if(count < 1 ) return false;
+            }
+
+            return true;
+        } 
+
+        //11.Thêm danh sách ứng cử viên vào cuộc bầu cử
+        public async Task<int> _AddListCandidatesToTheElection(CandidateListInElectionDto CandidateListInElectionDto){
+            using var connect = await _context.Get_MySqlConnection();
+            
+            //Kiểm tra xem ngày bầu cử có tồn tại không
+            bool checkElectionExist = await _ElectionsRepository._CheckIfElectionTimeExists(CandidateListInElectionDto.ngayBD, connect);
+            if(!checkElectionExist) return 0;
+
+            //Kiểm tra xem vị trí ứng cử có hợp lệ không
+            bool checkConstituencyExist = await _listOfPositionRepository._CheckIfTheCodeIsInTheListOfPosition(CandidateListInElectionDto.ID_Cap, connect);
+            if(!checkConstituencyExist) return -1;
+
+            //Nếu danh sách ứng cử viên vượt quá số lượt bình chọn tối đa đặt cho nó thì báo lỗi
+            int sl_cuTriToiDa = await  _ElectionsRepository._MaximumNumberOfCandidates(CandidateListInElectionDto.ngayBD, connect);
+            if(sl_cuTriToiDa < 0) return -2;
+
+            //Lấy số lượng ứng cử viên trong kỳ bầu cử này ở hiện tại
+            int sl_cuTriHienTai = await  _ElectionsRepository._GetCurrentCandidateCountByElection(CandidateListInElectionDto.ngayBD, connect);
+            if(sl_cuTriToiDa < 0) return -4;
+
+            if((sl_cuTriHienTai + CandidateListInElectionDto.listIDCandidate.Count) > sl_cuTriToiDa) return -3;
+
+            //thêm từng ứng cử viên trong danh sách vào cuộc bầu cử
+            const string sql = @"
+            INSERT INTO ketquabaucu(SoLuotBinhChon,ThoiDiemDangKy,TyLeBinhChon,ngayBD,ID_ucv,ID_Cap) 
+            VALUES(@SoLuotBinhChon,@ThoiDiemDangKy,@TyLeBinhChon,@ngayBD,@ID_ucv,@ID_Cap);";
+
+            foreach(string Candidate in CandidateListInElectionDto.listIDCandidate){
+                
+                //Kiểm tra xem nếu ứng cử viên đã tồn tại trong cuộc bầu cử này thì bỏ qua hoặc ứng cử viên này không tồn tại trong danh sách thì bỏ qua
+                bool checkInput = await _CheckCandidatForA_ParicularElection(Candidate,CandidateListInElectionDto.ngayBD,connect);
+                
+                if(!checkInput){
+                    using(var command = new MySqlCommand(sql, connect)){
+                        command.Parameters.AddWithValue("@SoLuotBinhChon", 0);
+                        command.Parameters.AddWithValue("@ThoiDiemDangKy", DateTime.Now);
+                        command.Parameters.AddWithValue("@TyLeBinhChon",0f);
+                        command.Parameters.AddWithValue("@ngayBD", CandidateListInElectionDto.ngayBD);
+                        command.Parameters.AddWithValue("@ID_ucv", Candidate);
+                        command.Parameters.AddWithValue("@ID_Cap", CandidateListInElectionDto.ID_Cap);
+                        
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            return 1;
+        }
+
+        //12. Xóa ứng cử viên khỏi kỳ bầu cử cụ thể
+        public async Task<int> _RemoveCandidateOfElection(string Id_ucv, DateTime ngayBD){
+            using var connect = await _context.Get_MySqlConnection();
+            
+            //Kiểm tra xem ứng cử viên có tồn tại không
+            bool checkCandidateExist = await _CheckCandidateExists(Id_ucv, connect);
+            if(!checkCandidateExist) return 0;
+
+            //Kiểm tra xem ngày bầu cử có tồn tại không
+            bool checkElectionExist = await _ElectionsRepository._CheckIfElectionTimeExists(ngayBD, connect);
+            if(!checkElectionExist) return -1;
+
+            const string sql = @"
+            DELETE FROM kybaucu
+            WHERE ID_ucv =@ID_ucv AND ngayBD =@ngayBD;";
+            using(var command = new MySqlCommand(sql, connect)){
+                command.Parameters.AddWithValue("@ID_ucv", Id_ucv);
+                command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                
+                int rowAffect = await command.ExecuteNonQueryAsync();
+                if(rowAffect < 0)
+                    return -2;
+            }
+            return 1;
+        }
+
     }
 }

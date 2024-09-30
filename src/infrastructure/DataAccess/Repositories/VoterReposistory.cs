@@ -601,7 +601,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return true;
         }
 
-
         //15.Thêm danh sách cử tri vào cuộc bầu cử
         public async Task<int> _AddListVotersToTheElection(VoterListInElectionDto voterListInElectionDto){
             using var connect = await _context.Get_MySqlConnection();
@@ -701,7 +700,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     });
                 }        
             }
-
             return list;
         } 
     }

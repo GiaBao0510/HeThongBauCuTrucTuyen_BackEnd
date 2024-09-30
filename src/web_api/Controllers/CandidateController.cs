@@ -4,6 +4,7 @@ using BackEnd.src.infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Authorization;
+using BackEnd.src.core.Models;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -286,6 +287,90 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện gửi phản hồi: {ex.Message}"
+                });
+            }
+        }
+
+        //10.Thêm danh sách các ứng cử viên vào kỳ bầu cử
+        [HttpPost("add-candidate-list-to-election")]
+        [Authorize(Roles = "1")]
+        public async Task<IActionResult> AddListCandidatesToTheElection([FromBody] CandidateListInElectionDto candidateListInElectionDto){
+            try{
+                //Kiểm tra đầu vào
+                if(
+                   candidateListInElectionDto.listIDCandidate.Count == 0 ||
+                   string.IsNullOrEmpty(candidateListInElectionDto.ngayBD.ToString()) ||
+                     string.IsNullOrEmpty(candidateListInElectionDto.ID_Cap.ToString())
+                )
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin."});
+                
+                var result = await _candidateReposistory._AddListCandidatesToTheElection(candidateListInElectionDto);
+                if(result <=0){
+                    int status = result switch{
+                        0 => 400, -1 => 400, -2 => 500, -3 => 400, -4 => 500, _ => 500
+                    };
+                    string errorMessage = result switch{
+                        0 => "Không tìm thấy được ngày tổ chức cuộc bầu cử",
+                        -1 => "Không tìm thấy ID vị trí ứng cử",
+                        -2 => "Lỗi khi thực hiện lấy số lượng ứng cử viên tối đa",
+                        -3 => "Lỗi, số lượng ứng cử viên tham gia vào kỳ bầu cử không lớn hơn số lượng quy định trước đó",
+                        -4 => "Lỗi khi lấy số lượng ứng cử viên hiện tại",
+                        _ =>"Lỗi không xác định"
+                    };
+
+                    return StatusCode(status ,new{Status = "False", Message = errorMessage}); 
+                }
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Thêm danh sách ứng cử viên vào cuộc bầu cử thành công"
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện thêm danh sách ứng cử viên vào kỳ bầu cử: {ex.Message}"
+                });
+            }
+        }
+
+        //11. Xóa ứng cử viên ra khỏi kỳ bầu cử theo ID
+        [HttpDelete("remove-candidate-from-election")]
+        [Authorize(Roles = "1")]
+        public async Task<IActionResult> RemoveCandidateFromSpecificElection([FromQuery] string ID_ucv, [FromQuery] DateTime ngayBD){
+            try{
+                if(string.IsNullOrEmpty(ID_ucv) || string.IsNullOrEmpty(ngayBD.ToString()))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin."});
+            
+                var result = await _candidateReposistory._RemoveCandidateOfElection(ID_ucv, ngayBD);
+                if(result <=0){
+                    int status = result switch{
+                        0 => 400, -1 => 400, -2 => 500, _ => 500
+                    };
+                    string errorMessage = result switch{
+                        0 => "Không tìm thấy ID ứng cử viên",
+                        -1 => "Không tìm thấy thời điểm của kỳ bầu cử cụ thể",
+                        -2 => "Lỗi khi thực hiện xóa ứng cử viên ra khỏi kỳ bầu cử",
+                       _ =>"Lỗi không xác định"
+                    };
+
+                    return StatusCode(status ,new{Status = "False", Message = errorMessage}); 
+                }
+                
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Xóa ứng cử viên ra khỏi kỳ bầu cử thành công"
+                });
+
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện xóa ứng cử viên khỏi kỳ bầu cử cụ thể: {ex.Message}"
                 });
             }
         }

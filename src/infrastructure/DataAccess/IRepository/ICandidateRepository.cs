@@ -34,5 +34,10 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _CandidateSubmitReport(SendReportDto reportDto);
         //Kiểm tra thông tin đầu vào trước khi lưu vào bảng Kết quả 
         Task<int> _CheckInformationBeforeEnterInTableElectionResults(CandidateDto Candidate, MySqlConnection connection);
+        Task<bool> _CheckCandidatForA_ParicularElection(string ID_cutri, DateTime ngayBD ,MySqlConnection connection);
+         //11.Thêm danh sách ứng cử viên vào cuộc bầu cử
+        Task<int> _AddListCandidatesToTheElection(CandidateListInElectionDto CandidateListInElectionDto);
+        //12. Xóa ứng cử viên khỏi kỳ bầu cử cụ thể
+        Task<int> _RemoveCandidateOfElection(string Id_ucv, DateTime ngayBD);
     }
 }
