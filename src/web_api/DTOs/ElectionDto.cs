@@ -9,6 +9,7 @@ namespace BackEnd.src.web_api.DTOs
     {
         public string? ngayBD { get; set; }
         public string? ngayKT { get; set; }
+        public string? NgayKT_UngCu { get; set; }
         public string? TenKyBauCu {get; set;}
         public string? MoTa { get; set; }
         public int SoLuongToiDaCuTri { get; set; }

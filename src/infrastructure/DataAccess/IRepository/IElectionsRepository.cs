@@ -23,5 +23,15 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<int> _GetCurrentVoterCountByElection(DateTime ngayBD, MySqlConnection connection);
         //Lấy số lượng ứng cử viên hiện tại đang có trong kỳ bầu cử
         Task<int> _GetCurrentCandidateCountByElection(DateTime ngayBD, MySqlConnection connection);
+        //So sánh số lượng cử tri hiện tại với số lượng cử tri tối đa trong kỳ bầu cử
+        Task<int> _CompareCurrentNumberCandidateWithSpecifieldNumber(DateTime ngayBD, MySqlConnection connection, MySqlTransaction transaction);
+        //Lấy danh sách ID và tên ứng cử viên được sắp xếp dựa trên ngày bắt đầu bầu cử
+        Task<List<CandidateNamesBasedOnElectionDateDto>> _GetListCandidateNamesBasedOnElections(DateTime ngayBD);
+        //Lầy ngày kết thúc đăng ký ứng cử dựa trên ngày bắt đầu bầu cử
+        Task<DateTime?> _GetRegistrationClosingDate(DateTime ngayBD, MySqlConnection connection);
+        //lấy danh sách các kỳ bầu cử trong tương lai
+        Task<List<ElectionDto>> _GetListOfFutureElections(); 
+        //Trả về ngày kết thúc của kỳ bầu cử dựa trên thời điểm bắt đầu
+        Task<TimeOfTheElectionDTO> _GetTimeOfElection(DateTime ngayBD, MySqlConnection connection);
     }
 }

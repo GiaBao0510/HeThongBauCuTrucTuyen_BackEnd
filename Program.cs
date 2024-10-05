@@ -35,16 +35,22 @@ namespace BackEnd
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.UseStartup<Startup>();
                     webBuilder.UseKestrel(kestrelServerOptions=>{
                         
-                        //Thiết lập lắng nghe trên cổng 3000 với IP bất kỳ
+                        //Thiết lập lắng bất kỳ IP của thiết bị nào trên cổng 3000
                         kestrelServerOptions.Listen(IPAddress.Any,3000);
+                        kestrelServerOptions.ListenAnyIP(3000);
+                        
+                        //Lắp nghe trên cổng 7147 với https
+                        kestrelServerOptions.Listen(IPAddress.Any, 7147, listenOpt =>{
+                            listenOpt.UseHttps();
+                        });
+                                     //Lắng nghe trên cổng 3000
 
                         //Lắng nghe cổng 3001 chạy server trên ứng dụng
                         kestrelServerOptions.ListenLocalhost(3001);
                     });
-                    //webBuilder.UseUrls("http://0.0.0.0:5085","https://0.0.0.0:7147");
-                    webBuilder.UseStartup<Startup>();
                 });
     }
 }

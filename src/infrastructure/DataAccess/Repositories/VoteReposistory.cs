@@ -9,9 +9,16 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
     public class VoteReposistory : IDisposable, IVoteRepository
     {
         private readonly DatabaseContext _context;
+        private readonly IElectionsRepository electionsRepository;
 
         //Khởi tạo
-        public VoteReposistory(DatabaseContext context) => _context = context;
+        public VoteReposistory(
+            DatabaseContext context, 
+            IElectionsRepository _electionsRepository
+            ){
+            _context = context;
+            electionsRepository = _electionsRepository;
+        }
 
         //hủy
         public void Dispose() => _context.Dispose();
@@ -36,25 +43,45 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //thêm
         public async Task<bool> _AddVote(VoteDto phieubau, MySqlConnection connection){
-            
-            //Kiểm tra mã số đơn vị bầu cử tại phieubau có tồn tại không
-            string checkInput = "SELECT COUNT(*) FROM kybaucu WHERE ngayBD = @ngayBD";
-            using(var commandCheck = new MySqlCommand(checkInput, connection)){
-                commandCheck.Parameters.AddWithValue("@ngayBD",phieubau.ngayBD);
-                int count = Convert.ToInt32(await commandCheck.ExecuteScalarAsync());
-                if(count < 1)
-                    return false;
-            }
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
             //Lấy 2 ký tự ngẫu nhiên
             string randomString = RandomString.ChuoiNgauNhien(2);
             DateTime currentDay = DateTime.Now;
             string ID_Phieu = randomString+$"{currentDay:yyyyMMddHHmmssff}";
 
             //Thực hiện thêm            
-            string Input = $"INSERT INTO phieubau(ID_Phieu,GiaTriPhieuBau,ngayBD) VALUES(@ID_Phieu,@GiaTriPhieuBau,@ngayBD);";
+            string Input = @$"
+            INSERT INTO phieubau(ID_Phieu,GiaTriPhieuBau,ngayBD,ID_cap) 
+            VALUES(@ID_Phieu,@GiaTriPhieuBau,@ngayBD,@ID_cap);";
+            
+            using (var commandAdd = new MySqlCommand(Input, connection)){
+                commandAdd.Parameters.AddWithValue("@ID_Phieu",ID_Phieu);
+                commandAdd.Parameters.AddWithValue("@GiaTriPhieuBau",0);
+                commandAdd.Parameters.AddWithValue("@ID_cap",phieubau.ID_cap);
+                commandAdd.Parameters.AddWithValue("@ngayBD",phieubau.ngayBD);
+                await commandAdd.ExecuteNonQueryAsync();
+            } 
+
+            return true; 
+        }
+
+        public async Task<bool> _AddVote(string ID_Phieu, VoteDto phieubau, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            //Thực hiện thêm            
+            string Input = @$"
+            INSERT INTO phieubau(ID_Phieu,GiaTriPhieuBau,ngayBD,ID_cap) 
+            VALUES(@ID_Phieu,@GiaTriPhieuBau,@ngayBD,@ID_cap);";
+            
             using (var commandAdd = new MySqlCommand(Input, connection)){
                 commandAdd.Parameters.AddWithValue("@ID_Phieu",ID_Phieu);
                 commandAdd.Parameters.AddWithValue("@GiaTriPhieuBau",phieubau.GiaTriPhieuBau);
+                commandAdd.Parameters.AddWithValue("@ID_cap",phieubau.ID_cap);
                 commandAdd.Parameters.AddWithValue("@ngayBD",phieubau.ngayBD);
                 await commandAdd.ExecuteNonQueryAsync();
             } 
@@ -165,23 +192,78 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //Tạo số lượng phiếu bầu theo kỳ nào đó
-        public async Task<bool> _CreateVoteByNumber(int number, VoteDto vote ){
+        public async Task<int> _CreateVoteByNumber(int number, VoteDto vote ){
             try{
                 using var connection = await _context.Get_MySqlConnection();
-                for(int i = 0 ; i< number ;i++){
-                    var result =await _AddVote(vote,connection);
-                    if(!result)
-                        return false;
+                int SoLuongPhieuHientai = 0, SoLuongToiDaCuTri = 0;
+
+                //Kiểm tra ngày bầu cử có tồn tại không
+                string checkInput = "SELECT COUNT(*) FROM kybaucu WHERE ngayBD = @ngayBD";
+                using(var commandCheck = new MySqlCommand(checkInput, connection)){
+                    commandCheck.Parameters.AddWithValue("@ngayBD",vote.ngayBD);
+                    int count = Convert.ToInt32(await commandCheck.ExecuteScalarAsync());
+                    if(count < 1){
+                        Console.WriteLine("Ngày bầu cử không tồn tại...");
+                        return -2;
+                    }
                 }
-            return true;
-            }catch(Exception ex){
+                
+                //Lấy số lượng phiếu hiện tại. Nếu mà nhỏ hơn số lượng ứng cử viên tại kỳ bầu cử thì được phép thêm vào
+                const string sql2 = @"
+                SELECT COUNT(pb.ID_Phieu) SoLuongPhieuHientai
+                FROM phieubau pb JOIN kybaucu kb ON pb.ngayBD = kb.ngayBD
+                WHERE pb.ngayBD = @ngayBD;"; 
+                using (var command = new MySqlCommand(sql2,connection)){
+                    command.Parameters.AddWithValue("@ngayBD", vote.ngayBD);
+                    
+                    using var reader = await command.ExecuteReaderAsync();
+                    if(await reader.ReadAsync()){
+                        SoLuongPhieuHientai = reader.GetInt32(reader.GetOrdinal("SoLuongPhieuHientai"));
+                    }
+                }
+
+                //Lấy số lượng cử tri tối đa
+                DateTime NgayBD = DateTime.Parse(vote.ngayBD);
+                SoLuongToiDaCuTri = await electionsRepository._MaximumNumberOfVoters(NgayBD, connection);
+
+                Console.WriteLine($"Số lượng phiếu bầu hiện tại: {SoLuongPhieuHientai}");
+                Console.WriteLine($"Số lượng cử tri tối đa: {SoLuongToiDaCuTri}");
+
+                //Nếu số lượng phiếu hiện tại mà == Số lượng cử tri tối đa rồi thì không thêm vào
+                if(SoLuongPhieuHientai >= SoLuongToiDaCuTri) return 0;
+
+                //Nếu số lượng phiếu đầu vào lớn hơn số lượng cử tri tối đa thì không cho thêm
+                if(SoLuongToiDaCuTri < number) return -3;
+
+                //Thực hiện thêm phiếu
+                for(int i = 0 ; i< number ;i++){
+                    if(SoLuongPhieuHientai <= SoLuongToiDaCuTri){
+                        var result =await _AddVote(vote,connection);
+
+                        SoLuongPhieuHientai++;
+                    }else{
+                        break;
+                    }
+                }
+            return 1;
+            }catch(MySqlException ex){
                 Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
                 Console.WriteLine($"Error Source: {ex.Source}");
                 Console.WriteLine($"Error HResult: {ex.HResult}");
+                return -1;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
                 Console.WriteLine($"Error InnerException: {ex.InnerException}");
-                return false;
+                return -1;
             }
         }
+
 
     } 
 }

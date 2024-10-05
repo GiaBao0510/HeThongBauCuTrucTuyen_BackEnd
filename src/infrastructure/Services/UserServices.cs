@@ -134,7 +134,7 @@ namespace BackEnd.src.infrastructure.Services
             var emailBody = emailopt.GenerateOtpEmail(opt);     //Nội dung email
             var cacheKey = $"OTP_{email}";                      //Đặt Key lưu vào bộ nhớ đệm
             _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
-            await _emailSender.SendEmailAsync(email, title, emailBody); //Gửi
+            await _emailSender.SendEmailAsync(email, title+":"+opt, emailBody); //Gửi
         }
 
         //3. Xác thực mã otp sau khi đăng nhập
@@ -189,7 +189,7 @@ namespace BackEnd.src.infrastructure.Services
             var emailBody = emailopt.GenerateOtpEmailVerify(opt);     //Nội dung email
             var cacheKey = $"OTP_{email}";                      //Đặt Key lưu vào bộ nhớ đệm
             _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
-            await _emailSender.SendEmailAsync(email, title, emailBody); //Gửi
+            await _emailSender.SendEmailAsync(email, title+":"+opt, emailBody); //Gửi
             return true;
         }
 
@@ -230,7 +230,7 @@ namespace BackEnd.src.infrastructure.Services
             var emailBody = emailopt.GenerateOtpEmail(opt);     //Nội dung email
             var cacheKey = $"OTP_{emailDTO.Email}";                      //Đặt Key lưu vào bộ nhớ đệm
             _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
-            await _emailSender.SendEmailAsync(emailDTO.Email, title, emailBody); //Gửi
+            await _emailSender.SendEmailAsync(emailDTO.Email, title+":"+opt, emailBody); //Gửi
             return true;
         }
 
@@ -277,6 +277,16 @@ namespace BackEnd.src.infrastructure.Services
             bool CheckExistsEmail = await _CheckEmailExists(email, connection);
             if(!CheckExistsEmail)
                 return false;
+
+            //Gửi mã otp đến email trên
+            string title = "Đặt lại mật khẩu";
+            string opt = RandomString.DaySoNgauNhien(6);        //Chuỗi ngẫu nhiên
+            EmailOTP_Verify emailopt = new EmailOTP_Verify();
+            var emailBody = emailopt.GenerateOtpEmailVerify(opt);     //Nội dung email
+            var cacheKey = $"OTP_{email}";                      //Đặt Key lưu vào bộ nhớ đệm
+            _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
+            await _emailSender.SendEmailAsync(email, title+":"+opt, emailBody); //Gửi
+
             return true;
         }
 

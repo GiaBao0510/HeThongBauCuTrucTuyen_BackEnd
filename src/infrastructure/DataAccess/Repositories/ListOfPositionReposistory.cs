@@ -127,7 +127,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //Kiểm tra mã chức vụ xem có tồn tại chưa
         public async Task<bool> _CheckIfTheCodeIsInTheListOfPosition(int ID, MySqlConnection connection){
-            
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
             const string sql = "SELECT COUNT(ID_Cap) FROM danhmucungcu WHERE ID_Cap=@ID_Cap;";
             using(var command = new MySqlCommand(sql, connection)){
                 command.Parameters.AddWithValue("@ID_Cap",ID);

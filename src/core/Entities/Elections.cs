@@ -16,6 +16,9 @@ namespace BackEnd.core.Entities
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DisplayName("End date")]
         public DateTime ngayKT { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [DisplayName("Closing date of nomination")]
+        public DateTime NgayKT_UngCu { get; set; }
         [StringLength(50)]
         [DisplayName("Election name")]
         public required string TenKyBauCu {get; set;}

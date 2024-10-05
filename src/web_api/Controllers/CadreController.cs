@@ -228,7 +228,7 @@ namespace BackEnd.src.web_api.Controllers
         //8. Thay đổi mật khẩu - cán bộ
         [HttpPut("ChangeCadrePwd/{id}")]
         [Authorize(Roles = "1,8,3,4")]
-        public async Task<IActionResult> ChangeCadrePassword(string id,[FromBody] SetPasswordDto setPasswordDto){
+        public async Task<IActionResult> ChangeCadrePassword(string id,[FromBody] ChangePasswordDto setPasswordDto){
             try{
                 if(string.IsNullOrEmpty(setPasswordDto.newPwd) || string.IsNullOrEmpty(setPasswordDto.oldPwd) )
                     return BadRequest(new {Status = "False", Message = "Mật khẩu cũ và mật khẩu mới không được bỏ trống."});

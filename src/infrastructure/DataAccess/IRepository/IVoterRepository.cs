@@ -42,11 +42,11 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<int> _AddListVotersToTheElection(VoterListInElectionDto voterListInElectionDto);
         //Kiểm tra xem cử tri có tồn tại trong kỳ bầu cử không
         Task<bool> _VoterCheckInElection(string ID_cutri, DateTime ngayBD,  MySqlConnection connection);
-        //Cử tri bỏ phiếu(chưa mã hóa giá trị phiếu khi cử tri đã bỏ phiếu)
-        //Task<bool> _VotersVote();
         //Danh sách các kỳ bầu cử mà cử tri có thể tham gia
 
-
+        //19. Kiểm tra xem cử tri đã bỏ phiếu trong kỳ bầu cử chưa
+        Task<bool> _CheckVoterHasVoted(string ID_cutri, DateTime ngayBD, MySqlConnection connect);
+        
         //Cử tri muốn xác thực lại phiếu đã bỏ trong thời gian bỏ, nhưng không
         Task<List<ElectionsDto>> _ListElectionsVotersHavePaticipated(string ID_cutri);
     }

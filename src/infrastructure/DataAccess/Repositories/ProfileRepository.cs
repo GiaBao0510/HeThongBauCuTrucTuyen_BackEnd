@@ -60,7 +60,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         
         //4.Thêm hồ sơ người dùng
         public async Task<bool> _AddProfile(string ID_user,  string Status,MySqlConnection connection){
-            
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
             //Kiểm tra xem người dùng có tồn tại không. Nếu có thì không thể thêm
             bool CheckUserProfileExists = await _CheckProfileExists(ID_user, connection);
             if(CheckUserProfileExists) return false;
@@ -308,6 +311,39 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 
                 return Convert.ToInt32(await command.ExecuteNonQueryAsync()) > 0;
             }
+        }
+
+        //17. Thêm hồ sơ ứng cử viên
+        public async Task<bool> _AddCandidateProfile(string ID_user ,MySqlConnection connection, MySqlTransaction transaction){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            try{
+                //Kiểm tra xem người dùng có tồn tại không. Nếu có thì không thể thêm
+                bool CheckUserProfileExists = await _CheckProfileExists(ID_user, connection);
+                if(CheckUserProfileExists) return false;
+                
+                //SQL thêm
+                const string sql = "INSERT INTO hosonguoidung(TrangThaiDangKy,ID_user) VALUES(@TrangThaiDangKy,@ID_user);";
+
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ID_user", ID_user);
+                    command.Parameters.AddWithValue("@TrangThaiDangKy", "1");
+                    
+                    await command.ExecuteNonQueryAsync();
+                }
+                return true; 
+            }catch(MySqlException ex){ 
+                Console.WriteLine("Error: " + ex.Message);
+                if(transaction.Connection != null)
+                    await transaction.RollbackAsync();
+                return false;
+            }catch(Exception){
+                await transaction.RollbackAsync();
+                throw;
+            }         
+              
         }
 
     }

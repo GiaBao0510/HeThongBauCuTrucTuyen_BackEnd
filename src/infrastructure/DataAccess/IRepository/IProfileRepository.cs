@@ -40,5 +40,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _DeleteProfileBy_ID_canbo(string ID_canbo);
         //Xóa hồ sơ dựa trên ID_ứng cử viên
         Task<bool> _DeleteProfileBy_ID_ungcuvien(string ID_ungcuvien);
+        //17. Thêm hồ sơ ứng cử viên
+        Task<bool> _AddCandidateProfile(string ID_user ,MySqlConnection connection, MySqlTransaction transaction);
     }
 }

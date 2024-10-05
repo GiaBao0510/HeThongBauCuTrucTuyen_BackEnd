@@ -564,8 +564,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 return ID_user;
             }
-            catch(MySqlException ex){
-                
+            catch(MySqlException ex){ 
+                Console.WriteLine("Error Mysql: " + ex.Message);
                 if(transaction.Connection != null)
                     await transaction.RollbackAsync();
 
@@ -583,7 +583,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     default:
                         return -100; 
                 }
-            }catch(Exception){
+            }catch(Exception ex){
+                Console.WriteLine("Error: " + ex.Message);
                 await transaction.RollbackAsync();
                 throw;
             }
@@ -776,7 +777,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }catch(Exception){
                 await transaction.RollbackAsync();
                 return false;
-            }
+            } 
         }
 
         //21 - 2. Kiểm tra xem thông tin chức vụ có tồn tại không
@@ -813,6 +814,32 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     trangThai =  reader.GetString(reader.GetOrdinal("TrangThaiDangKy"));
             }
             return Convert.ToInt32(trangThai);
+        }
+
+        //23. Người dùng thay đổi mật khẩu dựa trên email
+        public async Task<int> _SetPwdBasedOnUserEmail(string Email, string password){
+            using var connect = await _context.Get_MySqlConnection();
+
+            //Kiểm tra xem email người dùng có tồn tại không
+            int checkUserExists = await CheckEmailAlreadyExits(Email,connect);
+                if(checkUserExists <= 0) return -1;
+
+            //Bắm mật khẩu
+            password = Argon2.Hash(password);
+            
+            //set pwd
+            const string sql = @"
+            UPDATE taikhoan tk 
+            JOIN nguoidung nd ON tk.TaiKhoan = nd.SDT
+            SET tk.MatKhau = @MatKhau
+            WHERE nd.Email=@Email;";
+            using (var command = new MySqlCommand(sql, connect)){
+                command.Parameters.AddWithValue("@MatKhau", password);
+                command.Parameters.AddWithValue("@Email", Email);
+
+                int rowAffected = await command.ExecuteNonQueryAsync();
+                return rowAffected;
+            }
         }
 
     }

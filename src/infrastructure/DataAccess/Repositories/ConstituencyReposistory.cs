@@ -135,6 +135,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //Kiểm tra xem đơn vj bầu cử có tồn tại không
         public async Task<bool> _CheckIfConstituencyExists(string ID_DonViBauCu, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+                
             const string sql = "SELECT COUNT(ID_DonViBauCu) FROM donvibaucu WHERE ID_DonViBauCu =@ID_DonViBauCu;";
             
             using(var command = new MySqlCommand(sql, connection)){

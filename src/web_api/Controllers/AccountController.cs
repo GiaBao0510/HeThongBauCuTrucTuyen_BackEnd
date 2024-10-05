@@ -478,7 +478,7 @@ namespace BackEnd.src.web_api.Controllers
         }
 
         //13. Kiểm tra email có tồn tại không trước khi đăng nhập
-        [HttpGet("check-email-exists")]
+        [HttpGet("check-email-exists")] 
         [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> CheckEmailExists([FromQuery] string email){
             try{

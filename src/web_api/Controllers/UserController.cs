@@ -9,11 +9,13 @@ using Microsoft.Extensions.Caching.Memory;
 using BackEnd.src.core.Entities;
 using BackEnd.src.core.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackEnd.src.web_api.Controllers
 {
-    [Route("api/admin/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
+    [EnableRateLimiting("FixedWindowLimiter")]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository; 
@@ -251,12 +253,12 @@ namespace BackEnd.src.web_api.Controllers
         //Cập nhật Pwd người dùng dựa trên ID người dùng - người dùng: cử tri, cán bộ, ứng cử viên
         [HttpPut("ChangeUserPwd/{id}")]
         [Authorize(Roles= "1,2,5,8")]
-        public async Task<IActionResult> ChangeUserPassword(string id,[FromBody] SetPasswordDto setPasswordDto){
+        public async Task<IActionResult> ChangeUserPassword(string id,[FromBody] ChangePasswordDto ChangePasswordDto){
             try{
-                if(string.IsNullOrEmpty(setPasswordDto.newPwd) || string.IsNullOrEmpty(setPasswordDto.oldPwd))
+                if(string.IsNullOrEmpty(ChangePasswordDto.newPwd) || string.IsNullOrEmpty(ChangePasswordDto.oldPwd))
                     return BadRequest(new {Status = "False", Message = "Thông tin đầu vào không được bỏ trống."});
 
-                var result = await _userRepository._ChangeUserPassword(id, setPasswordDto.oldPwd,setPasswordDto.newPwd);
+                var result = await _userRepository._ChangeUserPassword(id, ChangePasswordDto.oldPwd,ChangePasswordDto.newPwd);
                 int status = 200;
                 if(result <= 0){
                     string errorMessage = result switch{
@@ -340,5 +342,31 @@ namespace BackEnd.src.web_api.Controllers
             }
         }
 
+        //Người dùng thay đổi mật dựa trên email người dùng
+        [HttpPut("set-pwd-based-on-email")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
+
+        public async Task<IActionResult> SetPwdBasedOnUserEmail([FromQuery]string email ,[FromBody] SetPasswordDto setPasswordByEmailDto){
+            try{
+                if(string.IsNullOrEmpty(email) || string.IsNullOrEmpty(setPasswordByEmailDto.newPwd))
+                    return BadRequest(new {Status = "False", Message = "Thông tin đầu vào không được bỏ trống."});
+
+                var result = await _userRepository._SetPwdBasedOnUserEmail(email, setPasswordByEmailDto.newPwd);
+                if(result < 1)
+                    return BadRequest(new {Status = "False", Message = "Email người dùng không tồn tại."});
+
+                return Ok(new{
+                    Status = true,
+                    Message ="Thay mật khẩu thành công."
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện thay đổi ảnh người dùng: {ex.Message}"
+                });
+            }
+        }
     }
 }

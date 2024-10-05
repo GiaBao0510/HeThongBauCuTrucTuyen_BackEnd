@@ -41,9 +41,17 @@ namespace BackEnd.src.web_api.Controllers
                         -4 =>"Đầu vào không hợp lệ hoặc bị để trống trường nào đó",
                         -5 => "Mã Danh mục ứng cử không tồn tại",
                         -6 => "Ngày bắt bầu cử không tìm thấy",
+                        -7 => "Đã vượt quá số lượng ứng cử viên đã quy định trong kỳ này.",
+                        -8 => "Đây không phải là thời điểm thích hợp để ứng cử cho kỳ bầu cử này",
                         _ => "Lỗi không xác định"
                     };
-                    return BadRequest(new {Status = "False", Message = errorMessage});
+                    int statusCode = result switch{
+                        0 => 400, -1 =>400, -2 => 400,
+                        -3 =>400, -4 =>400, -5 => 400,
+                        -6 => 400, -7 => 400 ,-8 =>400, _ => 500
+                    };
+                    Console.WriteLine($"Kết quả: {result}");
+                    return StatusCode(statusCode ,new {Status = "False", Message = errorMessage});
                 }
                     
                 return Ok(new{
@@ -231,7 +239,7 @@ namespace BackEnd.src.web_api.Controllers
         //8. Thay đổi mật khẩu - ứng cử viên
         [HttpPut("ChangeCandidatePwd/{id}")]
         [Authorize(Roles = "1,2")]
-        public async Task<IActionResult> ChangeCandidatePassword(string id,[FromBody] SetPasswordDto setPasswordDto){
+        public async Task<IActionResult> ChangeCandidatePassword(string id,[FromBody] ChangePasswordDto setPasswordDto){
             try{
                 if(string.IsNullOrEmpty(setPasswordDto.newPwd) || string.IsNullOrEmpty(setPasswordDto.oldPwd) )
                     return BadRequest(new {Status = "False", Message = "Mật khẩu cũ và mật khẩu mới không được bỏ trống."});
@@ -307,7 +315,7 @@ namespace BackEnd.src.web_api.Controllers
                 var result = await _candidateReposistory._AddListCandidatesToTheElection(candidateListInElectionDto);
                 if(result <=0){
                     int status = result switch{
-                        0 => 400, -1 => 400, -2 => 500, -3 => 400, -4 => 500, _ => 500
+                        0 => 400, -1 => 400, -2 => 500, -3 => 400, -4 => 500, -5 => 400,_ => 500
                     };
                     string errorMessage = result switch{
                         0 => "Không tìm thấy được ngày tổ chức cuộc bầu cử",
@@ -315,6 +323,7 @@ namespace BackEnd.src.web_api.Controllers
                         -2 => "Lỗi khi thực hiện lấy số lượng ứng cử viên tối đa",
                         -3 => "Lỗi, số lượng ứng cử viên tham gia vào kỳ bầu cử không lớn hơn số lượng quy định trước đó",
                         -4 => "Lỗi khi lấy số lượng ứng cử viên hiện tại",
+                        -5 => "Lỗi ngày đăng ký ứng cử đã kết thúc",
                         _ =>"Lỗi không xác định"
                     };
 

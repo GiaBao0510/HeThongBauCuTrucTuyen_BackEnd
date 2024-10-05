@@ -49,7 +49,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //-1. Kiểm tra điều kiện lưu thông tin vào bảng kết quả bầu cử. (Việc này cũng nhưng việc đăng ký ứng cử viên vào vị trí ứng cử)
         public async Task<int> _CheckInformationBeforeEnterInTableElectionResults(CandidateDto Candidate, MySqlConnection connection){
             if(! await _listOfPositionRepository._CheckIfTheCodeIsInTheListOfPosition(Candidate.ID_Cap, connection)) return -5;
-            if(! await _ElectionsRepository._CheckIfElectionTimeExists(Candidate.ngayBD.GetValueOrDefault(), connection)) return -6;
+            if(! await _ElectionsRepository._CheckIfElectionTimeExists(Candidate.ngayBD, connection)) return -6;
             return 1;
         }
 
@@ -70,9 +70,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //1.Thêm (Kèm thêm chức vụ cho ứng cử viên)
         public async Task<int> _AddCandidate(CandidateDto Candidate, IFormFile fileAnh){
+            Console.WriteLine("Đang thực hiện thêm thông tin ứng cử viên..");
             using var connect = await _context.Get_MySqlConnection();
 
-            //Kiểm tra kết nối
+            //Kiểm tra kết nối 
             if(connect.State != System.Data.ConnectionState.Open )
                 await connect.OpenAsync();
             
@@ -80,6 +81,22 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             bool transactionCommitted = false; //Kiểm tra xem đã rolleback chưa
 
             try{
+                //Kiểm tra xem nếu kỳ bầu cử đó có số lượng ứng cử viên vượt quá mức quy định thì không được thêm vào
+                int CheckNumberCandidate = await _ElectionsRepository._CompareCurrentNumberCandidateWithSpecifieldNumber(Candidate.ngayBD,connect, transaction);
+                if(CheckNumberCandidate == 0){
+                    await transaction.RollbackAsync();
+                    return -7;
+                }
+
+                //Kiêm tra nếu ngày hiện tại lớn hơn ngày đăng ký ứng cử thì không thể thêm
+                DateTime? TimeOfCanDiDate = await _ElectionsRepository._GetRegistrationClosingDate(Candidate.ngayBD,connect);
+                if(TimeOfCanDiDate != null && DateTime.Now > TimeOfCanDiDate){
+                    await transaction.RollbackAsync();
+                    return -8;
+                }
+                
+                //if(DateTime.Now > )
+
                 Candidate.RoleID = 2;   //Gán vai trò mặc định khi tạo ứng cử viên
 
                 //Thêm thông tin cơ sở
@@ -88,11 +105,13 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 //Kiểm tra đầu vào để đăng ký thông tin ứng cử viên vào bảng kết quả bầu cử (Nếu có lỗi thì quăng ra)
                 int CheckInputInElectionResults = await _CheckInformationBeforeEnterInTableElectionResults(Candidate, connect);
                 if(CheckInputInElectionResults < 0){
+                    Console.WriteLine("Lỗi thông tin ứng cử viên đầu vào đã trùng hoặc chưa điền đày đủ");
                     return CheckInputInElectionResults;
                 }
 
                 //Nếu có lỗi thì in ra
                 if(FillInBasicInfo is int result && result <=0){
+                    Console.WriteLine("Lỗi kiểm tra điền thông tin ứng cử viên");
                     return result;
                 }
                 
@@ -120,11 +139,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 }
 
                 //Tạo hồ sơ
-                bool AddProfile = await _profileRepository._AddProfile(ID_user, "1", connect);
+                bool AddProfile = await _profileRepository._AddCandidateProfile(ID_user, connect,transaction );
+                Console.WriteLine($"AddProfile: {AddProfile}");
                 if(!AddProfile){
                     Console.WriteLine("Lỗi khi tạo hồ sơ cho ứng cử viên");
                     await transaction.RollbackAsync();
-                    return -100;
+                    return -98;
                 }
 
                 await transaction.CommitAsync();
@@ -132,6 +152,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 return 1;
             }
             catch(Exception ex){
+                // Log lỗi và ném lại exception để controller xử lý
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                
                 if (!transactionCommitted){
                     try{
                         await transaction.RollbackAsync();
@@ -140,10 +164,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         Console.WriteLine($"Rollback Exception: {rollbackEx.Message}");
                     }
                 }
-                // Log lỗi và ném lại exception để controller xử lý
-                Console.WriteLine($"Exception Message: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                return -100;
+                
+                return -99;
             }
         }
 
@@ -529,6 +551,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             //Lấy số lượng ứng cử viên trong kỳ bầu cử này ở hiện tại
             int sl_cuTriHienTai = await  _ElectionsRepository._GetCurrentCandidateCountByElection(CandidateListInElectionDto.ngayBD, connect);
             if(sl_cuTriToiDa < 0) return -4;
+
+            DateTime? TimeOfCanDiDate = await _ElectionsRepository._GetRegistrationClosingDate(CandidateListInElectionDto.ngayBD,connect);
+            if(TimeOfCanDiDate != null && DateTime.Now > TimeOfCanDiDate)
+                return -5;
 
             if((sl_cuTriHienTai + CandidateListInElectionDto.listIDCandidate.Count) > sl_cuTriToiDa) return -3;
 

@@ -267,7 +267,10 @@ namespace BackEnd
             services.AddScoped<IProfileRepository,ProfileRepository>();
             services.AddScoped<IUserServices,UserServices>();
             services.AddScoped<IToken,TokenServices>();
+            services.AddScoped<IRoleRepository,RoleReposistory>();
+            services.AddScoped<IPaillierServices,PaillierServices>();
             services.AddScoped<ILoginHistoryRepository,LoginHistoryRepository>();
+            services.AddScoped<IVotingServices,VotingServices>();
         } 
 
         //Riêng các service muốn call thì sẽ goi trong đây
@@ -303,7 +306,7 @@ namespace BackEnd
             //Cấu hình các middleware khác
             app.UseHsts();
             app.UseHttpsRedirection();
-            app.UseStaticFiles();               //Thêm StaticFileMiddleware - nếu request yêu câu truy cập file tĩnh thì nó response nội dung file
+            //app.UseStaticFiles();               //Thêm StaticFileMiddleware - nếu request yêu câu truy cập file tĩnh thì nó response nội dung file
             app.UseRateLimiter();
             app.UseIpRateLimiting();       //Thêm middleware giới hạn tốc độ của người dùng
             app.UseRouting();

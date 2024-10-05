@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using BackEnd.src.core.Models;
+using BackEnd.src.core.Interfaces;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -13,6 +14,7 @@ namespace BackEnd.src.web_api.Controllers
     public class VoterController: ControllerBase
     {
         private readonly IVoterRepository _voterReposistory;
+        private readonly IVotingServices _votingServices;
 
         //Khởi tạo
         public VoterController(IVoterRepository vouterReposistory) => _voterReposistory = vouterReposistory;
@@ -235,7 +237,7 @@ namespace BackEnd.src.web_api.Controllers
         //8. thay đổi mật khẩu cử tri
         [HttpPut("ChangeVoterPwd/{id}")]
         [Authorize(Roles= "1,5")]
-        public async Task<IActionResult> ChangeVoterPassword(string id,[FromBody] SetPasswordDto setPasswordDto){
+        public async Task<IActionResult> ChangeVoterPassword(string id,[FromBody] ChangePasswordDto setPasswordDto){
             try{
                 if(string.IsNullOrEmpty(setPasswordDto.newPwd) || string.IsNullOrEmpty(setPasswordDto.oldPwd) )
                     return BadRequest(new {Status = "False", Message = "Mật khẩu cũ và mật khẩu mới không được bỏ trống."});
@@ -420,6 +422,7 @@ namespace BackEnd.src.web_api.Controllers
             }
         } 
 
+        //14. Hiển thị danh sách cử tri đã tham gia vào các k�� bầu cử  
         [HttpGet("list-pf-elections-voters-have-paticipated")]
         [Authorize(Roles= "1,5")]
         public async Task<IActionResult> ListElectionsVotersHavePaticipated([FromQuery]string ID_cutri){
@@ -443,6 +446,55 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện lấy thông tin cử tri trước khi đăng ký: {ex.Message}"
+                });
+            }
+        }
+
+        //15. Thêm phiếu bầu
+        [HttpPost("voter-vote")]
+        [Authorize(Roles= "1,5")]
+        public async Task<IActionResult> VoterVote([FromForm] VoterVoteDTO vouter){
+            try{
+                //Kiểm tra đầu vào
+                if(vouter == null || string.IsNullOrEmpty(vouter.ID_CuTri))
+                    return StatusCode(400,new{
+                        Status = "false",
+                        Message="Lỗi khi đầu vào không được rỗng"
+                    });
+                
+                //lấy kết quả thêm vào được hay không
+                var result = await _votingServices._VoterVote(vouter);
+                if(result <= 0){
+                    string errorMessage = result switch{
+                        0 => "Lỗi ngày bỏ phiếu không hợp lệ",
+                        -1 =>"Lỗi cử tri không tồn tại",
+                        -2 => "Lỗi không tìm thấy kỳ bầu cử",
+                        -3 =>"Cử tri đã bỏ phiếu rồi",
+                        -4 =>"Lỗi giá trị phiếu bầu không hợp lệ",
+                        -5 => "Lỗi vị trí ứng tuyển để bầu cử không tồn tại",
+                        -6 => "Lỗi không tìm thấy đơn vị bầu cử",
+                        -7 => "Lỗi khi khởi tại và thêm phiếu bầu",
+                        -8 => "Lỗi khi cập nhật trạng thái bầu cử của người dùng",
+                        -9 => "Lỗi khi thêm thông tin chi tiết của người dùng",
+                        _ => "Lỗi không xác định"
+                    };
+                    int status = result switch{
+                        0 => 400, -1 => 400, -2 => 400, -3 =>400, -4 => 400,
+                        -5=> 500, -6 => 400, -7=>500, -8=>500 , -9=> 500,_ => 500
+                    };
+                    return StatusCode(status,new {Status = "False", Message = errorMessage});
+                }
+                
+                return Ok(new{
+                    Status = "OK", 
+                    Message = "Bỏ phiếu bình chọn thành công"
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện bỏ phiếu: {ex.Message}"
                 });
             }
         }

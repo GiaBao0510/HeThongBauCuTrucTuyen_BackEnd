@@ -12,7 +12,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         private readonly DatabaseContext _context;
 
         //Khởi tạo
-        public ElectionsReposistory(DatabaseContext context) => _context = context;
+        public ElectionsReposistory(
+            DatabaseContext context
+        ){
+            _context = context;
+
+        } 
 
         //Hủy
         public void Dispose() => _context.Dispose();
@@ -29,6 +34,33 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 list.Add(new ElectionDto{
                     ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")).ToString("dd/MM/yyyy HH:mm:ss"),
                     ngayKT = reader.GetDateTime(reader.GetOrdinal("ngayKT")).ToString("dd/MM/yyyy HH:mm:ss"),
+                    NgayKT_UngCu = reader.GetDateTime(reader.GetOrdinal("NgayKT_UngCu")).ToString("dd/MM/yyyy HH:mm:ss"),
+                    SoLuongToiDaCuTri = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaCuTri")),
+                    SoLuongToiDaUngCuVien = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
+                    SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
+                    TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
+                    MoTa = reader.GetString(reader.GetOrdinal("MoTa"))
+                });
+            }
+            return list;
+        }
+
+        //Liệt kê các kỳ bầu cử trong tương lai
+        public async Task<List<ElectionDto>> _GetListOfFutureElections(){
+            var list = new List<ElectionDto>();
+
+            using var connection = await _context.Get_MySqlConnection();
+            using var command = new MySqlCommand("SELECT * FROM kybaucu WHERE NOW() <= ngayBD;", connection);
+            using var reader = await command.ExecuteReaderAsync();
+            
+            while(await reader.ReadAsync()){
+                list.Add(new ElectionDto{
+                    ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")).ToString("dd/MM/yyyy HH:mm:ss"),
+                    ngayKT = reader.GetDateTime(reader.GetOrdinal("ngayKT")).ToString("dd/MM/yyyy HH:mm:ss"),
+                    NgayKT_UngCu = reader.GetDateTime(reader.GetOrdinal("NgayKT_UngCu")).ToString("dd/MM/yyyy HH:mm:ss"),
+                    SoLuongToiDaCuTri = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaCuTri")),
+                    SoLuongToiDaUngCuVien = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
+                    SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
                     TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
                     MoTa = reader.GetString(reader.GetOrdinal("MoTa"))
                 });
@@ -46,12 +78,13 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             
             //Thực hiện thêm            
             string Input = @"
-                INSERT INTO kybaucu(ngayBD,ngayKT,TenKyBauCu,MoTa,SoLuongToiDaCuTri,SoLuongToiDaUngCuVien,SoLuotBinhChonToiDa) 
-                VALUES(@ngayBD,@ngayKT,@TenKyBauCu,@MoTa,@SoLuongToiDaCuTri,@SoLuongToiDaUngCuVien,@SoLuotBinhChonToiDa);";
+                INSERT INTO kybaucu(ngayBD,ngayKT,NgayKT_UngCu,TenKyBauCu,MoTa,SoLuongToiDaCuTri,SoLuongToiDaUngCuVien,SoLuotBinhChonToiDa) 
+                VALUES(@ngayBD,@ngayKT,@NgayKT_UngCu,@TenKyBauCu,@MoTa,@SoLuongToiDaCuTri,@SoLuongToiDaUngCuVien,@SoLuotBinhChonToiDa);";
             
             using (var commandAdd = new MySqlCommand(Input, connection)){
                 commandAdd.Parameters.AddWithValue("@ngayBD",kybaucu.ngayBD);
                 commandAdd.Parameters.AddWithValue("@ngayKT",kybaucu.ngayKT);
+                commandAdd.Parameters.AddWithValue("@NgayKT_UngCu",kybaucu.NgayKT_UngCu);
                 commandAdd.Parameters.AddWithValue("@TenKyBauCu",kybaucu.TenKyBauCu);
                 commandAdd.Parameters.AddWithValue("@MoTa",kybaucu.MoTa);
                 commandAdd.Parameters.AddWithValue("@SoLuongToiDaCuTri",kybaucu.SoLuongToiDaCuTri);
@@ -97,19 +130,21 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
             //Cập nhật
             const string sqlupdate = @"UPDATE kybaucu 
-            SET ngayBD = @ngayBDMoi, 
+            SET ngayBD = @ngayBDMoi,
+            NgayKT_UngCu = @NgayKT_UngCu, 
             TenKyBauCu = @TenKyBauCu, 
             ngayKT = @ngayKT, 
             MoTa = @MoTa,
             SoLuongToiDaCuTri = @SoLuongToiDaCuTri,
             SoLuongToiDaUngCuVien = @SoLuongToiDaUngCuVien,
             SoLuotBinhChonToiDa = @SoLuotBinhChonToiDa
-            WHERE ngayBD = @ngayBDCu;";
+            WHERE ngayBD = @ngayBDCu ;";
 
             using( var command = new MySqlCommand(sqlupdate, connection)){
                 command.Parameters.AddWithValue("@ngayBDMoi",Elections.ngayBD);
                 command.Parameters.AddWithValue("@TenKyBauCu",Elections.TenKyBauCu);
                 command.Parameters.AddWithValue("@ngayKT",Elections.ngayKT);
+                command.Parameters.AddWithValue("@NgayKT_UngCu",Elections.NgayKT_UngCu);
                 command.Parameters.AddWithValue("@MoTa",Elections.MoTa);
                 command.Parameters.AddWithValue("@ngayBDCu",ID);
                 command.Parameters.AddWithValue("@SoLuongToiDaCuTri",Elections.SoLuongToiDaCuTri);
@@ -140,7 +175,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //Kiểm tra xem ngày bầu cử có tồn tại không
         public async Task<bool> _CheckIfElectionTimeExists(DateTime ngayBD, MySqlConnection connection){
-            
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
             const string sql = "SELECT COUNT(ngayBD) FROM kybaucu WHERE ngayBD=@ngayBD;";
             using(var command = new MySqlCommand(sql, connection)){
                 command.Parameters.AddWithValue("@ngayBD",ngayBD);
@@ -152,6 +190,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //Lấy số lượng cử tri tối đa theo kỳ bầu cử
         public async Task<int> _MaximumNumberOfVoters(DateTime ngayBD, MySqlConnection connection){
+            //Kiểm tra kết nối
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+            
             const string sql = "SELECT SoLuongToiDaCuTri FROM kybaucu WHERE ngayBD =@ngayBD; ";
             using(var command = new MySqlCommand(sql, connection)){
                 command.Parameters.AddWithValue("@ngayBD",ngayBD);
@@ -176,8 +218,36 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return -1;
         }
 
+        //Lầy ngày kết thúc đăng ký ứng cử dựa trên ngày bắt đầu bầu cử
+        public async Task<DateTime?> _GetRegistrationClosingDate(DateTime ngayBD, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+            
+            try{
+                const string sql = "SELECT NgayKT_UngCu FROM kybaucu WHERE ngayBD =@ngayBD; ";
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                    using var reader = await command.ExecuteReaderAsync();
+
+                    if(await reader.ReadAsync())
+                        return reader.GetDateTime(reader.GetOrdinal("NgayKT_UngCu")); 
+                }
+                return null;
+            }catch(MySqlException ex){ 
+                Console.WriteLine("Error: " + ex.Message);
+                return null;
+            }catch(Exception){
+                throw;
+            } 
+        }
+
         //Lấy số lượt bình chọn tối đa theo kỳ bầu cử
         public async Task<int> _MaximumNumberOfVotes(DateTime ngayBD, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+            
             const string sql = "SELECT SoLuotBinhChonToiDa FROM kybaucu WHERE ngayBD =@ngayBD; ";
             using(var command = new MySqlCommand(sql, connection)){
                 command.Parameters.AddWithValue("@ngayBD",ngayBD);
@@ -206,7 +276,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     return reader.GetInt32(reader.GetOrdinal("SoLuongHienTai"));
             }
             return -1;
-        }
+        } 
 
         //Lấy số lượng ứng cử viên hiện tại đang có trong kỳ bầu cử
         public async Task<int> _GetCurrentCandidateCountByElection(DateTime ngayBD, MySqlConnection connection){
@@ -229,6 +299,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //Trả về ngày kết thúc của kỳ bầu cử dựa trên thời điểm bắt đầu
         public async Task<TimeOfTheElectionDTO> _GetTimeOfElection(DateTime ngayBD, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+            
             TimeOfTheElectionDTO result = new TimeOfTheElectionDTO();
 
             const string sql = @"
@@ -247,6 +321,74 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
 
             return null;// Không tồn tại
+        }
+
+        //So sánh số lượng ứng cử viên tại kỳ bầu cử hiện tại với số lượng ứng cử viên quy định từ trước theo ngày bầu cử
+        public async Task<int> _CompareCurrentNumberCandidateWithSpecifieldNumber(DateTime ngayBD, MySqlConnection connection, MySqlTransaction transaction){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            try{
+                const string sql = @"
+                SELECT 
+                case when ky.SoLuongToiDaUngCuVien >(
+                SELECT COUNT(kq.ngayBD)
+                FROM ketquabaucu kq
+                WHERE kq.ngayBD = @ngayBD
+                ) then 1
+                ELSE 0
+                END AS Result
+                FROM kybaucu ky
+                WHERE ky.ngayBD = @ngayBD;";
+
+                using (var command = new MySqlCommand(sql,connection)){
+                    command.Parameters.AddWithValue("@ngayBD",ngayBD);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    int count = 0;
+                    if(await reader.ReadAsync()){
+                        count = reader.GetInt32(reader.GetOrdinal("Result"));    
+                    }
+                    return count;
+                }
+
+            }catch(MySqlException ex){ 
+                Console.WriteLine("Error: " + ex.Message);
+                if(transaction.Connection != null)
+                    await transaction.RollbackAsync();
+                return -1;
+            }catch(Exception){
+                await transaction.RollbackAsync();
+                throw;
+            }   
+        }
+
+        //Lấy danh sách ID và tên ứng cử viên được sắp xếp dựa trên ngày bắt đầu bầu cử
+        public async Task<List<CandidateNamesBasedOnElectionDateDto>> _GetListCandidateNamesBasedOnElections(DateTime ngayBD){
+           var connection = await _context.Get_MySqlConnection();
+            List<CandidateNamesBasedOnElectionDateDto> result = new List<CandidateNamesBasedOnElectionDateDto>();
+            
+            const string sql = @"
+            SELECT ucv.ID_ucv, nd.HoTen
+            FROM ungcuvien ucv JOIN nguoidung nd ON ucv.ID_user = nd.ID_user
+            JOIN ketquabaucu kq ON kq.ID_ucv = ucv.ID_ucv
+            WHERE kq.ngayBD = @ngayBD
+            ORDER BY nd.HoTen";
+
+            using(var command =  new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                using var reader = await command.ExecuteReaderAsync();
+                
+                while(await reader.ReadAsync()){
+                    result.Add(new CandidateNamesBasedOnElectionDateDto{
+                        ID_ucv = reader.GetString(reader.GetOrdinal("ID_ucv")),
+                        HoTen = reader.GetString(reader.GetOrdinal("HoTen"))
+                    });
+                }
+            }
+
+            return result;
         }
     
     }

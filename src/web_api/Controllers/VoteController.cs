@@ -65,11 +65,19 @@ namespace BackEnd.src.web_api.Controllers
                 
                 //lấy kết quả thêm vào được hay không
                 var result = await _voteReposistory._CreateVoteByNumber(number,Vote);
-                if(result == false)
-                    return StatusCode(400,new{
-                        Status = "false",
-                        Message=$"Lỗi ngayBD không tồn tại."
+                if(result <  1){
+                    string ErrorMessage =  result switch{
+                        0 => "Lỗi số lượng phiếu tại kỳ bầu cử đã được tạo đủ rồi",
+                        -2 => "Lỗi ngayBD không tồn tại.",
+                        -1 => "Lỗi dữ liệu đầu vào rỗng.",
+                        -3 => "Lỗi số lượng phiều đầu vào cần tạo không được lớn hơn số lượng cử tri tối đa",
+                        _=> "Lỗi không xác định"  
+                    };
+                    return BadRequest(new{
+                        Status = "False",
+                        Message = ErrorMessage
                     });
+                }
                 
                 return Ok(new{
                     Status = "OK", 

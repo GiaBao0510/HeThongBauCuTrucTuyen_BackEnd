@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.Services;
 using BackEnd.src.core.Common;
 using Isopoh.Cryptography.Argon2;
+using BackEnd.src.core.Interfaces;
+using System.Numerics;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -16,13 +18,15 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         private readonly IProfileRepository _profileRepository;
         private readonly IElectionsRepository _electionsRepository;
         private readonly IConstituencyRepository _constituencyRepository;
-
         //Khởi tạo
         public VoterReposistory(
             DatabaseContext context,CloudinaryService cloudinaryService,
             IProfileRepository profileRepository, 
             IElectionsRepository electionsRepository,
-            IConstituencyRepository constituencyRepository
+            IConstituencyRepository constituencyRepository,
+            IPaillierServices paillierServices,
+            IVoteRepository voteRepository,
+            IListOfPositionRepository listOfPositionRepository
         ): base(context, cloudinaryService){
             _context=context;
             _cloudinaryService = cloudinaryService;
@@ -663,12 +667,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 return count > 0;
             }
-        }
-
-        //17. Cử tri bỏ phiếu
-            //-- lên kê hoạch tạo chức năng bỏ phiếu từ cử tri
-            //17.1 Thay đổi giá trị phiếu bầu điều tiên có giá trị bằng 0 được tìm thấy và phiếu bầu đó phải trong kỳ bầu cử của người bầu cử
-            //17.2 Khóa bí mật sẽ được mã hóa bằng giải thuật RSA và lưu khóa ngoại và khóa bí mật bên 2 tệp tin
+        }           
 
         //18. Danh sách các kỳ bầu cử mà cử tri có thể tham gia
         public async Task<List<ElectionsDto>> _ListElectionsVotersHavePaticipated(string ID_cutri){
@@ -701,6 +700,131 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 }        
             }
             return list;
+        }
+
+        //19. Kiểm tra xem cử tri đã bỏ phiếu trong kỳ bầu cử chưa
+        public async Task<bool> _CheckVoterHasVoted(string ID_cutri, DateTime ngayBD, MySqlConnection connect){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connect.State != System.Data.ConnectionState.Open)
+                await connect.OpenAsync();
+            try{
+                const string sql = @"
+                SELECT GhiNhan
+                FROM trangthaibaucu
+                WHERE ngayBD = @ngayBD AND ID_CuTri =@ID_CuTri;";
+
+                using (var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                    command.Parameters.AddWithValue("@ID_CuTri", ID_cutri);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    if(await reader.ReadAsync()){
+                        string ghinhan = reader.GetString(reader.GetOrdinal("GhiNhan"));
+                        if(ghinhan.Equals("1")) return false;
+                    }
+                }
+                return true;
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Lấy mã đơn vị dựa trên mã cử tri
+        public async Task<string> _getMaDonVi(string ID_CuTri,  MySqlConnection connect){
+             //Kiểm tra trạng thái kết nối trước khi mở
+            if(connect.State != System.Data.ConnectionState.Open)
+                await connect.OpenAsync();
+            
+            try{
+                const string sql = @"
+                SELECT ID_DonViBauCu 
+                FROM trangthaibaucu 
+                WHERE ID_CuTri = @ID_CuTri;";
+                string ID_DonViBauCu = null;
+
+                using (var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@ID_CuTri", ID_CuTri);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    if(await reader.ReadAsync()){
+                        ID_DonViBauCu = reader.GetString(reader.GetOrdinal("ID_DonViBauCu"));
+                    }
+                }
+                return ID_DonViBauCu;
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Lấy ma danh muc ứng cử dựa trên mã cử tri
+        public async Task<string> _getMaDanhMucUngCu(string ID_CuTri,  MySqlConnection connect){
+             //Kiểm tra trạng thái kết nối trước khi mở
+            if(connect.State != System.Data.ConnectionState.Open)
+                await connect.OpenAsync();
+            
+            try{
+                const string sql = @"
+                SELECT dm.ID_Cap
+                FROM trangthaibaucu tt 
+                JOIN donvibaucu dv ON tt.ID_DonViBauCu = dv.ID_DonViBauCu
+                JOIN danhmucungcu dm ON dm.ID_DonViBauCu = dv.ID_DonViBauCu
+                WHERE tt.ID_CuTri =  @ID_CuTri;";
+                string ID_Cap = null;
+
+                using (var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@ID_CuTri", ID_CuTri);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    if(await reader.ReadAsync()){
+                        ID_Cap = reader.GetString(reader.GetOrdinal("ID_Cap"));
+                    }
+                }
+                return ID_Cap;
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         } 
     }
 }
