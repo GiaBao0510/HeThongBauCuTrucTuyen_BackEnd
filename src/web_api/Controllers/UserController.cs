@@ -368,5 +368,59 @@ namespace BackEnd.src.web_api.Controllers
                 });
             }
         }
+
+        //Người dùng thay đổi mật dựa trên email người dùng
+        [HttpGet("get-personal-information")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
+        [Authorize(Roles= "1,2,3,4,5,8")]
+
+        public async Task<IActionResult> GetPersonnalInfomationByEmail([FromQuery]string email){
+            try{
+                var result = await _userRepository._GetPersonnalInfomationByEmail(email);
+                if(result == null)
+                    return BadRequest(new {Status = "False", Message = "Email người dùng không tồn tại."});
+
+                return Ok(new{
+                    Status = true,
+                    Message ="",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy thông tin người dùng: {ex.Message}"
+                });
+            }
+        }
+
+        //14. Hiển thị danh sách cử tri đã tham gia vào các ky bầu cử  
+        [HttpGet("list-of-elections-voters-have-paticipated")]
+        [Authorize(Roles= "1,5")]
+        public async Task<IActionResult> GetListOfElectionsByUserPhone([FromQuery]string sdt){
+            try{
+                if(string.IsNullOrEmpty(sdt))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền số điện thoại cử tri."});
+
+                var result = await _userRepository._getListOfElectionsByUserPhone(sdt);
+                if(result == null)
+                    return BadRequest(new{Status = "False", Message = "Không tìm thấy số điện thoại cử tri."});
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Danh sách các kỳ bầu cử mà cử tri đã tham gia",
+                    Data = result
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy thông tin cử tri trước khi đăng ký: {ex.Message}"
+                });
+            }
+        }
     }
 }

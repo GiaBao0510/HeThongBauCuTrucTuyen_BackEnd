@@ -41,6 +41,7 @@ namespace BackEnd
         public void ConfigureServices(IServiceCollection services){
             
             services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
             services.AddHttpContextAccessor();
@@ -276,6 +277,11 @@ namespace BackEnd
         //Riêng các service muốn call thì sẽ goi trong đây
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env){
             
+            app.UseCors(policy =>
+            policy.WithOrigins("*")
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+
             //Cấu hình pipline của ứng dụng
             if(env.IsDevelopment()){
                 app.UseDeveloperExceptionPage();

@@ -15,6 +15,7 @@ namespace BackEnd
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
 
+        [STAThread]
         static void Main(string[] args)
         {
                 // ----- Config log4net
@@ -40,13 +41,12 @@ namespace BackEnd
                         
                         //Thiết lập lắng bất kỳ IP của thiết bị nào trên cổng 3000
                         kestrelServerOptions.Listen(IPAddress.Any,3000);
-                        kestrelServerOptions.ListenAnyIP(3000);
+                        kestrelServerOptions.ListenAnyIP(5085);
                         
                         //Lắp nghe trên cổng 7147 với https
-                        kestrelServerOptions.Listen(IPAddress.Any, 7147, listenOpt =>{
-                            listenOpt.UseHttps();
-                        });
-                                     //Lắng nghe trên cổng 3000
+                        // kestrelServerOptions.Listen(IPAddress.Any, 7147, listenOpt =>{
+                        //     listenOpt.UseHttps();
+                        // });
 
                         //Lắng nghe cổng 3001 chạy server trên ứng dụng
                         kestrelServerOptions.ListenLocalhost(3001);

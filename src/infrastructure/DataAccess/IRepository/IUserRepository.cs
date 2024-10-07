@@ -36,5 +36,9 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //Kiểm tra xem tài khoản người dùng đã đăng ký chưa
         Task<int> _CheckRegisteredUser(string ID);
         Task<int> _SetPwdBasedOnUserEmail(string Email, string password);
+        //Lấy thông tin người dùng dựa trên Email
+        Task<PersonalInformationDTO> _GetPersonnalInfomationByEmail(string email);
+        //Lấy danh sách kỳ bầu cử mà người dùng có thể tham dự dựa trên sđt người dùng
+        Task<List<ElectionsDto>> _getListOfElectionsByUserPhone(string sdt); 
     }
 }

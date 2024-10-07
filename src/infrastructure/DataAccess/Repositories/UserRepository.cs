@@ -842,5 +842,85 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
+        //Lấy  thông tin người dùng dựa trên email
+        public async Task<PersonalInformationDTO> _GetPersonnalInfomationByEmail(string email){
+            using var connection = await _context.Get_MySqlConnection();
+            
+            const string sql = @"
+            SELECT nd.HoTen,nd.GioiTinh, nd.NgaySinh, nd.DiaChiLienLac, nd.Email, nd.SDT, nd.HinhAnh, dt.TenDanToc
+            FROM nguoidung nd JOIN dantoc dt ON dt.ID_DanToc = nd.ID_DanToc 
+            WHERE Email = @Email";
+
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@Email", email);
+                
+                using var reader = await command.ExecuteReaderAsync();
+                if(await reader.ReadAsync()){
+                    return new PersonalInformationDTO{
+                        HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
+                        GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh")),
+                        NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")),
+                        DiaChiLienLac = reader.GetString(reader.GetOrdinal("DiaChiLienLac")),
+                        Email = reader.GetString(reader.GetOrdinal("Email")),
+                        SDT = reader.GetString(reader.GetOrdinal("SDT")),
+                        HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
+                        TenDanToc = reader.GetString(reader.GetOrdinal("TenDanToc"))
+                    };
+                }
+            }
+
+            return null;
+        }
+
+        //Lấy danh sách kỳ bầu cử mà người dùng có thể tham dự dựa trên sđt người dùng
+        public async Task<List<ElectionsDto>> _getListOfElectionsByUserPhone(string sdt){
+            try{
+               using var connection = await _context.Get_MySqlConnection();
+                var list = new List<ElectionsDto>();
+
+                //Kiểm tra xem số điện thoại có tồn tại 
+                int checkVoterExists = await CheckPhoneNumberAlreadyExits(sdt, connection);
+                if(checkVoterExists == 0) return null;
+
+                //lấy danh sách kỳ bầu cử có mặc cử tri
+                const string sql = @"
+                SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, kbc.MoTa
+                FROM trangthaibaucu tt
+                JOIN kybaucu kbc ON kbc.ngayBD = tt.ngayBD
+                JOIN cutri ct ON tt.ID_CuTri = ct.ID_CuTri
+                JOIN nguoidung nd ON nd.ID_user = ct.ID_user
+                WHERE nd.SDT = @SDT";
+                using (var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@SDT",sdt);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new ElectionsDto{
+                            ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")),
+                            ngayKt =  reader.GetDateTime(reader.GetOrdinal("ngayBD")),
+                            TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
+                            Mota = reader.GetString(reader.GetOrdinal("Mota")),
+                        });
+                    }        
+                }
+                return list; 
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        } 
+
     }
 }

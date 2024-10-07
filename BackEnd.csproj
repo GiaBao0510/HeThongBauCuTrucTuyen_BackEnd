@@ -8,7 +8,7 @@
      <!-- Tắt thông báo cảnh báo theo mã hiệu Cảnh báo-->
     <NoWarn>
       AD0001;CS8073;NU1701;CS8603;CS8604;CS8601;CS0472;CS8618;CS8766;
-      CS8602;CS8625;CS8600;CS8714;CS8621;CS1998
+      CS8602;CS8625;CS8600;CS8714;CS8621;CS1998;CS0109;NETSDK1080
     </NoWarn>
   </PropertyGroup>
 
@@ -25,6 +25,7 @@
     <PackageReference Include="log4net" Version="2.0.17" />
     <PackageReference Include="MailKit" Version="4.7.1.1" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Client" Version="2.4.3" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.8" />
@@ -52,6 +53,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />

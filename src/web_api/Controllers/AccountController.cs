@@ -84,6 +84,7 @@ namespace BackEnd.src.web_api.Controllers
                 //2.Gửi mã otp xác nhận
                 await _userServices._SendVerificationOTPcodeAfterLogin(result.Email);
 
+                Console.WriteLine($"Đăng nhập thành công và lúc {DateTime.Now} - {result.Email}");
                 return Ok(new {
                         Success = true,
                         VaiTro =  result.Role,
