@@ -13,5 +13,6 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _DeleteListOfPositionsBy_ID(string ID);
         //Kiểm tra xem Mã danh mục ứng cử có tồn tại không
         Task<bool> _CheckIfTheCodeIsInTheListOfPosition(int ID, MySqlConnection connection);
+        Task<bool> _CheckTheListOgCandidatesWithTheVotingDateTogether(DateTime ngayBD ,int IDcap, MySqlConnection connection);
     }
 }

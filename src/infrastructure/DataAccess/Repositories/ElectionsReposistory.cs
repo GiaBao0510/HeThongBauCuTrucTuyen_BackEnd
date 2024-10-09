@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using BackEnd.src.web_api.DTOs;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using System.Data;
+using System.Globalization;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -298,13 +299,19 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //Trả về ngày kết thúc của kỳ bầu cử dựa trên thời điểm bắt đầu
-        public async Task<TimeOfTheElectionDTO> _GetTimeOfElection(DateTime ngayBD, MySqlConnection connection){
+        public async Task<TimeOfTheElectionDTO> _GetTimeOfElection(string ngayBD, MySqlConnection connection){
+            
             //Kiểm tra trạng thái kết nối trước khi mở
             if(connection.State != System.Data.ConnectionState.Open)
                 await connection.OpenAsync();
-            
-            TimeOfTheElectionDTO result = new TimeOfTheElectionDTO();
 
+            //Tìm ngày bắt đầu có không nếu không thì trả về null
+            CultureInfo provider = CultureInfo.InvariantCulture;
+            DateTime votingDay = DateTime.ParseExact(ngayBD,"yyyy-MM-dd HH:mm:ss",provider);
+            var check_ngayBD = await _CheckIfElectionTimeExists(votingDay,connection);
+            if(!check_ngayBD) return null;
+
+            TimeOfTheElectionDTO result = new TimeOfTheElectionDTO();
             const string sql = @"
             SELECT ngayBD, ngayKT FROM kybaucu 
             WHERE ngayBD = @ngayBD";
@@ -316,11 +323,11 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 if(await reader.ReadAsync()){
                     result.ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD"));
                     result.ngayKT = reader.GetDateTime(reader.GetOrdinal("ngayKT"));
+                    
                     return result;
                 }
+                return null;// Không tồn tại
             }
-
-            return null;// Không tồn tại
         }
 
         //So sánh số lượng ứng cử viên tại kỳ bầu cử hiện tại với số lượng ứng cử viên quy định từ trước theo ngày bầu cử

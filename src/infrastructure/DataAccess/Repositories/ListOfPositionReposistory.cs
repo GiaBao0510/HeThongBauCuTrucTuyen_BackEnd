@@ -139,5 +139,24 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 return count > 0;
             }
         }
+
+        //Kiểm tra xem mã kỳ bầu cử với mã danh mục ứng cử có tồn tại chung với nhau không
+        public async Task<bool> _CheckTheListOgCandidatesWithTheVotingDateTogether(DateTime ngayBD ,int IDcap, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            const string sql = @"
+            SELECT COUNT(ngayBD)
+            FROM ketquabaucu 
+            WHERE ngayBD = @ngayBD AND ID_Cap = @ID_Cap;";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_Cap",IDcap);
+                command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            }
+        }
     }
 }

@@ -32,6 +32,6 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //lấy danh sách các kỳ bầu cử trong tương lai
         Task<List<ElectionDto>> _GetListOfFutureElections(); 
         //Trả về ngày kết thúc của kỳ bầu cử dựa trên thời điểm bắt đầu
-        Task<TimeOfTheElectionDTO> _GetTimeOfElection(DateTime ngayBD, MySqlConnection connection);
+        Task<TimeOfTheElectionDTO> _GetTimeOfElection(string ngayBD, MySqlConnection connection);
     }
 }

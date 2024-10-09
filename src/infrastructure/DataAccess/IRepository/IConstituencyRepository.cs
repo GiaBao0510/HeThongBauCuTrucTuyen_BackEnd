@@ -12,5 +12,6 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<Constituency> _GetConstituencyBy_ID(string id);
         Task<bool> _DeleteConstituencyBy_ID(string ID);
         Task<bool> _CheckIfConstituencyExists(string ID, MySqlConnection connection);
+        Task<bool> _CheckVoterID_ConsituencyID_andPollingDateTogether(string ID_DonViBauCu, string IDcutri, DateTime ngayBD, MySqlConnection connection);
     }
 }

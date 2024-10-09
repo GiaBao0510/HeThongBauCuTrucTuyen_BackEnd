@@ -149,5 +149,27 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
+        //Kiểm tra ID của đơn vị bầu, mã cử tri và ngày bắt đầu có cùng tồn tại không
+        public async Task<bool> _CheckVoterID_ConsituencyID_andPollingDateTogether(string ID_DonViBauCu, string IDcutri, DateTime ngayBD, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+                
+            const string sql = @"
+            SELECT COUNT(ngayBD)
+            FROM trangthaibaucu 
+            WHERE ID_CuTri =@ID_CuTri AND ngayBD =@ngayBD AND ID_DonViBauCu =@ID_DonViBauCu; 
+            ";
+            
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_DonViBauCu",ID_DonViBauCu);
+                command.Parameters.AddWithValue("@ID_CuTri", IDcutri);
+                command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            }
+        }
+
     }
 }

@@ -720,10 +720,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     using var reader = await command.ExecuteReaderAsync();
                     if(await reader.ReadAsync()){
                         string ghinhan = reader.GetString(reader.GetOrdinal("GhiNhan"));
-                        if(ghinhan.Equals("1")) return false;
+                        Console.WriteLine($">>Ghi nhận bỏ phiếu: {ghinhan}");
+                        if(ghinhan.Equals("1")) return true; //Đã bỏ phiếu rồi
                     }
+                    return  false;  //Chưa bỏ phiếu
                 }
-                return true;
+                
 
             }catch(MySqlException ex){
                 Console.WriteLine($"Error message: {ex.Message}");
