@@ -846,10 +846,21 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         public async Task<PersonalInformationDTO> _GetPersonnalInfomationByEmail(string email){
             using var connection = await _context.Get_MySqlConnection();
             
-            const string sql = @"
-            SELECT nd.HoTen,nd.GioiTinh, nd.NgaySinh, nd.DiaChiLienLac, nd.Email, nd.SDT, nd.HinhAnh, dt.TenDanToc
-            FROM nguoidung nd JOIN dantoc dt ON dt.ID_DanToc = nd.ID_DanToc 
-            WHERE Email = @Email";
+            const string sql = @"         
+            SELECT nd.HoTen, nd.GioiTinh, nd.NgaySinh, nd.DiaChiLienLac, nd.Email, nd.SDT, nd.HinhAnh, dt.TenDanToc,
+            CASE 
+            WHEN tk.RoleID = '5' THEN ct.ID_CuTri
+            WHEN tk.RoleID = '2' THEN ucv.ID_ucv
+            WHEN tk.RoleID = '8' THEN cb.ID_CanBo
+            ELSE NULL
+            END AS ID_Object
+            FROM nguoidung nd
+            JOIN dantoc dt ON dt.ID_DanToc = nd.ID_DanToc
+            JOIN taikhoan tk ON tk.TaiKhoan = nd.SDT
+            LEFT JOIN cutri ct ON ct.ID_user = nd.ID_user AND tk.RoleID = '5'
+            LEFT JOIN ungcuvien ucv ON ucv.ID_user = nd.ID_user AND tk.RoleID = '2'
+            LEFT JOIN canbo cb ON cb.ID_user = nd.ID_user AND tk.RoleID = '8'
+            WHERE nd.Email = @Email;";
 
             using(var command = new MySqlCommand(sql, connection)){
                 command.Parameters.AddWithValue("@Email", email);
@@ -864,7 +875,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         Email = reader.GetString(reader.GetOrdinal("Email")),
                         SDT = reader.GetString(reader.GetOrdinal("SDT")),
                         HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
-                        TenDanToc = reader.GetString(reader.GetOrdinal("TenDanToc"))
+                        TenDanToc = reader.GetString(reader.GetOrdinal("TenDanToc")),
+                        ID_Object = reader.GetString(reader.GetOrdinal("ID_Object"))
                     };
                 }
             }
@@ -884,9 +896,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 //lấy danh sách kỳ bầu cử có mặc cử tri
                 const string sql = @"
-                SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, kbc.MoTa
+                SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, kbc.MoTa, dv.TenDonViBauCu,tt.GhiNhan
                 FROM trangthaibaucu tt
                 JOIN kybaucu kbc ON kbc.ngayBD = tt.ngayBD
+                JOIN donvibaucu dv ON dv.ID_DonViBauCu = tt.ID_DonViBauCu
                 JOIN cutri ct ON tt.ID_CuTri = ct.ID_CuTri
                 JOIN nguoidung nd ON nd.ID_user = ct.ID_user
                 WHERE nd.SDT = @SDT";
@@ -900,6 +913,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                             ngayKt =  reader.GetDateTime(reader.GetOrdinal("ngayBD")),
                             TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
                             Mota = reader.GetString(reader.GetOrdinal("Mota")),
+                            GhiNhan = reader.GetString(reader.GetOrdinal("GhiNhan")),
+                            TenDonViBauCu = reader.GetString(reader.GetOrdinal("TenDonViBauCu"))
                         });
                     }        
                 }

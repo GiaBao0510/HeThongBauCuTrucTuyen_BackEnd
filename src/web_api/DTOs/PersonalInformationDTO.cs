@@ -10,6 +10,6 @@ namespace BackEnd.src.web_api.DTOs
         public string? SDT;
         public string? HinhAnh;
         public string? TenDanToc;
-
+        public string? ID_Object;
     }
 }

@@ -39,5 +39,8 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<int> _AddListCandidatesToTheElection(CandidateListInElectionDto CandidateListInElectionDto);
         //12. Xóa ứng cử viên khỏi kỳ bầu cử cụ thể
         Task<int> _RemoveCandidateOfElection(string Id_ucv, DateTime ngayBD);
+        //Lấy danh sách và thông tin ứng cử viên dựa trên kỳ bầu cử
+        Task<List<ListCandidateOnElectionDateDTO>> _GetCandidateListBasedOnElectionDate(DateTime ngayBD);
+        
     }
 }

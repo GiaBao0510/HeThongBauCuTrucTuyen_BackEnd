@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using BackEnd.src.core.Models;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackEnd.src.web_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableRateLimiting("FixedWindowLimiter")]
     public class CandidateController: ControllerBase
     {
         private readonly ICandidateRepository _candidateReposistory;
@@ -113,6 +115,7 @@ namespace BackEnd.src.web_api.Controllers
         //4. Lấy theo ID
         [HttpGet("{id}")]
         [Authorize(Roles = "1,2")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> GetCandidateBy_ID(string id){
             try{
                 var District = await _candidateReposistory._GetCandidateBy_ID(id);
@@ -138,6 +141,7 @@ namespace BackEnd.src.web_api.Controllers
         //5.Sửa
         [HttpPut("{id}")]
         [Authorize(Roles = "1,2")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> EditCandidateBy_ID(string id,[FromBody] CandidateDto UngCuVien){
             try{
                 if(UngCuVien == null || string.IsNullOrEmpty(UngCuVien.HoTen))
@@ -238,6 +242,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //8. Thay đổi mật khẩu - ứng cử viên
         [HttpPut("ChangeCandidatePwd/{id}")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
         [Authorize(Roles = "1,2")]
         public async Task<IActionResult> ChangeCandidatePassword(string id,[FromBody] ChangePasswordDto setPasswordDto){
             try{
@@ -275,6 +280,7 @@ namespace BackEnd.src.web_api.Controllers
         //9. Gửi báo cáo
         [HttpPost("sendReport")]
         [Authorize(Roles = "2")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> VoterSubmitReport([FromBody] SendReportDto sendReportDto){
             try{
                 //Kiểm tra đầu vào
@@ -380,6 +386,34 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện xóa ứng cử viên khỏi kỳ bầu cử cụ thể: {ex.Message}"
+                });
+            }
+        }
+
+        //12. Lấydanh sách ứng cử viên dựa trên thời điểm bỏ phiếu
+        [HttpGet]
+        [Route("get-candidate-list-based-on-election-date")]
+        [Authorize(Roles = "1,2,5")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
+        public async Task<IActionResult> GetCandidateListBasedOnElectionDate([FromQuery] DateTime ngayBD){
+            try{
+                Console.WriteLine($"ngay BD:{ngayBD}");
+                if(string.IsNullOrEmpty(ngayBD.ToString()) || ngayBD == DateTime.MinValue )
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền thời điểm bầu cử."});
+
+                var result = await _candidateReposistory._GetCandidateListBasedOnElectionDate(ngayBD);
+                if(result == null)
+                    return BadRequest(new{Status = "False", Message = "Không tìm thấy thời điểm bầu cử"});
+
+                return Ok(new{
+                    Status = "Ok",
+                    Message = "null",
+                    Data = result
+                });
+            }catch(Exception ex){
+                return StatusCode(500,new{
+                    Status = "false",
+                    Message=$"Lỗi khi lấy danh sách ứng cử viên dựa trên thời điểm bầu cử: {ex.Message}"
                 });
             }
         }

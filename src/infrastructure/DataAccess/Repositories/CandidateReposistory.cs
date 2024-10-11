@@ -6,6 +6,7 @@ using BackEnd.src.infrastructure.Services;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.core.Common;
 using Isopoh.Cryptography.Argon2;
+using Microsoft.CodeAnalysis;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -608,6 +609,64 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     return -2;
             }
             return 1;
+        }
+
+        //Lấy danh sách và thông tin ứng cử viên dựa trên kỳ bầu cử
+        public async Task<List<ListCandidateOnElectionDateDTO>> _GetCandidateListBasedOnElectionDate(DateTime ngayBD){
+            using var connection = await _context.Get_MySqlConnection();
+            try{
+                
+                //Kiểm tra xem ngày bầu cử có tồn tại không
+                bool checkElectionExist = await _ElectionsRepository._CheckIfElectionTimeExists(ngayBD, connection);
+                if(!checkElectionExist) return null;
+
+                var list = new List<ListCandidateOnElectionDateDTO>();
+                const string sql = @"
+                SELECT nd.HoTen, nd.GioiTinh, nd.NgaySinh, 
+                nd.HinhAnh, nd.Email, ucv.TrangThai, 
+                dt.TenDanToc, kq.SoLuotBinhChon, kq.TyLeBinhChon
+                FROM ungcuvien ucv 
+                JOIN nguoidung nd ON ucv.ID_user = nd.ID_user
+                JOIN ketquabaucu kq ON kq.ID_ucv = ucv.ID_ucv
+                JOIN dantoc dt ON dt.ID_DanToc = nd.ID_DanToc
+                WHERE kq.ngayBD = @ngayBD
+                ORDER BY ucv.ID_ucv;";
+
+                using (var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD",ngayBD);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new ListCandidateOnElectionDateDTO{
+                            NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")),
+                            HoTen =  reader.GetString(reader.GetOrdinal("HoTen")),
+                            Email = reader.GetString(reader.GetOrdinal("Email")),
+                            GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh")),
+                            HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
+                            TrangThai = reader.GetString(reader.GetOrdinal("TrangThai")),
+                            TenDanToc = reader.GetString(reader.GetOrdinal("TenDanToc")),
+                            SoLuotBinhChon = reader.GetInt32(reader.GetOrdinal("SoLuotBinhChon")),
+                            TyLeBinhChon = reader.GetInt32(reader.GetOrdinal("TyLeBinhChon")),
+                        });
+                    }        
+                }
+            return list;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         }
 
     }
