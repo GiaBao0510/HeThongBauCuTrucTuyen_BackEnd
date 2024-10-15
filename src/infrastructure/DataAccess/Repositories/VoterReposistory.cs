@@ -681,7 +681,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
             //lấy danh sách kỳ bầu cử có mặc cử tri
             const string sql = @"
-            SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, kbc.MoTa
+            SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, kbc.MoTa, kbc.SoLuongToiDaCuTri, kbc.SoLuongToiDaUngCuVien, kbc.SoLuotBinhChonToiDa
             FROM trangthaibaucu tt
             JOIN kybaucu kbc ON kbc.ngayBD = tt.ngayBD
             JOIN cutri ct ON tt.ID_CuTri = ct.ID_CuTri
@@ -696,6 +696,9 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         ngayKt =  reader.GetDateTime(reader.GetOrdinal("ngayBD")),
                         TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
                         Mota = reader.GetString(reader.GetOrdinal("Mota")),
+                        SoLuongToiDaCuTri = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaCuTri")),
+                        SoLuongToiDaUngCuVien = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
+                        SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuotBinhChonToiDa"))
                     });
                 }        
             }

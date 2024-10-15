@@ -80,11 +80,18 @@ namespace BackEnd.src.web_api.Controllers
                 
                 //lấy kết quả thêm vào được hay không
                 var result = await _electionsReposistory._AddElections(Elections);
-                if(result == false)
-                    return StatusCode(400,new{
-                        Status = "false",
-                        Message=$"Lỗi ngayBD kỳ bầu cử đã bị trùng"
-                    });
+                if(result <= 0){
+                    string errorMessage = result switch{
+                        0 => "ID danh mục bầu cử không tồn tại",
+                        -1 =>"Không tìm thấy nơi lưu khóa cá nhân",
+                        _ => "Lỗi không xác định"
+                    };
+                    int statusCode = result switch{
+                        0 => 400, -1 =>400,  _ => 500
+                    };
+                    Console.WriteLine($"Kết quả: {result}");
+                    return StatusCode(statusCode ,new {Status = "False", Message = errorMessage});
+                }
                 
                 return Ok(new{
                     Status = "OK", 

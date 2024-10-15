@@ -40,5 +40,8 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<PersonalInformationDTO> _GetPersonnalInfomationByEmail(string email);
         //Lấy danh sách kỳ bầu cử mà người dùng có thể tham dự dựa trên sđt người dùng
         Task<List<ElectionsDto>> _getListOfElectionsByUserPhone(string sdt); 
+        //Người dùng tự cập nhật thong tin cá nhân
+        Task<int> _UpdatePersonalInfomation(PersonalInformationDTO personalInfo);
+        
     }
 }

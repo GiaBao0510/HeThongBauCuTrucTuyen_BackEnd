@@ -32,5 +32,6 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _SendOtpCodeAfterUserVoted(EmailDTO emailDTO, MySqlConnection connection);
         //11. Kiểm tra xem Email người dùng có tồn tại trong hệ thống không
         Task<bool> _CheckUserEmail(string email);
+        Task<int> _handleUserRegister(string sdt, string newPwd);
     }
 }

@@ -17,23 +17,25 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         private readonly IListOfPositionRepository _listOfPositionRepository;
         private readonly IElectionsRepository _ElectionsRepository;
         private readonly IProfileRepository _profileRepository;
+        private readonly IEducationLevelRepository _educationLevelRepository;
         
         //Khởi tạo
         public CandidateRepository(
             DatabaseContext context,CloudinaryService cloudinaryService,
             IListOfPositionRepository listOfPositionRepository,
             IElectionsRepository electionsRepository,
-            IProfileRepository profileRepository
+            IProfileRepository profileRepository,
+            IEducationLevelRepository educationLevelRepository
         ): base(context, cloudinaryService){
             _context=context;
             _cloudinaryService = cloudinaryService;
             _listOfPositionRepository = listOfPositionRepository;
             _ElectionsRepository = electionsRepository;
             _profileRepository = profileRepository;
+            _educationLevelRepository = educationLevelRepository;
         }
         //Hủy
         public new void Dispose() => _context.Dispose();
-
 
         //-2 .Kiểm tra ID ứng cử viên có tồn tại không
         public async Task<bool> _CheckCandidateExists(string ID, MySqlConnection connection){
@@ -95,8 +97,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     await transaction.RollbackAsync();
                     return -8;
                 }
-                
-                //if(DateTime.Now > )
 
                 Candidate.RoleID = 2;   //Gán vai trò mặc định khi tạo ứng cử viên
 
@@ -107,12 +107,14 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 int CheckInputInElectionResults = await _CheckInformationBeforeEnterInTableElectionResults(Candidate, connect);
                 if(CheckInputInElectionResults < 0){
                     Console.WriteLine("Lỗi thông tin ứng cử viên đầu vào đã trùng hoặc chưa điền đày đủ");
+                    await transaction.RollbackAsync();
                     return CheckInputInElectionResults;
                 }
 
                 //Nếu có lỗi thì in ra
                 if(FillInBasicInfo is int result && result <=0){
                     Console.WriteLine("Lỗi kiểm tra điền thông tin ứng cử viên");
+                    await transaction.RollbackAsync();
                     return result;
                 }
                 
@@ -121,7 +123,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         ID_user = FillInBasicInfo.ToString();
 
                 //Ngược lại thêm ứng cử viên, thêm phần vào bảng kết quả bầu cử
-                const string sqlCandidate = "INSERT INTO UngCuVien(ID_ucv,TrangThai,ID_user) VALUES(@ID_ucv,@TrangThai,@ID_user);";
+                const string sqlCandidate = "INSERT INTO UngCuVien(ID_ucv,TrangThai,ID_user,GioiThieu) VALUES(@ID_ucv,@TrangThai,@ID_user,@GioiThieu);";
                 const string sqlElectionResult = @"
                 INSERT INTO ketquabaucu(SoLuotBinhChon,ThoiDiemDangKy,TyLeBinhChon,ngayBD,ID_ucv,ID_Cap) 
                 VALUES(@SoLuotBinhChon,@ThoiDiemDangKy,@TyLeBinhChon,@ngayBD,@ID_ucv,@ID_Cap);";
@@ -135,6 +137,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command.Parameters.AddWithValue("@TyLeBinhChon", 0f);
                     command.Parameters.AddWithValue("@ngayBD", Candidate.ngayBD);
                     command.Parameters.AddWithValue("@ID_Cap", Candidate.ID_Cap);
+                    command.Parameters.AddWithValue("@GioiThieu", Candidate.GioiThieu);
 
                     await command.ExecuteNonQueryAsync();
                 }
@@ -147,6 +150,15 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     await transaction.RollbackAsync();
                     return -98;
                 }
+
+                
+                //Thêm trình độ học vấn cho ứng cử viên
+                bool AddEducationLevel = await _educationLevelRepository._AddEducationQualificationsToCandidates(Candidate.ID_TrinhDo,ID_ucv , connect);
+                if(!AddEducationLevel){
+                    await transaction.RollbackAsync();
+                    return -9;       //Nếu kỳ bầu cử không tồn tại
+                } 
+
 
                 await transaction.CommitAsync();
                 transactionCommitted = true;
@@ -198,7 +210,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
                     ID_DanToc = reader.GetInt32(reader.GetOrdinal("ID_DanToc")),
                     RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
-                    PublicID = reader.GetString(reader.GetOrdinal("PublicID"))
+                    PublicID = reader.GetString(reader.GetOrdinal("PublicID")),
+                    GioiThieu = reader.GetString(reader.GetOrdinal("GioiThieu")),
                 };
             }
             return null;
@@ -235,7 +248,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 //Cập nhật thông tin ứng cử viên - Và cập nhật phần tài khoảng ứng cử viên, nếu SDT thay đổi
                 const string sqlNguoiDung = @"
                     UPDATE nguoidung 
-                    SET HoTen = @HoTen, GioiTinh=@GioiTinh, NgaySinh=@NgaySinh,
+                    SET HoTen = @HoTen, GioiTinh=@GioiTinh, NgaySinh=@NgaySinh, GioiThieu=@GioiThieu,
                         DiaChiLienLac=@DiaChiLienLac, CCCD=@CCCD, SDT=@SDT, ID_DanToc=@ID_DanToc,
                         Email=@Email, RoleID=@RoleID
                     WHERE ID_user = @ID_user;";
@@ -259,6 +272,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command1.Parameters.AddWithValue("@Email", Candidate.Email);
                     command1.Parameters.AddWithValue("@RoleID", Candidate.RoleID);
                     command1.Parameters.AddWithValue("@ID_DanToc", Candidate.ID_DanToc);
+                    command1.Parameters.AddWithValue("@GioiThieu", Candidate.GioiThieu);
                 
                     int rowAffected = await command1.ExecuteNonQueryAsync();
                     if(rowAffected < 0) return -6;
@@ -320,7 +334,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
                     ID_DanToc = reader.GetInt32(reader.GetOrdinal("ID_DanToc")),
                     RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
-                    PublicID = reader.GetString(reader.GetOrdinal("PublicID"))
+                    PublicID = reader.GetString(reader.GetOrdinal("PublicID")),
+                    GioiThieu = reader.GetString(reader.GetOrdinal("GioiThieu")),
                 });
             }
             return list;
@@ -622,13 +637,15 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 var list = new List<ListCandidateOnElectionDateDTO>();
                 const string sql = @"
-                SELECT nd.HoTen, nd.GioiTinh, nd.NgaySinh, 
-                nd.HinhAnh, nd.Email, ucv.TrangThai, 
+                SELECT nd.HoTen, nd.GioiTinh, nd.NgaySinh, ucv.GioiThieu,
+                nd.HinhAnh, nd.Email, ucv.TrangThai, td.TenTrinhDoHocVan,
                 dt.TenDanToc, kq.SoLuotBinhChon, kq.TyLeBinhChon
                 FROM ungcuvien ucv 
                 JOIN nguoidung nd ON ucv.ID_user = nd.ID_user
                 JOIN ketquabaucu kq ON kq.ID_ucv = ucv.ID_ucv
                 JOIN dantoc dt ON dt.ID_DanToc = nd.ID_DanToc
+                JOIN chitiettrinhdohocvanungcuvien ct ON ct.ID_ucv = ucv.ID_ucv
+                JOIN trinhdohocvan td ON td.ID_TrinhDo = ct.ID_TrinhDo
                 WHERE kq.ngayBD = @ngayBD
                 ORDER BY ucv.ID_ucv;";
 
@@ -647,6 +664,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                             TenDanToc = reader.GetString(reader.GetOrdinal("TenDanToc")),
                             SoLuotBinhChon = reader.GetInt32(reader.GetOrdinal("SoLuotBinhChon")),
                             TyLeBinhChon = reader.GetInt32(reader.GetOrdinal("TyLeBinhChon")),
+                            TenTrinhDoHocVan = reader.GetString(reader.GetOrdinal("TenTrinhDoHocVan")),
+                            GioiThieu = reader.GetString(reader.GetOrdinal("GioiThieu"))
                         });
                     }        
                 }

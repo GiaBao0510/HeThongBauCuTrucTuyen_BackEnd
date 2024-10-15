@@ -331,13 +331,13 @@ namespace BackEnd.src.web_api.Controllers
         //11.HIển thị thông tin cử tri sau khi quét mã QR
         [HttpGet("show-information-before-registration")]
         public async Task<IActionResult> DisplayUserInformationAfterScanningTheCode([FromQuery] string id_cutri){
-            try{
+            try{ 
                 if(string.IsNullOrEmpty(id_cutri))
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền mã cử tri."});
 
                 var result = await _voterReposistory._DisplayUserInformationAfterScanningTheCode(id_cutri);
                 if(result == null)
-                    return BadRequest(new{Status = "False", Message = "Cử tri này đã đăng ký tài khoản rồi."});
+                    return BadRequest(new{Status = "False", Message = "Không tìm thấy thông tin cử tri hoặc cử tri đã đăng ký rồi"});
 
                 return Ok(new ApiRespons{
                     Success = true,

@@ -847,7 +847,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             using var connection = await _context.Get_MySqlConnection();
             
             const string sql = @"         
-            SELECT nd.HoTen, nd.GioiTinh, nd.NgaySinh, nd.DiaChiLienLac, nd.Email, nd.SDT, nd.HinhAnh, dt.TenDanToc,
+            SELECT nd.HoTen, nd.GioiTinh, nd.NgaySinh, nd.ID_user ,
+            nd.DiaChiLienLac, nd.Email, nd.SDT, nd.HinhAnh, dt.TenDanToc,
             CASE 
             WHEN tk.RoleID = '5' THEN ct.ID_CuTri
             WHEN tk.RoleID = '2' THEN ucv.ID_ucv
@@ -876,7 +877,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         SDT = reader.GetString(reader.GetOrdinal("SDT")),
                         HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
                         TenDanToc = reader.GetString(reader.GetOrdinal("TenDanToc")),
-                        ID_Object = reader.GetString(reader.GetOrdinal("ID_Object"))
+                        ID_Object = reader.GetString(reader.GetOrdinal("ID_Object")),
+                        ID_user = reader.GetString(reader.GetOrdinal("ID_user"))
                     };
                 }
             }
@@ -896,25 +898,32 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 //lấy danh sách kỳ bầu cử có mặc cử tri
                 const string sql = @"
-                SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, kbc.MoTa, dv.TenDonViBauCu,tt.GhiNhan
-                FROM trangthaibaucu tt
-                JOIN kybaucu kbc ON kbc.ngayBD = tt.ngayBD
-                JOIN donvibaucu dv ON dv.ID_DonViBauCu = tt.ID_DonViBauCu
-                JOIN cutri ct ON tt.ID_CuTri = ct.ID_CuTri
+                SELECT kb.ngayBD, kb.ngayKT, kb.TenKyBauCu, kb.MoTa, dv.TenDonViBauCu,tt.GhiNhan,
+                kb.SoLuongToiDaCuTri, kb.SoLuongToiDaUngCuVien, kb.SoLuotBinhChonToiDa,
+                dv.ID_DonViBauCu, kb.ID_Cap
+                FROM trangthaibaucu tt 
+                JOIN cutri ct ON ct.ID_CuTri = tt.ID_CuTri
                 JOIN nguoidung nd ON nd.ID_user = ct.ID_user
-                WHERE nd.SDT = @SDT";
+                JOIN kybaucu kb ON kb.ngayBD = tt.ngayBD
+                JOIN donvibaucu dv ON dv.ID_DonViBauCu = tt.ID_DonViBauCu
+                WHERE  nd.SDT =  @SDT";
                 using (var command = new MySqlCommand(sql, connection)){
                     command.Parameters.AddWithValue("@SDT",sdt);
 
                     using var reader = await command.ExecuteReaderAsync();
                     while(await reader.ReadAsync()){
-                        list.Add(new ElectionsDto{
+                        list.Add(new ElectionsDto{ 
                             ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")),
                             ngayKt =  reader.GetDateTime(reader.GetOrdinal("ngayBD")),
                             TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
                             Mota = reader.GetString(reader.GetOrdinal("Mota")),
                             GhiNhan = reader.GetString(reader.GetOrdinal("GhiNhan")),
-                            TenDonViBauCu = reader.GetString(reader.GetOrdinal("TenDonViBauCu"))
+                            TenDonViBauCu = reader.GetString(reader.GetOrdinal("TenDonViBauCu")),
+                            ID_Cap = reader.GetInt32(reader.GetOrdinal("ID_Cap")),
+                            ID_DonViBauCu = reader.GetInt32(reader.GetOrdinal("ID_DonViBauCu")),
+                            SoLuongToiDaCuTri = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaCuTri")),
+                            SoLuongToiDaUngCuVien = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
+                            SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuotBinhChonToiDa"))
                         });
                     }        
                 }
@@ -935,7 +944,70 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 Console.WriteLine($"Error InnerException: {ex.InnerException}");
                 throw;
             }
-        } 
+        }
 
+        //Người dùng tự cập nhật thong tin cá nhân
+        public async Task<int> _UpdatePersonalInfomation(PersonalInformationDTO personalInfo){
+            using var connection = await _context.Get_MySqlConnection();
+            
+            try{
+                //Kiểm tra trạng thái kết nối trước khi mở
+                if(connection.State != System.Data.ConnectionState.Open) await connection.OpenAsync(); 
+                
+                //Tìm xem số điện thoại trước đó có tồn tại không
+                bool CheckOld_phoneNum = await CheckPhoneNumberAlreadyExits(personalInfo.old_SDT,connection) > 0;
+                if(!CheckOld_phoneNum) return 0;
+
+                //Kiểm tra xem số điện thoại có bị trùng không
+                if(await CheckPhoneNumberAlreadyExits(personalInfo.SDT, connection) > 1) return -1;
+
+                //Kiểm tra xem email có bị trùng không
+                if(await CheckEmailAlreadyExits(personalInfo.Email, connection) > 1) return -2;           
+
+                //Thay đổi thông tin chính
+                const string sqlUser = @"
+                UPDATE nguoidung 
+                SET HoTen = @HoTen, GioiTinh=@GioiTinh, NgaySinh=@NgaySinh,
+                DiaChiLienLac=@DiaChiLienLac, SDT=@SDT, ID_DanToc=@ID_DanToc,
+                Email=@Email
+                WHERE ID_user = @ID_user;";
+
+                //Thay đổi tải khoản dựa trên sdt mới
+                const string sqlacc = @"UPDATE taikhoan 
+                SET TaiKhoan = @SDT
+                WHERE TaiKhoan = @OLD_SDT;";
+
+                using(var command = new MySqlCommand(sqlUser + sqlacc, connection)){
+                    command.Parameters.AddWithValue("@ID_user", personalInfo.ID_user);
+                    command.Parameters.AddWithValue("@HoTen", personalInfo.HoTen);
+                    command.Parameters.AddWithValue("@GioiTinh", personalInfo.GioiTinh);
+                    command.Parameters.AddWithValue("@NgaySinh", personalInfo.NgaySinh);
+                    command.Parameters.AddWithValue("@DiaChiLienLac", personalInfo.DiaChiLienLac);
+                    command.Parameters.AddWithValue("@OLD_SDT", personalInfo.old_SDT);
+                    command.Parameters.AddWithValue("@SDT", personalInfo.SDT);
+                    command.Parameters.AddWithValue("@Email", personalInfo.Email);
+                    command.Parameters.AddWithValue("@ID_DanToc", personalInfo.ID_DanToc);
+                    
+                    await command.ExecuteNonQueryAsync();
+                
+                    return 1;
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        } 
     }
 }

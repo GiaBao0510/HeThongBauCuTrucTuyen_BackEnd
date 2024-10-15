@@ -28,6 +28,7 @@ namespace BackEnd.core.Entities
         public int SoLuongToiDaCuTri { get; set; } = 0;
         public int SoLuongToiDaUngCuVien { get; set; } = 0;
         public int SoLuotBinhChonToiDa { get; set; } = 0;
+        public int ID_Cap { get; set; } = 0;
 
         //Truy xuất ngược
         public virtual ICollection<Vote> vote{set;get;}

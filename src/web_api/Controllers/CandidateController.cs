@@ -45,12 +45,14 @@ namespace BackEnd.src.web_api.Controllers
                         -6 => "Ngày bắt bầu cử không tìm thấy",
                         -7 => "Đã vượt quá số lượng ứng cử viên đã quy định trong kỳ này.",
                         -8 => "Đây không phải là thời điểm thích hợp để ứng cử cho kỳ bầu cử này",
+                        -9 => "Lỗi ID trình độ học vấn không tồn tại",
                         _ => "Lỗi không xác định"
                     };
                     int statusCode = result switch{
                         0 => 400, -1 =>400, -2 => 400,
                         -3 =>400, -4 =>400, -5 => 400,
-                        -6 => 400, -7 => 400 ,-8 =>400, _ => 500
+                        -6 => 400, -7 => 400 ,-8 =>400,
+                        -9 =>400, _ => 500
                     };
                     Console.WriteLine($"Kết quả: {result}");
                     return StatusCode(statusCode ,new {Status = "False", Message = errorMessage});

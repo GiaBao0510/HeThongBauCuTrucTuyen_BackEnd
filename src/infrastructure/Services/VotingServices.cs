@@ -6,6 +6,7 @@ using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
 using MySql.Data.MySqlClient;
 using System.Globalization;
+using System.Numerics;
 
 namespace BackEnd.src.infrastructure.Services
 {
@@ -75,11 +76,13 @@ namespace BackEnd.src.infrastructure.Services
                 Console.WriteLine($"Ngày KT: {timeOfTheElectionDTO.ngayKT}");
                 Console.WriteLine("\t\t --------------------------");
 
+                //Chuyển đổi giá trị phiếu
+                BigInteger GiaTriPhieuBauHienTai = BigInteger.Parse(voterVoteDTO.GiaTriPhieuBau);
 
                 //17.0 Kiêm tra xem thời điểm bỏ phiếu hợp lệ không. Nếu không thì trả về
-                if(DateTime.Now > timeOfTheElectionDTO.ngayKT || DateTime.Now < votingDay){
-                   return 0;
-                } 
+                // if(DateTime.Now > timeOfTheElectionDTO.ngayKT || DateTime.Now < votingDay){
+                //    return 0;
+                // } 
 
                 //17.1 Kiểm tra xem cử tri có tồn tại không
                 bool checkVoterExists = await _voterRepository._CheckVoterExists(voterVoteDTO.ID_CuTri, connect);
@@ -101,8 +104,8 @@ namespace BackEnd.src.infrastructure.Services
                 //17.4 Kiểm tra giá trị phiếu bầu có hợp lệ không
                 int SoLuotBinhChonToiDa = await _electionsRepository._MaximumNumberOfVotes(votingDay, connect);
                 int SoLuongToiDaCuTri = await _electionsRepository._MaximumNumberOfVoters(votingDay, connect);
-                int GiaTriPhieuLonNhat = _paillierServices.GiaTriToiDaCuaPhieuBau_M(SoLuongToiDaCuTri+1, SoLuotBinhChonToiDa);
-                if(GiaTriPhieuLonNhat < voterVoteDTO.GiaTriPhieuBau)
+                BigInteger GiaTriPhieuLonNhat = _paillierServices.GiaTriToiDaCuaPhieuBau_M(SoLuongToiDaCuTri+1, SoLuotBinhChonToiDa);
+                if(GiaTriPhieuLonNhat < GiaTriPhieuBauHienTai)
                     return -4;
 
                 //17.5 Kiểm tra ID của danh mục úng cử & ngày bầu cử có tồn tại trong kỳ bầu cử không không
@@ -122,7 +125,7 @@ namespace BackEnd.src.infrastructure.Services
                 VoteDto phieubau = new VoteDto();
                 phieubau.ngayBD = voterVoteDTO.ngayBD.ToString();
                 phieubau.ID_cap = voterVoteDTO.ID_Cap;
-                phieubau.GiaTriPhieuBau = voterVoteDTO.GiaTriPhieuBau;
+                phieubau.GiaTriPhieuBau = GiaTriPhieuBauHienTai;
 
                 bool addVote = await _voteRepository._AddVote(ID_Phieu, phieubau, connect);
                 if(!addVote){

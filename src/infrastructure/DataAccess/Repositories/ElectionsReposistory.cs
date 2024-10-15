@@ -5,19 +5,28 @@ using BackEnd.src.web_api.DTOs;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using System.Data;
 using System.Globalization;
+using BackEnd.src.core.Interfaces;
+using System.Numerics;
+using System;
+using System.IO;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
     public class ElectionsReposistory : IDisposable,IElectionsRepository
     {
         private readonly DatabaseContext _context;
+        private readonly IPaillierServices _PaillierServices;
+        private readonly IListOfPositionRepository _listOfPositionRepository;
 
         //Khởi tạo
         public ElectionsReposistory(
-            DatabaseContext context
+            DatabaseContext context,
+            IListOfPositionRepository listOfPositionRepository,
+            IPaillierServices paillierServices
         ){
             _context = context;
-
+            _listOfPositionRepository = listOfPositionRepository;
+            _PaillierServices = paillierServices;
         } 
 
         //Hủy
@@ -40,7 +49,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     SoLuongToiDaUngCuVien = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
                     SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
                     TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
-                    MoTa = reader.GetString(reader.GetOrdinal("MoTa"))
+                    MoTa = reader.GetString(reader.GetOrdinal("MoTa")),
+                    ID_Cap = reader.GetInt32(reader.GetOrdinal("ID_Cap"))
                 });
             }
             return list;
@@ -63,39 +73,89 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     SoLuongToiDaUngCuVien = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
                     SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
                     TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
-                    MoTa = reader.GetString(reader.GetOrdinal("MoTa"))
+                    MoTa = reader.GetString(reader.GetOrdinal("MoTa")),
+                    ID_Cap = reader.GetInt32(reader.GetOrdinal("ID_Cap"))
                 });
             }
             return list;
         }
 
         //Thêm
-        public async Task<bool> _AddElections(Elections kybaucu){
+        public async Task<int> _AddElections(Elections kybaucu){
             using var connection = await _context.Get_MySqlConnection();
 
-            //Lấy thời điểm hiện tại Và kiểm tra nếu ngày bắt đầu để rỗng thì nó lấy thời điểm hiện tại
-            DateTime currentDay = DateTime.Now;
-            kybaucu.ngayBD = kybaucu.ngayBD != null ? kybaucu.ngayBD : currentDay; 
-            
-            //Thực hiện thêm            
-            string Input = @"
-                INSERT INTO kybaucu(ngayBD,ngayKT,NgayKT_UngCu,TenKyBauCu,MoTa,SoLuongToiDaCuTri,SoLuongToiDaUngCuVien,SoLuotBinhChonToiDa) 
-                VALUES(@ngayBD,@ngayKT,@NgayKT_UngCu,@TenKyBauCu,@MoTa,@SoLuongToiDaCuTri,@SoLuongToiDaUngCuVien,@SoLuotBinhChonToiDa);";
-            
-            using (var commandAdd = new MySqlCommand(Input, connection)){
-                commandAdd.Parameters.AddWithValue("@ngayBD",kybaucu.ngayBD);
-                commandAdd.Parameters.AddWithValue("@ngayKT",kybaucu.ngayKT);
-                commandAdd.Parameters.AddWithValue("@NgayKT_UngCu",kybaucu.NgayKT_UngCu);
-                commandAdd.Parameters.AddWithValue("@TenKyBauCu",kybaucu.TenKyBauCu);
-                commandAdd.Parameters.AddWithValue("@MoTa",kybaucu.MoTa);
-                commandAdd.Parameters.AddWithValue("@SoLuongToiDaCuTri",kybaucu.SoLuongToiDaCuTri);
-                commandAdd.Parameters.AddWithValue("@SoLuongToiDaUngCuVien",kybaucu.SoLuongToiDaUngCuVien);
-                commandAdd.Parameters.AddWithValue("@SoLuotBinhChonToiDa",kybaucu.SoLuotBinhChonToiDa);
+            try{
+                //Lấy thời điểm hiện tại Và kiểm tra nếu ngày bắt đầu để rỗng thì nó lấy thời điểm hiện tại
+                DateTime currentDay = DateTime.Now;
+                kybaucu.ngayBD = kybaucu.ngayBD != null ? kybaucu.ngayBD : currentDay; 
+                
+                //Kiểm tra ID cấp của danh mục bầu cử có tồn tại không
+                bool checkID_cap = await _listOfPositionRepository._CheckIfTheCodeIsInTheListOfPosition(kybaucu.ID_Cap,connection);
+                if(checkID_cap == false) return 0;
 
-                await commandAdd.ExecuteNonQueryAsync();
-            } 
+                //Tạo khóa ngoại và khóa riêng tư
+                (BigInteger N, BigInteger G, BigInteger lamda, BigInteger muy) 
+                    = _PaillierServices.GenerateKey_public_private(kybaucu.SoLuongToiDaCuTri, kybaucu.SoLuongToiDaCuTri +1, kybaucu.SoLuotBinhChonToiDa);
+                
+                //Thực hiện thêm kỳ bầu cử           
+                const string Input = @"
+                    INSERT INTO kybaucu(ngayBD,ngayKT,NgayKT_UngCu,TenKyBauCu,MoTa,SoLuongToiDaCuTri,SoLuongToiDaUngCuVien,SoLuotBinhChonToiDa) 
+                    VALUES(@ngayBD,@ngayKT,@NgayKT_UngCu,@TenKyBauCu,@MoTa,@SoLuongToiDaCuTri,@SoLuongToiDaUngCuVien,@SoLuotBinhChonToiDa);";
+                
+                //Thực hiện thêm khóa ngoai
+                const string InputPublicKey = @"
+                    INSERT INTO khoa(NgayTao,N,G,path_PK,ngayBD)
+                    VALUES(@NgayTao,@N,@G,@path_PK,@ngayBD);
+                ";
 
-            return true; 
+                //Cấc biến hỗ trợ
+                string now = currentDay.ToString("yyyy-mm-dd_HH-mm-ss");
+                string directoryPath  = @"F:\PrivateKey";             //Thư mục lưu khóa chính
+                string filePath = Path.Combine(directoryPath, $"{now}.txt");
+
+                //Kiểm tra xem thư mục có tồn tại không
+                if(!Directory.Exists(directoryPath))
+                    return -1;
+                
+                //Ghi nội dung vào tệp tin 
+                string content = $"{lamda},{muy}";
+                File.WriteAllText(filePath, content);
+
+                //Lưu vào csdl
+                using (var commandAdd = new MySqlCommand( Input + InputPublicKey, connection)){
+                    commandAdd.Parameters.AddWithValue("@ngayBD",kybaucu.ngayBD);
+                    commandAdd.Parameters.AddWithValue("@ngayKT",kybaucu.ngayKT);
+                    commandAdd.Parameters.AddWithValue("@NgayKT_UngCu",kybaucu.NgayKT_UngCu);
+                    commandAdd.Parameters.AddWithValue("@TenKyBauCu",kybaucu.TenKyBauCu);
+                    commandAdd.Parameters.AddWithValue("@MoTa",kybaucu.MoTa);
+                    commandAdd.Parameters.AddWithValue("@SoLuongToiDaCuTri",kybaucu.SoLuongToiDaCuTri);
+                    commandAdd.Parameters.AddWithValue("@SoLuongToiDaUngCuVien",kybaucu.SoLuongToiDaUngCuVien);
+                    commandAdd.Parameters.AddWithValue("@SoLuotBinhChonToiDa",kybaucu.SoLuotBinhChonToiDa);
+                    commandAdd.Parameters.AddWithValue("@NgayTao",currentDay);
+                    commandAdd.Parameters.AddWithValue("@N",N);
+                    commandAdd.Parameters.AddWithValue("@G",G);
+                    commandAdd.Parameters.AddWithValue("@path_PK",directoryPath+$"{now}.txt");
+
+                    await commandAdd.ExecuteNonQueryAsync();
+                }
+
+                return 1; 
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         }
 
         //Lấy theo ID

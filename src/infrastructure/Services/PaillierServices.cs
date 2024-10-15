@@ -8,56 +8,34 @@ namespace BackEnd.src.infrastructure.Services
     {
         //1.Tính gcd()
         public BigInteger gcd( BigInteger a, BigInteger b){
-            if(a>b){
-                BigInteger r = a%b;
-                if(r == 1){
-                    return 1;
-                }else if(r == 0){
-                    return 0;
-                }else if(r > 0){
-                    return gcd( r,  b);
-                }
-            }
-            return 0;
-        }
-        
-        //2.Tính ước chung lớn nhất
-        public BigInteger UCLN( BigInteger a, BigInteger b){
-            //Phải khác 0
-            if(a == 0 || b == 0) return -1;
-
-            while(a != b){
-                if(a > b){
-                    a -=b;
-                }else{
-                    b -=a;
-                }
+            while (b != 0)
+            {
+                BigInteger temp = b;
+                b = a % b;
+                a = temp;
             }
             return a;
         }
 
-        //3.Tính bội chung nhỏ nhất
-        public BigInteger BCNN( BigInteger a,  BigInteger b){
-            //Phải khác 0
-            if(a == 0 || b == 0) return -1;
-
-            BigInteger aCopy = a, bCopy =b;
-            return a*b/UCLN( aCopy, bCopy );
+        //2. Tính bộ chung nhỏ nhất
+        public BigInteger lcm(BigInteger a, BigInteger b)
+        {
+            return BigInteger.Divide(BigInteger.Multiply(a, b), gcd(a, b));
         }
 
         //4.Tính nguyên tố cùng nhau
         public bool TinhNguyenToCungNhau( BigInteger a,  BigInteger b){
-            if(UCLN( a, b) == 1)
+            if(gcd( a, b) == 1)
                 return true;
             return false;
         }
 
         //5. Tính giá trị tối đa của phiếu bầu
-        public int GiaTriToiDaCuaPhieuBau_M( int b,  int s){
-            int result = 0;
+        public BigInteger GiaTriToiDaCuaPhieuBau_M( int b,  int s){
+            BigInteger result = 0;
             
             while(s >0){
-                result += (int)Math.Pow(b,(int)s);
+                result += (BigInteger)Math.Pow(b,(int)s);
                 s--;
             }
             return result;
@@ -73,7 +51,7 @@ namespace BackEnd.src.infrastructure.Services
             BigInteger Tmax = KetQuaKiemPhieuLonNhat_Tmax( n, b, s);
 
             //Đường dẫn 
-            string filePath = "../Config/SoNguyenTo.txt";
+            string filePath = "src/infrastructure/Config/SoNguyenTo.txt";
 
             //Đọc nội dung tệp tin
             string context = File.ReadAllText(filePath);
@@ -93,20 +71,19 @@ namespace BackEnd.src.infrastructure.Services
             return (q,p);
         }
 
-        //8. Tính cơ số nền g
-        public (BigInteger, BigInteger, BigInteger) TinhCoSoNEn_g( int n, int b, int s){
+        //8. tạo khóa công khai - và khóa cá nhân
+        public (BigInteger, BigInteger, BigInteger, BigInteger) GenerateKey_public_private( int n, int b, int s){
             //1.Tính N
             var random = new Random();
             (BigInteger q, BigInteger p) = TinhModulo_N( n, b, s);
             BigInteger N = p*q;
-            q-=1;
-            p-=1;
-            //2.Tính số camichael
-            BigInteger lamda = Carmichanel(q,p);
-            BigInteger Nx2 = N*N;
-            Console.WriteLine($">> N = {N}, N^2 = {Nx2}");
 
-            //3. Chọn bãn ngẫu nhiên Semi-random
+            //2.Tính số camichael - lamda
+            BigInteger lamda = lcm(q-1,p-1);
+            BigInteger Nx2 = N*N;
+            BigInteger G = 0;
+
+            //3. Chọn bãn ngẫu nhiên Semi-random - Chọn g 
             while(true){
                 BigInteger g = GetRanDomBigInteger_bytes(0,Nx2) ;
                 
@@ -116,14 +93,32 @@ namespace BackEnd.src.infrastructure.Services
                     BigInteger u = ModuloPower(g, lamda, Nx2);
 
                     //3.2 tính L(u)
-                    BigInteger Lu = (BigInteger)((u-1)/N);
+                    BigInteger Lu = BigInteger.Divide(u-1,N);
 
                     //3.3 Kiểm tra nguyên tố cùng nhau
-                    if(UCLN( Lu, N) == 1){
-                        return (g,N, lamda);
+                    if(gcd( Lu, N) == 1){
+                        G = g;
+                        break;      //Dừng
                     }
                 }
             }
+
+            //4.Tính muy            
+                // -- 4.1 Tìm u = g^lamda % N^2
+            BigInteger U = ModuloPower(G, lamda, Nx2);
+                
+                // -- 4.2  TÍnh L(U) = (u-1)//n
+            BigInteger LU = BigInteger.Divide(U-1,N);
+
+                // -- 4.2 Tính Muy = L(u)^-1 % N
+            BigInteger muy = Euclide_MoRong( N, LU);
+
+            // Console.WriteLine($"\t>> N = {N}");
+            // Console.WriteLine($"\t>> G = {G}");
+            // Console.WriteLine($"\t>> lamda = {lamda}");
+            // Console.WriteLine($"\t>> muy = {muy}");
+
+            return (N,G,lamda,muy);
         }
 
         //9.Hàm Euclide mở rộng
@@ -136,7 +131,7 @@ namespace BackEnd.src.infrastructure.Services
             while(true){
                 BigInteger r = a%b;
                 if(r == 0) break; //Điều kiện dừng
-                BigInteger q = a/b;
+                BigInteger q = BigInteger.Divide(a,b);
                 X = x1 - q*x0;
                 Y = y1 - q*y0;
 
@@ -150,29 +145,6 @@ namespace BackEnd.src.infrastructure.Services
             }
 
             return temp + Y;
-        }
-
-        //10.
-        public BigInteger xgcd(BigInteger a, BigInteger m){
-            BigInteger temp = m;
-            BigInteger x0 = 0,    x1 = 1,
-                y0 = 1,    y1 = 0;
-            while(m != 0){
-                BigInteger q = (BigInteger)(a/m);
-                a = m;
-                m = a%m;
-                x0 = x1;
-                x1 = x0 - q * x1;
-                y0 = y1;
-                y1 = y0-q*y1;
-            }
-            if(x0 < 0) x0 = temp + x0;
-            return x0;
-        }
-
-        //11. Hàm Carmichanel
-        public BigInteger Carmichanel(BigInteger q, BigInteger p){
-            return ((p-1)*(q-1) )/UCLN(p-1,q-1);
         }
 
         //12. Hàm tính luy thừa trực tiệp để giảm nguy cơ lỗi khi dùng Math.pow
@@ -209,19 +181,7 @@ namespace BackEnd.src.infrastructure.Services
             return result;
         }
 
-        //14.Tạo khóa (public[N,g] và private[lamda,muy])
-        public (BigInteger, BigInteger, BigInteger, BigInteger) GenerateKey(int n,int b, int s){
-            
-            (BigInteger g, BigInteger N, BigInteger lamda) = TinhCoSoNEn_g(n,b,s);
-            
-            //Trước khi tìm muy thì tính U và L(U)
-            BigInteger U = ModuloPower(g, lamda, N*N);
-            BigInteger h = (U-1) / N;
-
-            BigInteger muy = Euclide_MoRong(N, h);
-            return(N,g,lamda,muy);
-        }
-
+        //14. Mã hóa
         public BigInteger Encryption(BigInteger g, BigInteger N, BigInteger mi){
             
             //Chọn ri ngẫu nhiên và nguyên tố cùng nhau với N
@@ -231,17 +191,33 @@ namespace BackEnd.src.infrastructure.Services
                 if(TinhNguyenToCungNhau(ri,N))
                     break;
             }
-
-            //Mã hóa 
-            BigInteger c = BigInteger.Pow(g, (int)mi) * BigInteger.Pow(ri, (int)N) % (N * N);
+            Console.WriteLine($"\t>> ri = {ri}");
+            //Mã hóa C = g^mi * r^n mod n^2
+            BigInteger Nx2 = N*N;
+            BigInteger gMiMod = BigInteger.ModPow(g, mi, Nx2);
+            BigInteger rNMod = BigInteger.ModPow(ri, N, Nx2);
+            BigInteger c =  (gMiMod * rNMod) % Nx2;
             return c;
         }
 
         //15. Giải mã
         public BigInteger Decryption(BigInteger c, BigInteger N ,BigInteger lamda, BigInteger muy){
-            BigInteger u = ModuloPower(c,lamda, N*N);
-            BigInteger Lu = (u-1)/N;
-            BigInteger D = Lu*muy % N;
+            BigInteger Nx2 = N*N;
+
+            //Tính U = C^lamda mod N^2
+            BigInteger U = BigInteger.ModPow(c, lamda, Nx2);
+
+            // Kiểm tra để tránh lỗi chia không đúng
+            if ((U - 1) % N != 0) {
+                throw new ArgumentException("U - 1 is not divisible by N. The decryption may fail.");
+            }
+
+            //Tính Lu = (U-1)/N
+            BigInteger Lu = BigInteger.Divide(U-1,N);
+
+            //Tính D = (Lu * muy) mod N
+            BigInteger D = (Lu * muy) % N;
+            
             return D;
         }
     }

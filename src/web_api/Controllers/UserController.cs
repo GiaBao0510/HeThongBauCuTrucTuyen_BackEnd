@@ -422,5 +422,48 @@ namespace BackEnd.src.web_api.Controllers
                 });
             }
         }
+
+        //15. Người dùng tự cập nhật thoong tin cá nhân dựa trên ID người dùng
+        [HttpPut("user-update-info")]
+        [Authorize(Roles= "1,2,3,4,5,8")]
+        public async Task<IActionResult> UpdatePersonalInfomation([FromBody]PersonalInformationDTO personalInfo){
+            try{
+                if(string.IsNullOrEmpty(personalInfo.HoTen))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin"});
+
+                var result = await _userRepository._UpdatePersonalInfomation(personalInfo);
+                if(result <= 0){
+                    string errorMessage = result switch{
+                        0 => "Không tìm thấy số điện thoại trước đó",
+                        -1 => "Đã trùng số điện thoại",
+                        -2 => "Đã trùng email",
+                        _ => "Lỗi không xác định"
+                    };
+                    int status = result switch{
+                        0 => 400, 
+                        -1 => 400,
+                        -2 => 400,
+                        _ => 500
+                    };
+
+                    return StatusCode( status,new {Status = "False", Message = errorMessage});
+                }
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Cập nhật thông tin thành công",
+                    Data = result
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện cập nhật thông tin người dùng: {ex.Message}"
+                });
+            }
+        }
+
     }
 }

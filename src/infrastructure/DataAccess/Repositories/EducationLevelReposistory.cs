@@ -104,5 +104,49 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return rowAffected > 0;
         }
 
+        //Kiểm tra xem ID trình dộ có tồn tại không
+        public async Task<bool> _IsEducationLevelIDExist(int ID_TrinhDo, MySqlConnection connection){
+
+            //Mở kết nối nết tắt
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            const string sql = @"
+            SELECT count(ID_TrinhDo) 
+            FROM trinhdohocvan 
+            WHERE ID_TrinhDo = @ID_TrinhDo;";
+
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_TrinhDo",ID_TrinhDo);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                if(count < 1) return false;
+            }
+            return true;
+        }
+
+        //Gắn ứng cử viên vào trình độ học vấn
+        public async Task<bool> _AddEducationQualificationsToCandidates(int ID_TrinhDo, string ID_UCV, MySqlConnection connection){
+            //Mở kết nối nết tắt
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            //Kiểm tra trình độ học vấn có tồn tại không
+            bool EducationLevelExists = await _IsEducationLevelIDExist(ID_TrinhDo, connection);
+            if(!EducationLevelExists) return false;
+
+            const string sql = @"
+            INSERT INTO chitiettrinhdohocvanungcuvien(ID_TrinhDo,ID_ucv) 
+            VALUES(@ID_TrinhDo,@ID_ucv);";
+
+            using( var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_TrinhDo",ID_TrinhDo);
+                command.Parameters.AddWithValue("@ID_ucv",ID_UCV);
+
+                await command.ExecuteNonQueryAsync();
+                return true;
+            }
+        }
+
     }
 }

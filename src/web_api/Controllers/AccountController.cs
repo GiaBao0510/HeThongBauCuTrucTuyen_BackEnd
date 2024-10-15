@@ -70,7 +70,6 @@ namespace BackEnd.src.web_api.Controllers
         public async Task<IActionResult> Login([FromBody]LoginModel loginModel){
             try{
                 
-
                 //1.Nếu không điển cũng quăng ra lỗi luôn
                 if(string.IsNullOrEmpty(loginModel.account) || string.IsNullOrEmpty(loginModel.password))
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin đăng nhập."});
@@ -252,7 +251,7 @@ namespace BackEnd.src.web_api.Controllers
                     Success = false, 
                     Message = "Lỗi khi gửi mã otp"
                 });
-            }
+            } 
         }
 
         //6. Xác nhận mã OTP
@@ -502,6 +501,43 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500,new ApiRespons{
                     Success = false, 
                     Message = "Lỗi khi kiểm tra email người dùng."
+                });
+            }
+        }
+
+        //14. Xử lý khi người dùng đăng ký
+        [HttpPost("register")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto){
+            try{
+                if(string.IsNullOrEmpty(registerDto.SDT))
+                    return StatusCode(400, new ApiRespons{ Success = false, Message = "Vui lòng điền số điện thoại để xác thực"});
+                var result = await _userServices._handleUserRegister(registerDto.SDT, registerDto.pwd);
+                
+                if(result <= 0){
+                    string errorMessage = result switch{
+                        0 => "Số điện thoại không tồn tại",
+                        -1 =>"Tài khoản đã đăng ký rồi",
+                        _ => "Lỗi không xác định"
+                    };
+                    int statusCode = result switch{
+                        0 => 400, -1 =>400,  _ => 500
+                    };
+                    return StatusCode(statusCode ,new {Status = "False", Message = errorMessage});
+                }
+
+                return Ok(new ApiRespons{
+                    Success = true, 
+                    Message = "Đăng ký thành công."
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error message:{ex.Message}");
+                Console.WriteLine($"Error TargetSite:{ex.TargetSite}");
+                Console.WriteLine($"Error StackTrace:{ex.StackTrace}");
+                Console.WriteLine($"Error Data:{ex.Data}");
+                return StatusCode(500,new ApiRespons{
+                    Success = false, 
+                    Message = "Lỗi khi thực hiện đăng ký người dùng."
                 });
             }
         }

@@ -22,6 +22,7 @@ namespace BackEnd.src.infrastructure.Services
         private readonly IMemoryCache _cache;
         private readonly IToken _token;
 
+
         //Khởi tạo
         public UserServices(
             DatabaseContext context,
@@ -40,6 +41,10 @@ namespace BackEnd.src.infrastructure.Services
 
         //-1. Kiểm tra email có tồn tại không
         public async Task<bool> _CheckEmailExists(string email, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+            
             const string sql = "SELECT COUNT(Email) FROM nguoidung WHERE Email=@Email;";
             using (var command = new MySqlCommand(sql, connection)){
                 command.Parameters.AddWithValue("@Email",email);
@@ -50,15 +55,58 @@ namespace BackEnd.src.infrastructure.Services
             return true;
         }
 
+        //-2. Kiểm tra email có tồn tại không
+        public async Task<bool> _CheckPhonNumberExists(string sdt, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            const string sql = "SELECT COUNT(SDT) FROM nguoidung WHERE SDT=@SDT;";
+            using (var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@SDT",sdt);
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                if(count < 1)
+                    return false;
+            }
+            return true;
+        }
+
+        //-2. Kiểm tra email có tồn tại không
+        public async Task<bool> _CheckUserRegistered(string sdt, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+            
+            const string sql = @"
+            SELECT hs.TrangThaiDangKy
+            FROM hosonguoidung hs 
+            JOIN nguoidung nd ON hs.ID_user = nd.ID_user
+            WHERE nd.SDT = @SDT;";
+            using (var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@SDT",sdt);
+                
+                using var reader = await command.ExecuteReaderAsync();
+                if(await reader.ReadAsync()){
+                    string trangthai = reader.GetString(reader.GetOrdinal("TrangThaiDangKy"));
+                    
+                    if(trangthai == "1")    //Đã đăng ký
+                        return true;
+                }
+            }
+            return false;
+        }
+
         //0.Đăng nhập
         public async Task<LoginModel> _Login(LoginModel loginDto){
             using var connection = await _context.Get_MySqlConnection();
 
             //Lấy số điện thoại, kiểm tra xem có không .Nếu không thì trả về false
             const string CheckSDT = @"
-            SELECT tk.TaiKhoan,tk.MatKhau,tk.RoleID,tk.BiKhoa,tk.SuDung, nd.Email 
-            FROM taikhoan tk INNER JOIN nguoidung nd ON nd.SDT = tk.TaiKhoan
-            WHERE tk.TaiKhoan = @TaiKhoan;";
+            SELECT tk.TaiKhoan,tk.MatKhau,tk.RoleID,tk.BiKhoa,tk.SuDung, nd.Email, hs.TrangThaiDangKy 
+            FROM taikhoan tk 
+            JOIN nguoidung nd ON nd.SDT = tk.TaiKhoan
+            JOIN hosonguoidung hs ON hs.ID_user = nd.ID_user
+            WHERE tk.TaiKhoan =  @TaiKhoan;";
 
             using var command = new MySqlCommand(CheckSDT, connection);
             command.Parameters.AddWithValue("@TaiKhoan", loginDto.account);
@@ -73,12 +121,19 @@ namespace BackEnd.src.infrastructure.Services
             string HashedPwd = reader.GetString(reader.GetOrdinal("MatKhau")),
                     role = reader.GetInt32(reader.GetOrdinal("RoleID")).ToString(),
                     BiKhoa = reader.GetString(reader.GetOrdinal("BiKhoa")),
-                    Email = reader.GetString(reader.GetOrdinal("Email"));
+                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                    DaDangKy = reader.GetString(reader.GetOrdinal("TrangThaiDangKy"));
             int SuDung = reader.GetInt32(reader.GetOrdinal("SuDung"));
 
             if(string.IsNullOrEmpty(role) || string.IsNullOrEmpty(HashedPwd)){
                 _log.WarnExt("Đăng nhập thất bại vì không tìm thấy số điện thoại");
                 Console.WriteLine("Đăng nhập thất bại vì không tìm thấy số điện thoại");
+                return null;
+            }
+
+            if(DaDangKy == "0"){
+                _log.WarnExt("Tài khoản này chưa đăng ký");
+                Console.WriteLine("Tài khoản này chưa đăng ký");
                 return null;
             }
 
@@ -288,6 +343,62 @@ namespace BackEnd.src.infrastructure.Services
             await _emailSender.SendEmailAsync(email, title+":"+opt, emailBody); //Gửi
 
             return true;
+        }
+
+        //Xử lý ngươi dùng đăng ký. Gồm: Đặt mật khẩu người dung dựa trên sdt và  đặt lại hồ sơ người dùng là cử tri này đã đăng ký
+        public async Task<int> _handleUserRegister(string sdt, string newPwd) {
+            try{
+                using var connection = await _context.Get_MySqlConnection();
+
+                //Kiểm tra xem sdt người dùng có tồn tại không
+                bool CheckExistsPhoneNumber= await _CheckPhonNumberExists(sdt, connection);
+                if(!CheckExistsPhoneNumber)
+                    return 0;
+
+                //Kiểm tra người dùng đăng ký chưa. Nếu rồi thì báo lỗi
+                bool checkUserRegistered = await _CheckUserRegistered(sdt, connection);
+                if(checkUserRegistered == true)
+                    return -1;
+
+                //Băm mật khẩu
+                newPwd = Argon2.Hash(newPwd);
+
+                //Cập nhật lại mật khẩu
+                const string setPwd = @"
+                UPDATE taikhoan 
+                SET MatKhau = @MatKhau
+                WHERE TaiKhoan = @SDT;";
+
+                //Cập nhật lại hò sơ người dùng dựa trên sdt
+                const string updateStatus = @"
+                UPDATE hosonguoidung hs
+                JOIN nguoidung nd ON hs.ID_user = nd.ID_user
+                SET hs.TrangThaiDangKy = '1'
+                WHERE nd.SDT = @SDT;";
+
+                using (var command = new MySqlCommand(setPwd+updateStatus ,connection)){
+                    command.Parameters.AddWithValue("@MatKhau", newPwd);
+                    command.Parameters.AddWithValue("@SDT", sdt);
+                    await command.ExecuteNonQueryAsync();
+                    
+                    return 1;
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         }
     }
     
