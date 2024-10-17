@@ -34,8 +34,6 @@ namespace BackEnd.src.infrastructure.Data
         public DbSet<Notifications> Notifications{set;get;} 
         public DbSet<PermanentAddress> PermanentAddress{set;get;} 
         public DbSet<Province> Provinces{set;get;}
-        public DbSet<PrivateKey> PrivateKey{set;get;}
-        public DbSet<PublicKey> PublicKey{set;get;}
         public DbSet<ResponseCadre> ResponseCadres{set;get;}
         public DbSet<Position> Positions{set;get;}  
         public DbSet<ResponseCandidate> ResponseCandidates{set;get;}
@@ -267,7 +265,13 @@ namespace BackEnd.src.infrastructure.Data
                 E.ToTable("Khoa");
                 E.HasKey(e => e.ID_Khoa);
                 E.Property(e => e.NgayTao).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
-                E.Property(e => e.NgayHetHan).IsRequired();
+                E.Property(e => e.G).IsRequired();
+                E.Property(e => e.N).IsRequired();
+                E.Property(e => e.path_PK).IsRequired();
+                E.HasOne( e => e.elections)
+                    .WithMany(e => e._lock)
+                    .HasForeignKey(e => e.ngayBD)
+                    .HasConstraintName("FK_khoa_kybaucu");
             });
             modelBuilder.Entity<LoginHistory>(E=>{
                 E.ToTable("LichSuDangNhap");
@@ -300,28 +304,10 @@ namespace BackEnd.src.infrastructure.Data
                 E.HasKey(e => e.ID_ChucVu);
                 E.Property(e => e.TenChucVu).IsRequired().HasMaxLength(50);
             });
-            modelBuilder.Entity<PrivateKey>(E=>{
-                E.ToTable("KhoaBiMat");
-                E.Property(e => e.HamCamichanel).HasDefaultValue(0);
-                E.Property(e => e.GiaTriB_Phan).HasDefaultValue(0);
-                E.HasOne( e => e._lock)
-                    .WithMany(e => e.privateKey)
-                    .HasForeignKey(e => e.ID_Khoa)
-                    .HasConstraintName("FK_khoa_privatek");
-            });
             modelBuilder.Entity<Province>(E=>{
                 E.ToTable("TinhThanh");
                 E.HasKey(e => e.STT);
                 E.Property(e => e.TenTinhThanh).IsRequired().HasMaxLength(50);
-            });
-            modelBuilder.Entity<PublicKey>(E=>{
-                E.ToTable("KhoaCongKhai");
-                E.Property(e => e.Modulo).HasDefaultValue(0);
-                E.Property(e => e.SemiRandom_g).HasDefaultValue(0);
-                E.HasOne( e => e._lock)
-                    .WithMany(e => e.publicKey)
-                    .HasForeignKey(e => e.ID_Khoa)
-                    .HasConstraintName("FK_khoa_publick");
             });
             modelBuilder.Entity<ResponseCadre>(E=>{
                 E.ToTable("PhanHoiCanBo");

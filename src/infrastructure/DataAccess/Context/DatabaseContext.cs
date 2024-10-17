@@ -28,13 +28,11 @@ namespace BackEnd.src.infrastructure.DataAccess.Context
         //Kết nối với MySQL
         public async Task<MySqlConnection> Get_MySqlConnection(){
             
-            //Nếu kiểm tra chưa thấy kết nối đến thì thực hiện kết nối
-            if(_MysqlConnection == null)
+            //Nếu kiểm tra chưa thấy kết nối đến thì thực hiện kết nối hoặc
+            if(_MysqlConnection == null || _MysqlConnection.State != ConnectionState.Open || _MysqlConnection.State == ConnectionState.Closed){
                 _MysqlConnection = new MySqlConnection(_appconfig.GetMySQLConnectionString());
-            
-            //Nếu kết nối chưa mở thì mở
-            if(_MysqlConnection.State != ConnectionState.Open)
                 await _MysqlConnection.OpenAsync();
+            }   
 
             return _MysqlConnection;
         }

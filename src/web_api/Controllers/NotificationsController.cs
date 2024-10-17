@@ -32,7 +32,7 @@ namespace BackEnd.src.web_api.Controllers
                     Status = "false",
                     Message=$"Lỗi khi truy xuất danh sách các thông báo: {ex.Message}"
                 });
-            }
+            } 
         }
 
         //Thêm
@@ -79,7 +79,7 @@ namespace BackEnd.src.web_api.Controllers
                     Message = $"Lỗi ID_ThongBao của thông báo không tồn tại"
                 });
 
-                return Ok(new{
+                return Ok(new{ 
                     Status = "Ok",
                     Message = "null",
                     Data = Notifications

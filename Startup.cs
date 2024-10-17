@@ -26,6 +26,9 @@ using BackEnd.core.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNet.SignalR.Client;
+using BackEnd.src.infrastructure.Hubs;
 
 namespace BackEnd
 {
@@ -237,6 +240,9 @@ namespace BackEnd
                     opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;  //Thiết lập quy trình xử lý là đến sớm sẽ được xử lý sớm
                 }).RejectionStatusCode = 429;
             });
+
+                //13. Thêm dịch vụ signal
+            services.AddSignalR();
             
             services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
             services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
@@ -272,6 +278,10 @@ namespace BackEnd
             services.AddScoped<IPaillierServices,PaillierServices>();
             services.AddScoped<ILoginHistoryRepository,LoginHistoryRepository>();
             services.AddScoped<IVotingServices,VotingServices>();
+            services.AddScoped<ILockRepository,LockRepository>();
+            services.AddScoped<NotificationHubs>();
+            services.AddHostedService<AotomaticNotificationService>();  //Thêm dịch vụ chạy tự động
+            
         } 
 
         //Riêng các service muốn call thì sẽ goi trong đây
@@ -324,6 +334,7 @@ namespace BackEnd
             {
                 endpoints.MapControllers();
                 endpoints.MapRazorPages();
+                endpoints.MapHub<NotificationHubs>("/notificationHub"); // Thêm route cho SignalR
             });
         }
 

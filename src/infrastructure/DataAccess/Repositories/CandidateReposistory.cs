@@ -91,9 +91,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     return -7;
                 }
 
+
                 //Kiêm tra nếu ngày hiện tại lớn hơn ngày đăng ký ứng cử thì không thể thêm
                 DateTime? TimeOfCanDiDate = await _ElectionsRepository._GetRegistrationClosingDate(Candidate.ngayBD,connect);
-                if(TimeOfCanDiDate != null && DateTime.Now > TimeOfCanDiDate){
+                if((TimeOfCanDiDate != null && DateTime.Now >= TimeOfCanDiDate ) || DateTime.Now >= Candidate.ngayBD){
                     await transaction.RollbackAsync();
                     return -8;
                 }

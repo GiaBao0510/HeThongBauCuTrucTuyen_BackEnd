@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BackEnd.src.core.Entities;
 
 namespace BackEnd.core.Entities
 { 
@@ -34,12 +35,13 @@ namespace BackEnd.core.Entities
         public virtual ICollection<Vote> vote{set;get;}
         public virtual ICollection<ElectionResults> electionResults{set;get;}
         public virtual ICollection<ElectionStatus> electionStatus{set;get;}
-
+        public virtual ICollection<Lock> _lock{set;get;}
         //Trả về mảng rỗng cho các lớp truy xuất ngược
         public Elections(){
             vote = new List<Vote>();
             electionResults = new List<ElectionResults>();
             electionStatus = new List<ElectionStatus>();
+            _lock = new List<Lock>();
         }
 	}
 }

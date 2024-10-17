@@ -111,7 +111,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 //Cấc biến hỗ trợ
                 string now = currentDay.ToString("yyyy-mm-dd_HH-mm-ss");
                 string directoryPath  = @"F:\PrivateKey";             //Thư mục lưu khóa chính
-                string filePath = Path.Combine(directoryPath, $"{now}.txt");
+                string filePath = Path.Combine(directoryPath, $@"\{now}.txt");
 
                 //Kiểm tra xem thư mục có tồn tại không
                 if(!Directory.Exists(directoryPath))
@@ -291,8 +291,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command.Parameters.AddWithValue("@ngayBD",ngayBD);
                     using var reader = await command.ExecuteReaderAsync();
 
-                    if(await reader.ReadAsync())
+                    if(await reader.ReadAsync()){
                         return reader.GetDateTime(reader.GetOrdinal("NgayKT_UngCu")); 
+                    }
+                        
                 }
                 return null;
             }catch(MySqlException ex){ 

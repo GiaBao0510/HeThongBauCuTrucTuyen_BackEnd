@@ -19,6 +19,7 @@ namespace BackEnd.src.infrastructure.Services
         private readonly IPaillierServices _paillierServices;
         private readonly IListOfPositionRepository _listOfPositionRepository;
         private readonly IConstituencyRepository _constituencyRepository;
+        private readonly ILockRepository _lockRepository;
 
         public VotingServices(
             DatabaseContext context,
@@ -27,7 +28,8 @@ namespace BackEnd.src.infrastructure.Services
             IPaillierServices paillierServices,
             IConstituencyRepository constituencyRepository,
             IVoteRepository voteRepository,  //Thêm
-            IListOfPositionRepository listOfPositionRepository
+            IListOfPositionRepository listOfPositionRepository,
+            ILockRepository lockRepository
         )
         {
             _voterRepository = voterRepository;
@@ -37,6 +39,7 @@ namespace BackEnd.src.infrastructure.Services
             _constituencyRepository = constituencyRepository;
             _voteRepository = voteRepository;  //Thêm
             _listOfPositionRepository = listOfPositionRepository;
+            _lockRepository = lockRepository;
         }
 
         //Hủy
@@ -116,16 +119,22 @@ namespace BackEnd.src.infrastructure.Services
                 bool CheckID_Constituency = await _constituencyRepository._CheckVoterID_ConsituencyID_andPollingDateTogether(voterVoteDTO.ID_DonViBauCu.ToString(),voterVoteDTO.ID_CuTri,votingDay ,connect);
                 if(!CheckID_Constituency) return -6;
                 
-                //17.6 Tự tạo phiếu phầu khi người dùng bỏ phiếu và thêm vào đó luôn
+                //17.7 Tự tạo phiếu phầu khi người dùng bỏ phiếu và thêm vào đó luôn
                     //Lấy 2 ký tự ngẫu nhiên
                 string randomString = RandomString.ChuoiNgauNhien(2);
                 DateTime currentDay = DateTime.Now;
                 string ID_Phieu = randomString+$"{currentDay:yyyyMMddHHmmssff}";
 
+                    //Lấy N và G dựa trên ngày bầu cử
+                var Lock = await  _lockRepository._getLockBasedOnElectionDate(voterVoteDTO.ngayBD,connect);
+                    
+                    //Mã hóa phiếu trước khi lưu    
+                BigInteger GiaTriPhieuBauHienTai_MaHoa = _paillierServices.Encryption(Lock.G, Lock.N, GiaTriPhieuBauHienTai);
+
                 VoteDto phieubau = new VoteDto();
                 phieubau.ngayBD = voterVoteDTO.ngayBD.ToString();
                 phieubau.ID_cap = voterVoteDTO.ID_Cap;
-                phieubau.GiaTriPhieuBau = GiaTriPhieuBauHienTai;
+                phieubau.GiaTriPhieuBau = GiaTriPhieuBauHienTai_MaHoa;
 
                 bool addVote = await _voteRepository._AddVote(ID_Phieu, phieubau, connect);
                 if(!addVote){

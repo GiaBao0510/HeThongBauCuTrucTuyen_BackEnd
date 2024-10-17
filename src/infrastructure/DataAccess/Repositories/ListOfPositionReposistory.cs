@@ -155,6 +155,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 command.Parameters.AddWithValue("@ngayBD",ngayBD);
                 
                 int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                Console.WriteLine($"Đếm ngayBD trong danh muc dựa trên kq bầu cử: {count}");
                 return count > 0;
             }
         }
