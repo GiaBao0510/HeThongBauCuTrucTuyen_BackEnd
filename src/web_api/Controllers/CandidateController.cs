@@ -317,13 +317,13 @@ namespace BackEnd.src.web_api.Controllers
                    candidateListInElectionDto.listIDCandidate.Count == 0 ||
                    string.IsNullOrEmpty(candidateListInElectionDto.ngayBD.ToString()) ||
                      string.IsNullOrEmpty(candidateListInElectionDto.ID_Cap.ToString())
-                )
+                ) 
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin."});
                 
                 var result = await _candidateReposistory._AddListCandidatesToTheElection(candidateListInElectionDto);
                 if(result <=0){
                     int status = result switch{
-                        0 => 400, -1 => 400, -2 => 500, -3 => 400, -4 => 500, -5 => 400,_ => 500
+                        0 => 400, -1 => 400, -2 => 500, -3 => 400, -4 => 500, -5 => 400, -6=>400,_ => 500
                     };
                     string errorMessage = result switch{
                         0 => "Không tìm thấy được ngày tổ chức cuộc bầu cử",
@@ -332,6 +332,7 @@ namespace BackEnd.src.web_api.Controllers
                         -3 => "Lỗi, số lượng ứng cử viên tham gia vào kỳ bầu cử không lớn hơn số lượng quy định trước đó",
                         -4 => "Lỗi khi lấy số lượng ứng cử viên hiện tại",
                         -5 => "Lỗi ngày đăng ký ứng cử đã kết thúc",
+                        -6 => "Lỗi không tìm thấy bất kỳ mã ứng cử viên nào hợp lệ",
                         _ =>"Lỗi không xác định"
                     };
 
@@ -340,7 +341,7 @@ namespace BackEnd.src.web_api.Controllers
 
                 return Ok(new ApiRespons{
                     Success = true,
-                    Message = "Thêm danh sách ứng cử viên vào cuộc bầu cử thành công"
+                    Message = $"Thêm danh sách ứng cử viên vào cuộc bầu cử thành công. (Số lượng ứng cử viên hợp lệ là {result})"
                 });
             }catch(Exception ex){
                 // Log lỗi và xuất ra chi tiết lỗi
@@ -416,6 +417,33 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500,new{
                     Status = "false",
                     Message=$"Lỗi khi lấy danh sách ứng cử viên dựa trên thời điểm bầu cử: {ex.Message}"
+                });
+            }
+        }
+
+        //13. Lấy các kỳ bầu cử mà ứng cử viên đã ghi danh
+        [HttpGet]
+        [Route("get-list-of-registered-candidate")]
+        [Authorize(Roles = "1,2,5")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
+        public async Task<IActionResult> getListOfRegisteredCandidate([FromQuery] string ID_ucv){
+            try{
+                if(string.IsNullOrEmpty(ID_ucv) )
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền mã ứng cử viên."});
+
+                var result = await _candidateReposistory._getListOfRegisteredCandidate(ID_ucv);
+                if(result == null)
+                    return BadRequest(new{Status = "False", Message = "Không tìm thấy mã ứng cử viên"});
+
+                return Ok(new{
+                    Status = "Ok",
+                    Message = "null",
+                    Data = result
+                });
+            }catch(Exception ex){
+                return StatusCode(500,new{
+                    Status = "false",
+                    Message=$"Lỗi khi lấy danh sách kỳ bầu cử mã ứng cử viên đã đăng ký: {ex.Message}"
                 });
             }
         }

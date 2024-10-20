@@ -199,7 +199,6 @@ namespace BackEnd.src.infrastructure.Hubs
             try{
                 var listVoterDays = await _getElectionInformationToVoters(connection);
                 foreach(var e in listVoterDays){
-                    
                     //Lấy thông tin ngày bắt đầu bầu cử. Nếu trước một ngày thì sẽ thông báo
                     CultureInfo culture = new CultureInfo("vi-VN");
                     DateTime upcomingDay = Convert.ToDateTime(e.ngayBD, culture);
@@ -207,6 +206,7 @@ namespace BackEnd.src.infrastructure.Hubs
                     TimeSpan difference = upcomingDay - currentDay;
 
                     if(difference.Days == 1){
+                        Console.WriteLine($">>>>>Thông báo ID cử tri: {e.ID_CuTri} Ngày bắt đầu bầu cử: {e.ngayBD}");
                         //Chuỗi thông báo
                         string message = $"Ngày bầu cử sắp tới của bạn tham dự là {e.ngayBD}.";
                         
@@ -260,6 +260,7 @@ namespace BackEnd.src.infrastructure.Hubs
                     TimeSpan difference = upcomingDay - currentDay;
 
                     if(difference.Days == 1){
+                        Console.WriteLine($">>>>>Thông báo ID ứng cử viên: {e.ID_ucv} Ngày bắt đầu bầu cử: {e.ngayBD}");
                         //Chuỗi thông báo
                         string message = $"Ngày bầu cử sắp tới của bạn là {upcomingDay}.";
                         
@@ -305,7 +306,7 @@ namespace BackEnd.src.infrastructure.Hubs
             try{
                 var listVoterDays = await _getElectionInformationToCandres(connection);
                 foreach(var e in listVoterDays){
-                    
+
                     //Lấy thông tin ngày bắt đầu bầu cử. Nếu trước một ngày thì sẽ thông báo
                     CultureInfo culture = new CultureInfo("vi-VN");
                     DateTime upcomingDay = Convert.ToDateTime(e.ngayBD, culture);
@@ -313,6 +314,7 @@ namespace BackEnd.src.infrastructure.Hubs
                     TimeSpan difference = upcomingDay - currentDay;
 
                     if(difference.Days == 1){
+                        Console.WriteLine($">>>>>Thông báo ID cử tri: {e.ID_CanBo} Ngày bắt đầu bầu cử: {e.ngayBD}");
                         //Chuỗi thông báo
                         string message = $"Ngày bầu cử sắp tới của bạn là {e.ngayBD}.";
                         

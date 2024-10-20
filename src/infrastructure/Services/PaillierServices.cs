@@ -202,7 +202,7 @@ namespace BackEnd.src.infrastructure.Services
 
         //15. Giải mã
         public BigInteger Decryption(BigInteger c, BigInteger N ,BigInteger lamda, BigInteger muy){
-            BigInteger Nx2 = N*N;
+            BigInteger Nx2 = N*N; 
 
             //Tính U = C^lamda mod N^2
             BigInteger U = BigInteger.ModPow(c, lamda, Nx2);

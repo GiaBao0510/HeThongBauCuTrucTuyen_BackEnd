@@ -181,7 +181,10 @@ namespace BackEnd
                 options.AddDefaultPolicy(
                     policy =>
                     {
-                        policy.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+                        policy.WithOrigins("*","http://localhost:3002")
+                        .AllowCredentials()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
                     });
             });
 
@@ -287,30 +290,44 @@ namespace BackEnd
         //Riêng các service muốn call thì sẽ goi trong đây
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env){
             
-            app.UseCors(policy =>
-            policy.WithOrigins("*")
-                .AllowAnyHeader()
-                .AllowAnyMethod());
-
-            //Cấu hình pipline của ứng dụng
-            if(env.IsDevelopment()){
+            // 1. Exception Handling & Development Environment Setup (Luôn đặt đầu tiên)
+            if (env.IsDevelopment())
+            {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI( c => c.SwaggerEndpoint("/swagger/v1/swagger.json","BauCuTrucTuyen v1"));
-            }else{
-                app.UseExceptionHandler("/Home/Error");
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BauCuTrucTuyen v1"));
+            }
+            else 
+            {
+                app.UseExceptionHandler(a => a.Run(async context => 
+                {
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    context.Response.ContentType = "application/json";
+                    var error = new { message = "An unexpected error occurred" };
+                    await context.Response.WriteAsJsonAsync(error);
+                }));
                 app.UseHsts();
             }
 
-            //Xử lý lỗi trong môi trường Development và Production
-            app.UseExceptionHandler(a => a.Run(async context => {
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                context.Response.ContentType = "application/json";
-                var error = new {message = "An unexpected error occurred"};
-                await context.Response.WriteAsJsonAsync(error);
-            }));
+            // 2. Security Headers & HTTPS
+            app.UseHttpsRedirection();
 
-            //Xử lý lỗi Not Found 404
+            // 3. Rate Limiting (Đặt trước CORS và Authentication)
+            app.UseRateLimiter();
+            app.UseIpRateLimiting();
+
+            // 4. CORS Configuration (Đặt trước Authentication và Routing)
+            app.UseCors(policy => 
+                policy.WithOrigins(
+                    "http://localhost:3002",      // Vue.js frontend
+                    "http://0.0.0.0:3000"   // Flutter frontend
+                )
+                .AllowCredentials()
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+            );
+
+            //5. Xử lý lỗi Not Found 404
             app.UseStatusCodePages(async context => {
                 if(context.HttpContext.Response.StatusCode  == (int)HttpStatusCode.NotFound){
                     context.HttpContext.Response.ContentType = "application/json";
@@ -319,22 +336,17 @@ namespace BackEnd
                 }
             });
 
-            //Cấu hình các middleware khác
-            app.UseHsts();
-            app.UseHttpsRedirection();
-            //app.UseStaticFiles();               //Thêm StaticFileMiddleware - nếu request yêu câu truy cập file tĩnh thì nó response nội dung file
-            app.UseRateLimiter();
-            app.UseIpRateLimiting();       //Thêm middleware giới hạn tốc độ của người dùng
+            // 6. Routing & Authentication Pipeline
             app.UseRouting();
-            app.UseCors("AllowAll");
-            app.UseAuthentication();            //Phục hồi thông tin đăng nhập(xác thực)
-            app.UseAuthorization();             //Phục hồi thông tin về quyền của User
-            
+            app.UseAuthentication();    // Phải đặt sau UseRouting và trước UseAuthorization
+            app.UseAuthorization();     // Phải đặt sau UseAuthentication
+
+            // 7. Endpoint Configuration (Luôn đặt cuối cùng)
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapRazorPages();
-                endpoints.MapHub<NotificationHubs>("/notificationHub"); // Thêm route cho SignalR
+                endpoints.MapHub<NotificationHubs>("/notificationHub");
             });
         }
 
@@ -343,5 +355,6 @@ namespace BackEnd
         {
             services.AddTransient<IAppConfig, AppConfig>();
         }
+
     }
 }

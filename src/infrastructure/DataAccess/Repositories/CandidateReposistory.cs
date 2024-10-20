@@ -553,52 +553,75 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         public async Task<int> _AddListCandidatesToTheElection(CandidateListInElectionDto CandidateListInElectionDto){
             using var connect = await _context.Get_MySqlConnection();
             
-            //Kiểm tra xem ngày bầu cử có tồn tại không
-            bool checkElectionExist = await _ElectionsRepository._CheckIfElectionTimeExists(CandidateListInElectionDto.ngayBD, connect);
-            if(!checkElectionExist) return 0;
+            try{
+                int dem = 0; //Đếm số lượng ững cử viên đã góp mặt
+                //Kiểm tra xem ngày bầu cử có tồn tại không
+                bool checkElectionExist = await _ElectionsRepository._CheckIfElectionTimeExists(CandidateListInElectionDto.ngayBD, connect);
+                if(!checkElectionExist) return 0;
 
-            //Kiểm tra xem vị trí ứng cử có hợp lệ không
-            bool checkConstituencyExist = await _listOfPositionRepository._CheckIfTheCodeIsInTheListOfPosition(CandidateListInElectionDto.ID_Cap, connect);
-            if(!checkConstituencyExist) return -1;
+                //Kiểm tra xem vị trí ứng cử có hợp lệ không
+                bool checkConstituencyExist = await _listOfPositionRepository._CheckIfTheCodeIsInTheListOfPosition(CandidateListInElectionDto.ID_Cap, connect);
+                if(!checkConstituencyExist) return -1;
 
-            //Nếu danh sách ứng cử viên vượt quá số lượt bình chọn tối đa đặt cho nó thì báo lỗi
-            int sl_cuTriToiDa = await  _ElectionsRepository._MaximumNumberOfCandidates(CandidateListInElectionDto.ngayBD, connect);
-            if(sl_cuTriToiDa < 0) return -2;
+                //Nếu danh sách ứng cử viên vượt quá số lượng tối đã ứng cử viên đã quy định trước đo thì báo lỗi
+                int sl_cuTriToiDa = await  _ElectionsRepository._MaximumNumberOfCandidates(CandidateListInElectionDto.ngayBD, connect);
+                if(sl_cuTriToiDa < 0) return -2;
 
-            //Lấy số lượng ứng cử viên trong kỳ bầu cử này ở hiện tại
-            int sl_cuTriHienTai = await  _ElectionsRepository._GetCurrentCandidateCountByElection(CandidateListInElectionDto.ngayBD, connect);
-            if(sl_cuTriToiDa < 0) return -4;
+                //Lấy số lượng ứng cử viên trong kỳ bầu cử này ở hiện tại
+                int sl_cuTriHienTai = await  _ElectionsRepository._GetCurrentCandidateCountByElection(CandidateListInElectionDto.ngayBD, connect);
+                if(sl_cuTriHienTai < 0) return -4;
 
-            DateTime? TimeOfCanDiDate = await _ElectionsRepository._GetRegistrationClosingDate(CandidateListInElectionDto.ngayBD,connect);
-            if(TimeOfCanDiDate != null && DateTime.Now > TimeOfCanDiDate)
-                return -5;
+                DateTime? TimeOfCanDiDate = await _ElectionsRepository._GetRegistrationClosingDate(CandidateListInElectionDto.ngayBD,connect);
+                if(TimeOfCanDiDate != null && DateTime.Now > TimeOfCanDiDate)
+                    return -5;
 
-            if((sl_cuTriHienTai + CandidateListInElectionDto.listIDCandidate.Count) > sl_cuTriToiDa) return -3;
+                if((sl_cuTriHienTai + CandidateListInElectionDto.listIDCandidate.Count) > sl_cuTriToiDa) return -3;
 
-            //thêm từng ứng cử viên trong danh sách vào cuộc bầu cử
-            const string sql = @"
-            INSERT INTO ketquabaucu(SoLuotBinhChon,ThoiDiemDangKy,TyLeBinhChon,ngayBD,ID_ucv,ID_Cap) 
-            VALUES(@SoLuotBinhChon,@ThoiDiemDangKy,@TyLeBinhChon,@ngayBD,@ID_ucv,@ID_Cap);";
+                //thêm từng ứng cử viên trong danh sách vào cuộc bầu cử
+                const string sql = @"
+                INSERT INTO ketquabaucu(SoLuotBinhChon,ThoiDiemDangKy,TyLeBinhChon,ngayBD,ID_ucv,ID_Cap) 
+                VALUES(@SoLuotBinhChon,@ThoiDiemDangKy,@TyLeBinhChon,@ngayBD,@ID_ucv,@ID_Cap);";
 
-            foreach(string Candidate in CandidateListInElectionDto.listIDCandidate){
-                
-                //Kiểm tra xem nếu ứng cử viên đã tồn tại trong cuộc bầu cử này thì bỏ qua hoặc ứng cử viên này không tồn tại trong danh sách thì bỏ qua
-                bool checkInput = await _CheckCandidatForA_ParicularElection(Candidate,CandidateListInElectionDto.ngayBD,connect);
-                
-                if(!checkInput){
-                    using(var command = new MySqlCommand(sql, connect)){
-                        command.Parameters.AddWithValue("@SoLuotBinhChon", 0);
-                        command.Parameters.AddWithValue("@ThoiDiemDangKy", DateTime.Now);
-                        command.Parameters.AddWithValue("@TyLeBinhChon",0f);
-                        command.Parameters.AddWithValue("@ngayBD", CandidateListInElectionDto.ngayBD);
-                        command.Parameters.AddWithValue("@ID_ucv", Candidate);
-                        command.Parameters.AddWithValue("@ID_Cap", CandidateListInElectionDto.ID_Cap);
-                        
-                        await command.ExecuteNonQueryAsync();
+                foreach(string Candidate in CandidateListInElectionDto.listIDCandidate){
+                    
+                    //Kiểm tra xem nếu ứng cử viên đã tồn tại trong cuộc bầu cử này thì bỏ qua hoặc ứng cử viên này không tồn tại trong danh sách thì bỏ qua
+                    bool checkInput = await _CheckCandidatForA_ParicularElection(Candidate,CandidateListInElectionDto.ngayBD,connect);
+                    
+                    //Kiểm tra xem mã ứng cử viên có tồn tại không. Nếu không thì bỏ qua
+                    bool checkCandidateExist = await _CheckCandidateExists(Candidate, connect);
+
+                    if(!checkInput && checkCandidateExist){
+                        using(var command = new MySqlCommand(sql, connect)){
+                            command.Parameters.AddWithValue("@SoLuotBinhChon", 0);
+                            command.Parameters.AddWithValue("@ThoiDiemDangKy", DateTime.Now);
+                            command.Parameters.AddWithValue("@TyLeBinhChon",0f);
+                            command.Parameters.AddWithValue("@ngayBD", CandidateListInElectionDto.ngayBD);
+                            command.Parameters.AddWithValue("@ID_ucv", Candidate);
+                            command.Parameters.AddWithValue("@ID_Cap", CandidateListInElectionDto.ID_Cap);
+                            
+                            await command.ExecuteNonQueryAsync();
+                            dem++;
+                        }
                     }
                 }
+                if(dem == 0) return -6;
+                return dem;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
             }
-            return 1;
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         }
 
         //12. Xóa ứng cử viên khỏi kỳ bầu cử cụ thể
@@ -627,7 +650,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return 1;
         }
 
-        //Lấy danh sách và thông tin ứng cử viên dựa trên kỳ bầu cử
+        //13.Lấy danh sách và thông tin ứng cử viên dựa trên kỳ bầu cử
         public async Task<List<ListCandidateOnElectionDateDTO>> _GetCandidateListBasedOnElectionDate(DateTime ngayBD){
             using var connection = await _context.Get_MySqlConnection();
             try{
@@ -689,5 +712,57 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
+        //14. Lấy danh sách các kỳ bầu cử mà ứng cử viên đã tham gia
+        public async Task<List<CandidateRegistedForElectionsDTO>> _getListOfRegisteredCandidate(string ID_ucv){
+            try{
+                using var connection = await _context.Get_MySqlConnection();
+                if(connection.State != System.Data.ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                //Kiểm tra xem ứng cử viên có tồn tại không
+                bool checkCandidateExist = await _CheckCandidateExists(ID_ucv, connection);
+                if(!checkCandidateExist) return null;    
+
+                var list = new List<CandidateRegistedForElectionsDTO>();
+                const string sql = @"
+                SELECT kbc.TenKyBauCu, kbc.ngayBD, kbc.ngayKT ,kbc.MoTa, dm.TenCapUngCu, dv.TenDonViBauCu 
+                FROM ketquabaucu kq
+                JOIN kybaucu kbc ON kbc.ngayBD = kq.ngayBD
+                JOIN danhmucungcu dm ON dm.ID_Cap = kq.ID_Cap
+                JOIN donvibaucu dv ON dv.ID_DonViBauCu = dm.ID_DonViBauCu
+                WHERE kq.ID_ucv =  @ID_ucv;";
+
+                using var command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@ID_ucv", ID_ucv);
+
+                using var reader = await command.ExecuteReaderAsync();
+                while(await reader.ReadAsync()){
+                    list.Add(new CandidateRegistedForElectionsDTO{
+                        ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")),
+                        ngayKT = reader.GetDateTime(reader.GetOrdinal("ngayKT")),
+                        TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
+                        MoTa = reader.GetString(reader.GetOrdinal("MoTa")),
+                        TenCapUngCu = reader.GetString(reader.GetOrdinal("TenCapUngCu")),
+                        TenDonViBauCu = reader.GetString(reader.GetOrdinal("TenDonViBauCu"))
+                    });
+                }
+                return list;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
     }
 }

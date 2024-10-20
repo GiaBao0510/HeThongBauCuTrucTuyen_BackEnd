@@ -22,7 +22,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     const string sql = @"
                     INSERT INTO 
                     lichsudangnhap(ThoiDiem,DiaChiIP,taikhoan) 
-                    VALUES(@ThoiDiem,@DiaChiIP,@taikhoan);";
+                    VALUES(@ThoiDiem,@DiaChiIP,@taikhoan)
+                    ON DUPLICATE KEY UPDATE ThoiDiem = VALUES(ThoiDiem), DiaChiIP = VALUES(DiaChiIP);";
 
                     using (var command = new MySqlCommand(sql, connect))
                     {

@@ -106,5 +106,29 @@ namespace BackEnd.src.web_api.Controllers
             }
         }
 
+        [HttpGet("get-list-of-decoded-votes-based-on-election-date")]
+        [Authorize(Roles= "1")]
+        public async Task<IActionResult> getListOfDecodedVotesBasedOnElection([FromQuery] string ngayBD){
+            try{
+                if(string.IsNullOrEmpty(ngayBD) || string.IsNullOrEmpty(ngayBD))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền ngày bắt đầu."});
+                
+                var result = await _lockRepository._ListOfDecodedVotesBasedOnElection(ngayBD);
+                if(result == null)
+                    return BadRequest(new{Status = "False", Message = "Ngày bắt đầu không tồn tại"});
+                
+                return Ok(new{Status = true, Message = "", data = result});
+
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy thông tin về thông tin phiếu đã giải mã dựa trên kỳ bầu cử: {ex.Message}"
+                });
+            }
+        }
+
     }
 }

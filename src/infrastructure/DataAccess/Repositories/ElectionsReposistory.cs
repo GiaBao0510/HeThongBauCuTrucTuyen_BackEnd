@@ -9,6 +9,7 @@ using BackEnd.src.core.Interfaces;
 using System.Numerics;
 using System;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -17,16 +18,19 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         private readonly DatabaseContext _context;
         private readonly IPaillierServices _PaillierServices;
         private readonly IListOfPositionRepository _listOfPositionRepository;
+        public IConfiguration Configuration{get;}
 
         //Khởi tạo
         public ElectionsReposistory(
             DatabaseContext context,
             IListOfPositionRepository listOfPositionRepository,
-            IPaillierServices paillierServices
+            IPaillierServices paillierServices,
+            IConfiguration configuration
         ){
             _context = context;
             _listOfPositionRepository = listOfPositionRepository;
             _PaillierServices = paillierServices;
+            Configuration = configuration;
         } 
 
         //Hủy
@@ -99,8 +103,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 
                 //Thực hiện thêm kỳ bầu cử           
                 const string Input = @"
-                    INSERT INTO kybaucu(ngayBD,ngayKT,NgayKT_UngCu,TenKyBauCu,MoTa,SoLuongToiDaCuTri,SoLuongToiDaUngCuVien,SoLuotBinhChonToiDa) 
-                    VALUES(@ngayBD,@ngayKT,@NgayKT_UngCu,@TenKyBauCu,@MoTa,@SoLuongToiDaCuTri,@SoLuongToiDaUngCuVien,@SoLuotBinhChonToiDa);";
+                    INSERT INTO kybaucu(ngayBD,ngayKT,NgayKT_UngCu,TenKyBauCu,MoTa,SoLuongToiDaCuTri,SoLuongToiDaUngCuVien,SoLuotBinhChonToiDa,ID_Cap) 
+                    VALUES(@ngayBD,@ngayKT,@NgayKT_UngCu,@TenKyBauCu,@MoTa,@SoLuongToiDaCuTri,@SoLuongToiDaUngCuVien,@SoLuotBinhChonToiDa,@ID_Cap);";
                 
                 //Thực hiện thêm khóa ngoai
                 const string InputPublicKey = @"
@@ -110,16 +114,18 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 //Cấc biến hỗ trợ
                 string now = currentDay.ToString("yyyy-mm-dd_HH-mm-ss");
-                string directoryPath  = @"F:\PrivateKey";             //Thư mục lưu khóa chính
-                string filePath = Path.Combine(directoryPath, $@"\{now}.txt");
-
+                string directoryPath  = Configuration["AppSettings:PrivateKeyPath"];   //Thư mục lưu khóa chính
+                string filePk = $@"\{now}.txt";
+                string filePath = Path.Combine(directoryPath, filePk);
+                Console.WriteLine($"\nĐường dẫn: {filePath}");
+                Console.WriteLine($"\nĐường dẫn đầy đủ: {directoryPath+filePath}");
                 //Kiểm tra xem thư mục có tồn tại không
                 if(!Directory.Exists(directoryPath))
                     return -1;
                 
                 //Ghi nội dung vào tệp tin 
                 string content = $"{lamda},{muy}";
-                File.WriteAllText(filePath, content);
+                File.WriteAllText(directoryPath+filePath, content);
 
                 //Lưu vào csdl
                 using (var commandAdd = new MySqlCommand( Input + InputPublicKey, connection)){
@@ -211,11 +217,11 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 command.Parameters.AddWithValue("@SoLuongToiDaCuTri",Elections.SoLuongToiDaCuTri);
                 command.Parameters.AddWithValue("@SoLuongToiDaUngCuVien",Elections.SoLuongToiDaUngCuVien);
                 command.Parameters.AddWithValue("@SoLuotBinhChonToiDa",Elections.SoLuotBinhChonToiDa);
+                
                 //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
                 int rowAffected = await command.ExecuteNonQueryAsync();
                 return rowAffected > 0;
             }
-            
         }
 
         //Xóa
@@ -226,7 +232,17 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 DELETE FROM kybaucu
                 WHERE ngayBD = @ngayBD";
             
-            using var command = new MySqlCommand(sqlupdate, connection);
+            //Xóa khóa dự trên ngày BD
+            const string sqlupdate2 = @"
+                DELETE FROM khoa
+                WHERE ngayBD = @ngayBD";
+
+            //Lấy đường dẫn khóa riêng tư - và xóa tệp tin dựa trên đường dẫn
+            string pathPK = await _getPrivateKeyPathBasedOnElectionDate(ID,connection);
+            if(File.Exists(pathPK))
+                File.Delete(pathPK);
+
+            using var command = new MySqlCommand(sqlupdate2 + sqlupdate, connection);
             command.Parameters.AddWithValue("@ngayBD",ID);
         
             //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
@@ -344,7 +360,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //Lấy số lượng ứng cử viên hiện tại đang có trong kỳ bầu cử
         public async Task<int> _GetCurrentCandidateCountByElection(DateTime ngayBD, MySqlConnection connection){
             const string sql = @"
-            SELECT COUNT(ct.ID_CuTri) SoLuongHienTai
+            SELECT COUNT(ucv.ID_ucv) SoLuongHienTai
             FROM ketquabaucu kq  
             JOIN ungcuvien ucv on kq.ID_ucv = ucv.ID_ucv
             JOIN kybaucu ky ON  ky.ngayBD = kq.ngayBD
@@ -458,6 +474,46 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
 
             return result;
+        }
+
+        //Lấy private key path dựa trên ngày bắt đầu
+        public async Task<string> _getPrivateKeyPathBasedOnElectionDate(string ngayBD, MySqlConnection connection){
+            try{
+                //Kiểm tra xem ngày bắt đầu có tồn tại không
+                CultureInfo provider = CultureInfo.InvariantCulture;
+                DateTime votingDay = DateTime.ParseExact(ngayBD,"yyyy-MM-dd HH:mm:ss",provider);
+                bool check_ngayBD = await _CheckIfElectionTimeExists(votingDay, connection);
+                if(!check_ngayBD) return null;
+
+                const string sql = @"
+                SELECT path_PK
+                FROM khoa 
+                WHERE ngayBD = @ngayBD;";
+                using (var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                    using var reader = await command.ExecuteReaderAsync();
+
+                    if(await reader.ReadAsync()){
+                        return reader.GetString(reader.GetOrdinal("path_PK"));
+                    }
+                    return null;
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         }
     
     }

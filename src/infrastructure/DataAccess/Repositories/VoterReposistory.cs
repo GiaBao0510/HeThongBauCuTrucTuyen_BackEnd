@@ -680,7 +680,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             if(!checkVoterExists) return null;
 
             //lấy danh sách kỳ bầu cử có mặc cử tri
-            const string sql = @"
+            const string sql = @" 
             SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, kbc.MoTa, kbc.SoLuongToiDaCuTri, kbc.SoLuongToiDaUngCuVien, kbc.SoLuotBinhChonToiDa
             FROM trangthaibaucu tt
             JOIN kybaucu kbc ON kbc.ngayBD = tt.ngayBD

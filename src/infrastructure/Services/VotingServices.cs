@@ -126,7 +126,10 @@ namespace BackEnd.src.infrastructure.Services
                 string ID_Phieu = randomString+$"{currentDay:yyyyMMddHHmmssff}";
 
                     //Lấy N và G dựa trên ngày bầu cử
-                var Lock = await  _lockRepository._getLockBasedOnElectionDate(voterVoteDTO.ngayBD,connect);
+                LockDTO Lock = await  _lockRepository._getLockBasedOnElectionDate(voterVoteDTO.ngayBD,connect);
+                Console.WriteLine($"N: {Lock.N}");
+                Console.WriteLine($"G: {Lock.G}");
+                Console.WriteLine($"GiaTriPhieuBauHienTai: {GiaTriPhieuBauHienTai}");
                     
                     //Mã hóa phiếu trước khi lưu    
                 BigInteger GiaTriPhieuBauHienTai_MaHoa = _paillierServices.Encryption(Lock.G, Lock.N, GiaTriPhieuBauHienTai);

@@ -15,5 +15,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _deleteKeyBasedOnElectionDate(string ngayBD);
         //4.Lấy khóa thông tin khóa mật theo ngày bắt đầu
         Task<PrivateKeyDTO> _getPrivateKeyBasedOnElectionDateAndKey(string ngayBD);
+        //5. Lấy danh sách giá trị phiếu đã giải mã theo thời điểm bầu cử
+        Task<List<VoteDto>> _ListOfDecodedVotesBasedOnElection(string ngayBD);
     }
 }
