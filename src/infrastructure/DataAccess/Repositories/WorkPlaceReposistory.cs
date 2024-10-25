@@ -248,5 +248,23 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
             return true; 
         }
+
+        //12. Kiểm tra cán bộ đã tham dự kỳ bầu cử chưa
+        public async Task<bool> _CheckTheCadresWhoAttendedTheElection(string ID_CanBo, DateTime ngayBD ,MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            const string sql = @"SELECT COUNT(ID_CanBo) 
+            FROM hoatdong 
+            WHERE ID_CanBo=@ID_CanBo AND ngayBD=@ngayBD;";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_CanBo",ID_CanBo);
+                command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            } 
+        } 
     }
 }

@@ -137,7 +137,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 
                 int count = Convert.ToInt32(await command.ExecuteScalarAsync());
                 return count > 0;
-            }
+            } 
         }
 
         //Kiểm tra xem mã kỳ bầu cử với mã danh mục ứng cử có tồn tại chung với nhau không

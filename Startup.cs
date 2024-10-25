@@ -319,8 +319,8 @@ namespace BackEnd
             // 4. CORS Configuration (Đặt trước Authentication và Routing)
             app.UseCors(policy => 
                 policy.WithOrigins(
-                    "http://localhost:3002",      // Vue.js frontend
-                    "http://0.0.0.0:3000"   // Flutter frontend
+                    Configuration["AppSettings:ListenOnTheWeb"],      // Vue.js frontend
+                    Configuration["AppSettings:ListenOnTheApp"]   // Flutter frontend
                 )
                 .AllowCredentials()
                 .AllowAnyHeader()

@@ -13,17 +13,30 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
     public class CadreRepository: UserRepository, IDisposable, ICadreRepository
     {
         private readonly DatabaseContext _context;
+        private readonly IElectionsRepository _ElectionsRepository; //kỳ bầu cử
         private readonly IProfileRepository _profileRepository;
         private readonly CloudinaryService _cloudinaryService;
+        private readonly IBoardRepository _boardRepository;      //Ban
+        private readonly IPositionsRepository _positionsRepository;//Chức vụ
+        private readonly IWorkPlaceRepository _workPlaceRepository;//Nơi làm việc
 
         //Khởi tạo
         public CadreRepository(
-            DatabaseContext context,CloudinaryService cloudinaryService,
-            IProfileRepository profileRepository
-        ): base(context, cloudinaryService){
+            DatabaseContext context,
+            CloudinaryService cloudinaryService,
+            IProfileRepository profileRepository, 
+            IElectionsRepository ElectionsRepository,
+            IPositionsRepository positionsRepository,
+            IWorkPlaceRepository workPlaceRepository,
+            IBoardRepository boardRepository
+        ) : base(context, cloudinaryService){
             _context=context;
             _cloudinaryService = cloudinaryService;
             _profileRepository = profileRepository;
+            _ElectionsRepository = ElectionsRepository;
+            _positionsRepository = positionsRepository;
+            _workPlaceRepository = workPlaceRepository;
+            _boardRepository = boardRepository;
         }
         //Hủy
         public new void Dispose() => _context.Dispose();
@@ -62,16 +75,18 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             //Kiểm tra kết nối
             if(connect.State != System.Data.ConnectionState.Open )
                 await connect.OpenAsync();
-            
             using var transaction =await connect.BeginTransactionAsync();
 
             try{
+                //Chỉnh lại vai trò cho cán bộ
+                Cadre.RoleID = 8;
 
                 //Thêm thông tin cơ sở
                 var FillInBasicInfo = await _AddUserWithConnect(Cadre, fileAnh, connect, transaction);
                 
                 //Nếu có lỗi thì in ra
                 if(FillInBasicInfo is int result && result <=0){
+                    Console.WriteLine($">>>> FillInBasicInfo: {FillInBasicInfo}");
                     await transaction.RollbackAsync();
                     return result;
                 }
@@ -79,7 +94,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 //Lấy ID người dùng vừa tạo và tạo ID cán bộ
                 string ID_CanBo = RandomString.CreateID(),
                         ID_user = FillInBasicInfo.ToString();
-
 
                 //Ngược lại thêm cán bộ  
                 const string sql = "INSERT INTO canbo(ID_CanBo,GhiChu,NgayCongTac,ID_user) VALUES(@ID_CanBo,@GhiChu,@NgayCongTac,@ID_user);";
@@ -124,7 +138,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
-        //2. Lấy thông tin người dùng theo ID
+        //2.1 Lấy thông tin người dùng theo ID
         public async Task<CadreDto> _GetCadreBy_ID(string IDCadre){
             using var connection = await _context.Get_MySqlConnection();
             
@@ -158,6 +172,21 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 };
             }
             return null;
+        }
+
+        //2.2 Kiểm tra xem ID cán bộ có tồn tại không
+        public async Task<bool> _CheckIfTheCadreCodeExists(string ID_CanBo, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            const string sql = "SELECT COUNT(ID_CanBo) FROM canbo WHERE ID_CanBo=@ID_CanBo;";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_CanBo",ID_CanBo);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            } 
         }
 
         //3. Sửa thông tin cán bộ dựa trên ID cán bộ
@@ -469,5 +498,128 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 return false;
             }
         }
+
+        //10.thêm danh sách id cán bộ vào kỳ bầu cử
+        public async Task<int>  _AddListCadresToTheElection(CadreListInElectionDto cadreListInElectionDto){
+            using var connection = await _context.Get_MySqlConnection();
+            try{
+                int dem  = 0;
+                
+                //kiểm tra xem kỳ bầu cử có tồn tại không
+                bool checkExitsElection = await _ElectionsRepository._CheckIfElectionTimeExists(cadreListInElectionDto.ngayBD, connection);
+                if(!checkExitsElection)
+                    return -2;
+
+                //Kiểm tra xem ban có tồn tại không
+                bool checkExitsBoard = await _boardRepository._CheckIfTheCodeIsInTheBoard(cadreListInElectionDto.ID_Ban, connection);
+                if(!checkExitsBoard)
+                    return -1;
+
+                foreach(var cadre in cadreListInElectionDto.ListID_canbo){
+                    //Kiểm tra ID cán bộ đã tồn tại chưa
+                    bool checkExistsCadre = await _CheckCadreExists(cadre, connection);
+                    
+                    //Kiểm tra xem cán bộ đã trực tại kỳ bầu cử này chưa
+                    bool checkTheCadresWhoAttendedTheElection = await _workPlaceRepository._CheckTheCadresWhoAttendedTheElection(cadre, cadreListInElectionDto.ngayBD, connection);
+                    
+                    //Kiểm tra xem chức vụ có tồn tại không
+                    bool checkExitsPosition = await _positionsRepository._CheckIfTheCodeIsInThePosition(cadreListInElectionDto.ListID_ChucVu[cadreListInElectionDto.ListID_canbo.IndexOf(cadre)],connection);
+                    
+                    if(checkExistsCadre && !checkTheCadresWhoAttendedTheElection && checkExitsPosition){
+                        using (var command = new MySqlCommand("INSERT INTO hoatdong(ID_CanBo,ID_ChucVu,ID_Ban,ngayBD) VALUES(@ID_CanBo,@ID_ChucVu,@ID_Ban,@NgayBD);", connection)){
+                            command.Parameters.AddWithValue("@ID_CanBo", cadre);
+                            command.Parameters.AddWithValue("@ID_ChucVu", cadreListInElectionDto.ListID_ChucVu[cadreListInElectionDto.ListID_canbo.IndexOf(cadre)]);
+                            command.Parameters.AddWithValue("@ID_Ban", cadreListInElectionDto.ID_Ban);
+                            command.Parameters.AddWithValue("@NgayBD", cadreListInElectionDto.ngayBD);
+
+                            await command.ExecuteNonQueryAsync();
+                            dem++;
+                        }
+                    }
+                }
+               
+                //Kiểm tra xem
+                return dem;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //11.Thông tin các kỳ bầu cử mà cán bộ đã tham dự để trực
+        public async Task<List<CadreJoinedForElectionDTO>> _getListOfCadreJoinedForElection(string ID_CanBo){
+            try{
+                using var connection = await _context.Get_MySqlConnection();
+                if(connection.State != System.Data.ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                //Kiểm tra cán bộ có tồn tại không
+                bool checkExistsCadre = await _CheckCadreExists(ID_CanBo, connection);
+                if(!checkExistsCadre)
+                    return null;
+                
+                var list = new List<CadreJoinedForElectionDTO>();
+                const string sql = @"
+                SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, 
+                kbc.MoTa, kbc.SoLuongToiDaCuTri, kbc.SoLuongToiDaUngCuVien, 
+                kbc.SoLuotBinhChonToiDa, kbc.CongBo, dm.TenCapUngCu, dv.TenDonViBauCu
+                FROM kybaucu kbc 
+                JOIN hoatdong hd ON hd.ngayBD = kbc.ngayBD
+                JOIN danhmucungcu dm ON dm.ID_Cap = kbc.ID_Cap
+                JOIN donvibaucu dv ON dv.ID_DonViBauCu = dm.ID_DonViBauCu
+                WHERE hd.ID_canbo = @ID_canbo;";
+
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ID_canbo", ID_CanBo);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new CadreJoinedForElectionDTO{
+                            ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")),
+                            ngayKT = reader.GetDateTime(reader.GetOrdinal("ngayKT")),
+                            TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
+                            MoTa = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
+                            SoLuongToiDaCuTri = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaCuTri")),
+                            SoLuongToiDaUngCuVien = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
+                            SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuotBinhChonToiDa")),
+                            CongBo =reader.GetString(reader.GetOrdinal("CongBo")),
+                            TenCapUngCu = reader.GetString(reader.GetOrdinal("TenCapUngCu")),
+                            TenDonViBauCu = reader.GetString(reader.GetOrdinal("TenDonViBauCu")),
+                        });
+                    }
+                }
+                return list;
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+
     }
 }

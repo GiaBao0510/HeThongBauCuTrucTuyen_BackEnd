@@ -105,5 +105,20 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return rowAffected > 0;
         }
 
+        //Kiểm tra mã chức vụ xem có tồn tại chưa
+        public async Task<bool> _CheckIfTheCodeIsInThePosition(int ID_ChucVu, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            const string sql = "SELECT COUNT(ID_ChucVu) FROM chucvu WHERE ID_ChucVu=@ID_ChucVu;";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_ChucVu",ID_ChucVu);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            } 
+        }
+
     }
 }

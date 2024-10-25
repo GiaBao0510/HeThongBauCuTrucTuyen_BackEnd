@@ -36,5 +36,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _UpdatePositionBy_IDcadre(string ID_canBo, int ID_chucvu);
         //Đặt lại ban mà cán bộ đã làm việc theo -ID cán bộ
         Task<bool> _UpdateBoardBy_IDcadre(string ID_canBo, int ID_ban);
+        //12. Kiểm tra cán bộ đã tham dự kỳ bầu cử chưa
+        Task<bool> _CheckTheCadresWhoAttendedTheElection(string ID_CanBo, DateTime ngayBD ,MySqlConnection connection);
     }
 }

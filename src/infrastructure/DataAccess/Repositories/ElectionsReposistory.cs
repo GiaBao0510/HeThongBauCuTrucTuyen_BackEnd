@@ -39,7 +39,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //Liệt kê
         public async Task<List<ElectionDto>> _GetListOfElections(){
             var list = new List<ElectionDto>();
-
+ 
             using var connection = await _context.Get_MySqlConnection();
             using var command = new MySqlCommand("SELECT * FROM kybaucu", connection);
             using var reader = await command.ExecuteReaderAsync();
@@ -515,6 +515,168 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 throw;
             }
         }
-    
+
+        //Kiểm tra xem kỳ bầu cử đã công bố kết quả chưa
+        public async Task<bool> _checkResultAnnouncement(string ngayBD,  MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            try{
+                //Kiểm tra ngày bắt đầu bầu cử có tồn tại không
+                CultureInfo provider = CultureInfo.InvariantCulture;
+                DateTime votingDay = DateTime.ParseExact(ngayBD,"yyyy-MM-dd HH:mm:ss",provider);
+                bool check_ngayBD = await _CheckIfElectionTimeExists(votingDay, connection);
+                if(!check_ngayBD) return false;
+
+                const string sql = @"SELECT CongBo FROM kybaucu WHERE ngayBD = @ngayBD;";
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                    using var reader = await command.ExecuteReaderAsync();
+                    if(await reader.ReadAsync()){
+                        string congBo = reader.GetString(reader.GetOrdinal("CongBo"));
+                        return congBo.Equals("1");
+                    }
+                    return false;
+                } 
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Lấy danh sách ID và tên ứng cử viên được sắp xếp dựa trên ngày bắt đầu bầu cử
+        public async Task<List<CandidateNamesBasedOnElectionDateDto>> _GetListCandidateNamesBasedOnElections_OtherID_ucv(DateTime ngayBD,MySqlConnection connection){
+           try{
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            List<CandidateNamesBasedOnElectionDateDto> result = new List<CandidateNamesBasedOnElectionDateDto>();
+            const string sql = @"
+            SELECT ID_ucv 
+            FROM kybaucu 
+            WHERE ngayBD = @ngayBD  
+            ORDER BY ID_ucv;";
+
+            using(var command =  new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                using var reader = await command.ExecuteReaderAsync();
+                
+                while(await reader.ReadAsync()){
+                    result.Add(new CandidateNamesBasedOnElectionDateDto{
+                        ID_ucv = reader.GetString(reader.GetOrdinal("ID_ucv")),
+                    });
+                }
+            }
+
+            return result;
+           }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Cập nhật số lượt bình chọn, tỉ lệ bình chọn cho ID_ucv tương ứng dựa trên ngày bắt đầu
+        public async Task<bool> _updateVoteCountAndVotePercentage(DateTime ngayBD, int SoLuotBinhChon, float tiLeBinhChon, string ID_ucv ,MySqlConnection connection){
+            try{
+                //Kiểm tra trạng thái kết nối trước khi mở
+                if(connection.State != System.Data.ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = @"
+                UPDATE kybaucu
+                SET SoLuotBinhChon =@SoLuotBinhChon, TyLeBinhChon =@ 
+                WHERE ngayBD =@ngayBD AND ID_ucv =@ID_ucv;";
+
+                using(var commad = new MySqlCommand(sql, connection)){
+                    commad.Parameters.AddWithValue("@SoLuotBinhChon",SoLuotBinhChon);
+                    commad.Parameters.AddWithValue("@tiLeBinhChon",tiLeBinhChon);
+                    commad.Parameters.AddWithValue("@ngayBD",ngayBD);
+                    commad.Parameters.AddWithValue("@ID_ucv",ID_ucv);
+
+                    int rowAffected = await commad.ExecuteNonQueryAsync();
+                    return rowAffected > 0;
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Cập nhật đã công bố kết quả bầu cử rồi dựa trên kỳ bầu cử
+        public async Task<bool> _UpdateResultAnnouncementElectionBasedOnElectionDate(DateTime ngayBD, MySqlConnection connection){
+            try{
+
+                //Kiểm tra trạng thái kết nối trước khi mở
+                if(connection.State != System.Data.ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = @"
+                UPDATE kybaucu
+                SET CongBo = '1'
+                WHERE ngayBD = @ngayBD;";
+
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                    
+                    int rowAffected = await command.ExecuteNonQueryAsync();
+                    return rowAffected > 0;
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
     }
 }

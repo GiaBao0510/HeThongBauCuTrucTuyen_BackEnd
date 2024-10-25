@@ -26,66 +26,156 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //0.Kiểm tra email có trùng không
         public async Task<int> CheckEmailAlreadyExits(string email, MySqlConnection connection){
-            //Nếu đầu vào rỗng thì trả về false
-            if(string.IsNullOrEmpty(email)) return 1;
+            try{
+                //Nếu đầu vào rỗng thì trả về false
+                if(string.IsNullOrEmpty(email)) return 1;
 
-            const string sql_check = "SELECT COUNT(Email) FROM nguoidung WHERE Email = @Email;";
-            using(var Command = new MySqlCommand(sql_check, connection)){
-                Command.Parameters.AddWithValue("@Email",email);
-                return Convert.ToInt32(await Command.ExecuteScalarAsync());
+                const string sql_check = "SELECT COUNT(Email) FROM nguoidung WHERE Email = @Email;";
+                using(var Command = new MySqlCommand(sql_check, connection)){
+                    Command.Parameters.AddWithValue("@Email",email);
+                    return Convert.ToInt32(await Command.ExecuteScalarAsync());
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Lỗi tại kiểm tra email trùng trong MYSQL");
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
             }
         }
 
         //1.Kiểm tra xem số điện thoại có bị trùng không
         public async Task<int> CheckPhoneNumberAlreadyExits(string sdt, MySqlConnection connection){
-            const string sql_check = "SELECT COUNT(sdt) FROM nguoidung WHERE sdt = @sdt;";
-            using(var Command = new MySqlCommand(sql_check, connection)){
-                Command.Parameters.AddWithValue("@sdt",sdt);
-                return Convert.ToInt32(await Command.ExecuteScalarAsync());
+            try{
+                const string sql_check = "SELECT COUNT(sdt) FROM nguoidung WHERE sdt = @sdt;";
+                using(var Command = new MySqlCommand(sql_check, connection)){
+                    Command.Parameters.AddWithValue("@sdt",sdt);
+                    return Convert.ToInt32(await Command.ExecuteScalarAsync());
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Lỗi tại kiểm tra số điện thoại trùng trong MYSQL");
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
             }
         }
 
         //2. Kiểm tra xem số căn cước có bị trùng không
         public async Task<int> CheckCitizenIdentificationAlreadyExits(string cccd, MySqlConnection connection){
-            const string sql_check = "SELECT COUNT(cccd) FROM nguoidung WHERE cccd = @cccd;";
-            using(var Command = new MySqlCommand(sql_check, connection)){
-                Command.Parameters.AddWithValue("@cccd",cccd);
-                return Convert.ToInt32(await Command.ExecuteScalarAsync());
+            try{
+                const string sql_check = "SELECT COUNT(cccd) FROM nguoidung WHERE cccd = @cccd;";
+                using(var Command = new MySqlCommand(sql_check, connection)){
+                    Command.Parameters.AddWithValue("@cccd",cccd);
+                    return Convert.ToInt32(await Command.ExecuteScalarAsync());
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Lỗi tại kiểm tra số căn cước trùng trong MYSQL");
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
             }
         }
 
         //2.5 lấy thuộc tính cụ thể của người dùng thông qua ID người dùng
         public async Task<string> _GetUserProperties(string ID_user, string attribute, MySqlConnection connection){
-            string result = null;
-            string sql = $"SELECT {attribute} FROM nguoidung WHERE ID_user = @ID_user";
-            using (var command = new MySqlCommand(sql, connection)){
-                command.Parameters.AddWithValue("@ID_user", ID_user);
+            try{
+                string result = null;
+                string sql = $"SELECT {attribute} FROM nguoidung WHERE ID_user = @ID_user";
+                using (var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ID_user", ID_user);
 
-                using var reader = await command.ExecuteReaderAsync();
-                if(await reader.ReadAsync())
-                    result = reader.GetString(reader.GetOrdinal($"{attribute}"));
+                    using var reader = await command.ExecuteReaderAsync();
+                    if(await reader.ReadAsync())
+                        result = reader.GetString(reader.GetOrdinal($"{attribute}"));
+                }
+
+                return result;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Lỗi tại lấy thuộc tính cụ thể của người dùng trong MYSQL");
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
             }
-
-            return result;
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         }
 
         //3. KIểm tra vai trò người dùng có tồn tại không
         public async Task<bool> CheckRoleAlreadyExits(int role, MySqlConnection connection){
-            const string sql_check = "SELECT COUNT(RoleID) FROM vaitro WHERE RoleID = @RoleID;";
-            using(var Command = new MySqlCommand(sql_check, connection)){
-                Command.Parameters.AddWithValue("@RoleID",role);
-                int count = Convert.ToInt32(await Command.ExecuteScalarAsync());
-                if(count < 1)
-                    return false;       //Không tồn tại
+            try{
+                const string sql_check = "SELECT COUNT(RoleID) FROM vaitro WHERE RoleID = @RoleID;";
+                using(var Command = new MySqlCommand(sql_check, connection)){
+                    Command.Parameters.AddWithValue("@RoleID",role);
+                    int count = Convert.ToInt32(await Command.ExecuteScalarAsync());
+                    if(count < 1)
+                        return false;       //Không tồn tại
+                }
+                return true;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Lỗi tại kiểm tra vai trò người dùng trong MYSQL");
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
             }
-            return true;
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         }
 
         //4. Kiểm tra thông tin trùng lặp
         public async Task<int> CheckForDuplicateUserInformation(int N,UserDto user, MySqlConnection connection){
             if(await CheckPhoneNumberAlreadyExits(user.SDT, connection) > N) return 0;
             if(await CheckEmailAlreadyExits(user.Email, connection) > N) return -1;
-            if(await CheckCitizenIdentificationAlreadyExits(user.CCCD, connection) > N) return -2;
+            //if(await CheckCitizenIdentificationAlreadyExits(user.CCCD, connection) > N) return -2;
             if(await CheckRoleAlreadyExits(user.RoleID, connection) == false) return -3;
             return 1;
         }
@@ -93,7 +183,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //5. Kiểm tra xem có thông tin nào bỏ trống không, nếu có thì trả về false
         public bool CheckUserInformationIsNotEmpty(UserDto user){
             if(user.HoTen == null ||user.GioiTinh == null ||user.NgaySinh == null ||user.DiaChiLienLac == null ||
-            user.CCCD == null ||user.Email == null ||user.SDT == null ||user.ID_DanToc == null || user.RoleID == null)
+            user.Email == null ||user.SDT == null ||user.ID_DanToc == null || user.RoleID == null)
                 return false;
             return true;
         }
@@ -505,7 +595,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //16. Thêm người dùng có Connection
         public async Task<object> _AddUserWithConnect(UserDto user ,IFormFile fileAnh ,MySqlConnection connection, MySqlTransaction transaction){
 
-            //Kiểm tra trạng thái kết nối trước khi mở
+            //Kiểm tra trạng thái kết nối trước khi mở 
             if(connection.State != System.Data.ConnectionState.Open)
                 await connection.OpenAsync();
             
@@ -565,7 +655,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 return ID_user;
             }
             catch(MySqlException ex){ 
-                Console.WriteLine("Error Mysql: " + ex.Message);
+                Console.WriteLine("Error Mysql Message: " + ex.Message);
+                Console.WriteLine("Error Mysql SqlState: " + ex.SqlState);
+                Console.WriteLine("Error Mysql TargetSite: " + ex.TargetSite);
+                Console.WriteLine("Error Mysql Code: " + ex.Code);
+                Console.WriteLine("Error Mysql Source: " + ex.Source);
+                Console.WriteLine("Error Mysql Data: " + ex.Data);
                 if(transaction.Connection != null)
                     await transaction.RollbackAsync();
 

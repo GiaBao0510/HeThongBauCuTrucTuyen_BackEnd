@@ -1,6 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using BackEnd.src.core.Interfaces;
 using BackEnd.src.core.Models;
@@ -8,7 +7,6 @@ using BackEnd.src.infrastructure.DataAccess.Context;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MySql.Data.MySqlClient;
 
 namespace BackEnd.src.infrastructure.Services
 {

@@ -281,7 +281,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
-        //Lấy private key path dựa trên ngày bắt đầu
+        //5.Lấy private key path dựa trên ngày bắt đầu
         public async Task<string> _getPrivateKeyPathBasedOnElectionDate(string ngayBD, MySqlConnection connection){
             try{
                 //Kiểm tra xem ngày bắt đầu có tồn tại không
@@ -321,64 +321,286 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
-        //Giải mã các giá trị phiếu bầu dựa trên kỳ bầu cử
-        public async Task<List<VoteDto>> _ListOfDecodedVotesBasedOnElection(string ngayBD){
+        //6.Giải mã các giá trị phiếu bầu dựa trên kỳ bầu cử
+        public async Task<dynamic> _ListOfDecodedVotesBasedOnElection(string ngayBD){
             using var connection = await _context.Get_MySqlConnection();
-            var list = new List<VoteDto>();
 
-            var pbKey = await _getLockBasedOnElectionDate(ngayBD, connection);
-            if(pbKey == null){
-                Console.WriteLine("ngày bắt đầu không tồn tại");
-                return null;
-            }
+            try{
+                var list = new List<VoteDto>();
+                var pbKey = await _getLockBasedOnElectionDate(ngayBD, connection);
+                if(pbKey == null){
+                    Console.WriteLine("ngày bắt đầu không tồn tại");
+                    return 0;
+                }
 
-            const string sql = @"
-            SELECT pb.ID_Phieu, pb.GiaTriPhieuBau,pb.ID_cap
-            FROM phieubau pb 
-            JOIN khoa k ON pb.ngayBD = k.ngayBD
-            WHERE k.ngayBD = @ngayBD;";
+                const string sql = @"
+                SELECT pb.ID_Phieu, pb.GiaTriPhieuBau,pb.ID_cap
+                FROM phieubau pb 
+                JOIN khoa k ON pb.ngayBD = k.ngayBD
+                WHERE k.ngayBD = @ngayBD;";
 
-            //Kiểm tra đường dẫn tồn tại không 
-            if(!File.Exists(pbKey.path_PK)){
-                Console.WriteLine($"File khóa mật phiếu bầu không tồn tại:{pbKey.path_PK}");
-                return null;
-            }
+                //Kiểm tra đường dẫn tồn tại không 
+                if(!File.Exists(pbKey.path_PK)){
+                    Console.WriteLine($"File khóa mật phiếu bầu không tồn tại:{pbKey.path_PK}");
+                    return -1;
+                }
 
-            //Truy xuất các giá trị phiếu đã mã hóa và ngày bầu cử (Giá trị phiếu, ID phiếu , N, Path mã hóa)
-            using(var command = new MySqlCommand(sql, connection)){
-                command.Parameters.AddWithValue("@ngayBD",ngayBD);
-                using var reader = await command.ExecuteReaderAsync();
-                
-                while(await reader.ReadAsync()){
+                //Truy xuất các giá trị phiếu đã mã hóa và ngày bầu cử (Giá trị phiếu, ID phiếu , N, Path mã hóa)
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                    using var reader = await command.ExecuteReaderAsync();
                     
-                    //Đọc giá trị từng phiếu bầu
-                    var vote = new VoteDto{
-                        ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
-                        GiaTriPhieuBau = (BigInteger)reader.GetDecimal(reader.GetOrdinal("GiaTriPhieuBau")),
-                        ID_cap = reader.GetInt32(reader.GetOrdinal("ID_cap")),
-                        ngayBD = ngayBD
-                    };
+                    while(await reader.ReadAsync()){
+                        
+                        //Đọc giá trị từng phiếu bầu
+                        var vote = new VoteDto{
+                            ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
+                            GiaTriPhieuBau = (BigInteger)reader.GetDecimal(reader.GetOrdinal("GiaTriPhieuBau")),
+                            ID_cap = reader.GetInt32(reader.GetOrdinal("ID_cap")),
+                            ngayBD = ngayBD
+                        };
 
-                    //Lấy đường dẫn khóa mật
-                    string content = File.ReadAllText(pbKey.path_PK);
+                        //Lấy đường dẫn khóa mật
+                        string content = File.ReadAllText(pbKey.path_PK);
 
-                    //Tách các giá trị trong tệp tin dựa vào dấu ','
-                    string[] values = content.Split(',');
+                        //Tách các giá trị trong tệp tin dựa vào dấu ','
+                        string[] values = content.Split(',');
 
-                    var pvKey = new PrivateKeyDTO();
+                        var pvKey = new PrivateKeyDTO();
 
-                    if(values.Length == 2){
-                        //Chuyển đổi giá trị đọc được thành BigInteger
-                        pvKey.lamda = BigInteger.Parse(values[0].Trim());
-                        pvKey.muy = BigInteger.Parse(values[1].Trim());
+                        if(values.Length == 2){
+                            //Chuyển đổi giá trị đọc được thành BigInteger
+                            pvKey.lamda = BigInteger.Parse(values[0].Trim());
+                            pvKey.muy = BigInteger.Parse(values[1].Trim());
 
-                        //Giải mã
-                        var decodedValue = _paillierServices.Decryption(vote.GiaTriPhieuBau, pbKey.N, pvKey.lamda, pvKey.muy);
-                        vote.GiaTriPhieuBau = decodedValue;
-                        list.Add(vote);
+                            //Giải mã
+                            var decodedValue = _paillierServices.Decryption(vote.GiaTriPhieuBau, pbKey.N, pvKey.lamda, pvKey.muy);
+                            vote.GiaTriPhieuBau = decodedValue;
+                            list.Add(vote);
+                        }
+                    }
+                    return list;
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //6.1 Giải mã các giá trị phiếu bầu dựa trên kỳ bầu cử - MySQLConnection
+        public async Task<dynamic> _ListOfDecodedVotesBasedOnElection(string ngayBD, MySqlConnection connection){
+
+            try{
+                var list = new List<VoteDto>();
+                var pbKey = await _getLockBasedOnElectionDate(ngayBD, connection);
+                if(pbKey == null){
+                    Console.WriteLine("ngày bắt đầu không tồn tại");
+                    return 0;
+                }
+
+                const string sql = @"
+                SELECT pb.ID_Phieu, pb.GiaTriPhieuBau,pb.ID_cap
+                FROM phieubau pb 
+                JOIN khoa k ON pb.ngayBD = k.ngayBD
+                WHERE k.ngayBD = @ngayBD;";
+
+                //Kiểm tra đường dẫn tồn tại không 
+                if(!File.Exists(pbKey.path_PK)){
+                    Console.WriteLine($"File khóa mật phiếu bầu không tồn tại:{pbKey.path_PK}");
+                    return -1;
+                }
+
+                //Truy xuất các giá trị phiếu đã mã hóa và ngày bầu cử (Giá trị phiếu, ID phiếu , N, Path mã hóa)
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD",ngayBD);
+                    using var reader = await command.ExecuteReaderAsync();
+                    
+                    while(await reader.ReadAsync()){
+                        
+                        //Đọc giá trị từng phiếu bầu
+                        var vote = new VoteDto{
+                            ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
+                            GiaTriPhieuBau = (BigInteger)reader.GetDecimal(reader.GetOrdinal("GiaTriPhieuBau")),
+                            ID_cap = reader.GetInt32(reader.GetOrdinal("ID_cap")),
+                            ngayBD = ngayBD
+                        };
+
+                        //Lấy đường dẫn khóa mật
+                        string content = File.ReadAllText(pbKey.path_PK);
+
+                        //Tách các giá trị trong tệp tin dựa vào dấu ','
+                        string[] values = content.Split(',');
+
+                        var pvKey = new PrivateKeyDTO();
+
+                        if(values.Length == 2){
+                            //Chuyển đổi giá trị đọc được thành BigInteger
+                            pvKey.lamda = BigInteger.Parse(values[0].Trim());
+                            pvKey.muy = BigInteger.Parse(values[1].Trim());
+
+                            //Giải mã
+                            var decodedValue = _paillierServices.Decryption(vote.GiaTriPhieuBau, pbKey.N, pvKey.lamda, pvKey.muy);
+                            vote.GiaTriPhieuBau = decodedValue;
+                            list.Add(vote);
+                        }
+                    }
+                    return list;
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //7.Công bố kết quả bầu cử dựa trên ngày bầu cử
+        public async Task<int> _CaculateAndAnnounceElectionResult(string ngayBD){
+            using var connection = await _context.Get_MySqlConnection();
+            using var transaction = await connection.BeginTransactionAsync();
+
+            try{
+                //Đưa ngày bắt đầu về dạng DateTime
+                CultureInfo provider = CultureInfo.InvariantCulture;
+                DateTime startTime = DateTime.ParseExact(ngayBD,"yyyy-MM-dd HH:mm:ss",provider);
+
+                //lấy danh sách các giá trị phiếu bầu đã được giải mã
+                var listOfDecodedVotesBasedOnElection = await _ListOfDecodedVotesBasedOnElection(ngayBD, connection);
+
+                //lấy danh sách ứng cử viên dựa trên ngày bắt đầu trong bảng kết quả bầu cử
+                var listCandidateBasedOnElections = await _electionsRepository._GetListCandidateNamesBasedOnElections_OtherID_ucv(startTime, connection);
+                
+                //Trả về kết quả nếu gặp lối
+                if(listOfDecodedVotesBasedOnElection is int int_result){
+                    await transaction.RollbackAsync();
+                    return int_result;
+                }
+                
+                //Kiểm tra ngày bắt đầu của kỳ bầu cử công bố chưa. Nếu công bố rồi thì hủy
+                bool checkResultAnnouncement = await _electionsRepository._checkResultAnnouncement(ngayBD, connection);
+                if(checkResultAnnouncement){
+                    await transaction.RollbackAsync();
+                    return -2;
+                }
+
+                //Lấy số lượng cử tri tối đã dựa trên ngày bắt đầu
+                int n = await _electionsRepository._MaximumNumberOfVoters(startTime,connection);
+
+                //Lấy số lượng ứng cử viên tối đã dựa trên ngày bắt đầu
+                int k = await _electionsRepository._MaximumNumberOfCandidates(startTime, connection);
+
+                //Lấy số lượng bầu chọn tối đã dựa trên ngày bắt đầu
+                int s = await _electionsRepository._MaximumNumberOfVotes(startTime, connection);
+
+                //Tính B-phân
+                int b = n+1;
+
+                //Tạo danh sách số nguyên với dựa trên số lượng ứng cử viên
+                List<int> BallotPaper = Enumerable.Repeat(0, k).ToList();
+
+                //Tính toán từng phiếu bầu để tìm số lượt bình chọn cho từng ứng củ viên
+                foreach(var vote in listOfDecodedVotesBasedOnElection){
+                    int vote_mi = vote;
+                    int s_temp = s;
+
+                    //Dựa trên từng số lần bỏ phiếu, tìm ứng viên được bầu
+                    while(s_temp >=0){
+
+                        double power_b_s = Math.Pow(b, s_temp);  // Tính toán b^s_temp một lần
+                        if(vote_mi >= Math.Pow(b, s_temp)){
+                            vote_mi -= (int)power_b_s;      // Trừ giá trị vote
+                            BallotPaper[s_temp]++;          // Tăng số lần bình chọn cho ứng viên
+
+                            // Nếu giá trị còn lại là 1, thì cộng vào vị trí đầu tiên
+                            if(vote_mi == 1){
+                                BallotPaper[0]++;
+                                break;
+                            }
+                        }
+                        s_temp--;
                     }
                 }
-                return list;
+
+                //Tổng các giá trị phiếu
+                int TotalVotes = BallotPaper.Sum(item => (int)item);
+
+                //Tính tỉ lệ phần trăm
+                float scale = 100.0f/(float)TotalVotes;
+                List<float> VotingScale = new List<float>();
+                foreach(var e in BallotPaper){
+                    float temp = (float)scale*e;
+                    VotingScale.Add(temp);
+                }
+ 
+                //Cập nhật thông tin số lượt bình chọn và tỷ lệ bình chọn cho từng ứng cử viên dựa trên ngày bầu cử
+                const string sql_updateResultElection = @"
+                UPDATE kybaucu
+                SET SoLuotBinhChon =@SoLuotBinhChon ,TyLeBinhChon =@TyLeBinhChon 
+                WHERE ngayBD =@ngayBD AND ID_ucv =@ID_ucv;";
+
+                foreach (var item in listCandidateBasedOnElections)
+                {
+                    string ID_ucv = item.ID_ucv;
+                    int SoLuotBinhChon = BallotPaper[listCandidateBasedOnElections.IndexOf(item)];
+                    float TyLeBinhChon = VotingScale[listCandidateBasedOnElections.IndexOf(item)];
+                    using(var command = new MySqlCommand(sql_updateResultElection, connection)){
+                        command.Parameters.AddWithValue("@SoLuotBinhChon", SoLuotBinhChon);
+                        command.Parameters.AddWithValue("@TyLeBinhChon", TyLeBinhChon);
+                        command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                        command.Parameters.AddWithValue("@ID_ucv", ID_ucv);
+                        
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+
+                //Cập nhật công bố kỳ bầu cử đã công bố
+                bool checkUpdateResultAnnouncement = await _electionsRepository._UpdateResultAnnouncementElectionBasedOnElectionDate(startTime, connection);
+                if(!checkUpdateResultAnnouncement){
+                    await transaction.RollbackAsync();
+                    return -3;
+                }
+                
+                await transaction.CommitAsync();
+                return 1;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                await transaction.RollbackAsync();
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                await transaction.RollbackAsync();
+                throw;
             }
         }
     }

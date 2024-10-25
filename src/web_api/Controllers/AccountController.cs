@@ -192,20 +192,28 @@ namespace BackEnd.src.web_api.Controllers
 
                 //Tạo Gửi tệp tin cookie chứa accesstone và refreshtoken lên người dùng
                 // --- Tạo CookieOptions
+                 // Cấu hình cookie cho môi trường localhost
                 var accessTokenCookieOptions = new CookieOptions
                 {
-                    HttpOnly = true,                        // Chỉ cho phép truy cập cookie từ server, không từ client
-                    Secure = true,                          // Chỉ gửi cookie qua kết nối HTTPS
-                    SameSite = SameSiteMode.Strict,         // Chỉ gửi cookie khi request đến từ cùng một trang web
-                    Expires = DateTime.UtcNow.AddHours(3)   // Thời gian hết hạn của cookie
+                    Path = "/",
+                    HttpOnly = true,
+                    Secure = false,            // Quan trọng: false cho localhost
+                    SameSite = SameSiteMode.Lax,  // Quan trọng: None cho localhost testing
+                    Expires = DateTime.UtcNow.AddHours(3)
                 };
-                var refreshTokenCookieOptions =new CookieOptions
+
+                var refreshTokenCookieOptions = new CookieOptions
                 {
-                    HttpOnly = true,                        // Chỉ cho phép truy cập cookie từ server, không từ client
-                    Secure = true,                          // Chỉ gửi cookie qua kết nối HTTPS
-                    SameSite = SameSiteMode.Strict,         // Chỉ gửi cookie khi request đến từ cùng một trang web
-                    Expires = DateTime.UtcNow.AddDays(14)   // Thời gian hết hạn của cookie
+                    Path = "/",
+                    HttpOnly = true,
+                    Secure = false,            // Quan trọng: false cho localhost
+                    SameSite = SameSiteMode.Lax,  // Quan trọng: None cho localhost testing
+                    Expires = DateTime.UtcNow.AddDays(14)
                 };
+
+
+                Console.WriteLine($"Setting access token cookie: {result.accessToken.Substring(0, 10)}...");
+                Console.WriteLine($"Setting refresh token cookie: {result.refreshToken.Substring(0, 10)}...");
                 // --- Gửi Cookie đến người đùn
                 Response.Cookies.Append("accessToken", result.accessToken, accessTokenCookieOptions);
                 Response.Cookies.Append("refreshToken", result.refreshToken, refreshTokenCookieOptions);

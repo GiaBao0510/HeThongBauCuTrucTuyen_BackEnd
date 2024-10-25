@@ -81,6 +81,27 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return null;
         }
 
+        public async Task<Board> _GetBoardBy_ID(string id,  MySqlConnection connection){
+
+            const string sql = @"
+                SELECT * FROM ban 
+                WHERE ID_Ban = @ID_Ban";
+
+            using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID_Ban",id);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if(await reader.ReadAsync()){
+                return new Board{
+                    ID_Ban = reader.GetInt32(reader.GetOrdinal("ID_Ban")),
+                    TenBan = reader.GetString(reader.GetOrdinal("TenBan")),
+                    ID_DonViBauCu = reader.GetInt32(reader.GetOrdinal("ID_DonViBauCu"))
+                };
+            }
+
+            return null;
+        }
+
         //Sửa
         public async Task<bool> _EditBoardBy_ID(string ID, Board Board){
             using var connection = await _context.Get_MySqlConnection();
@@ -123,6 +144,21 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
             int rowAffected = await command.ExecuteNonQueryAsync();
             return rowAffected > 0;
+        }
+
+        //Kiểm tra mã chức vụ xem có tồn tại chưa
+        public async Task<bool> _CheckIfTheCodeIsInTheBoard(int ID_Ban, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            const string sql = "SELECT COUNT(ID_Ban) FROM ban WHERE ID_Ban=@ID_Ban;";
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_Ban",ID_Ban);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            } 
         }
     }
 }

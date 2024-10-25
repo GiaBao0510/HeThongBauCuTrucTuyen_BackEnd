@@ -33,5 +33,12 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<List<ElectionDto>> _GetListOfFutureElections(); 
         //Trả về ngày kết thúc của kỳ bầu cử dựa trên thời điểm bắt đầu
         Task<TimeOfTheElectionDTO> _GetTimeOfElection(string ngayBD, MySqlConnection connection);
+        //Kiểm tra xem kỳ bầu cử đã công bố kết quả chưa
+        Task<bool> _checkResultAnnouncement(string ngayBD,  MySqlConnection connection);
+        Task<List<CandidateNamesBasedOnElectionDateDto>> _GetListCandidateNamesBasedOnElections_OtherID_ucv(DateTime ngayBD,MySqlConnection connection);
+        //Cập nhật số lượt bình chọn, tỉ lệ bình chọn cho ID_ucv tương ứng dựa trên ngày bắt đầu
+        Task<bool> _updateVoteCountAndVotePercentage(DateTime ngayBD, int SoLuotBinhChon, float tiLeBinhChon, string ID_ucv ,MySqlConnection connection);
+        //Cập nhật đã công bố kết quả bầu cử rồi dựa trên kỳ bầu cử
+        Task<bool> _UpdateResultAnnouncementElectionBasedOnElectionDate(DateTime ngayBD, MySqlConnection connection);
     }
 }

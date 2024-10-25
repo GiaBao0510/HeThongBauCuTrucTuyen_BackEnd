@@ -1,14 +1,17 @@
 
+using BackEnd.src.core.Models;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackEnd.src.web_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableRateLimiting("FixedWindowLimiter")]
     public class CadreController : ControllerBase
     {
         private readonly ICadreRepository _CadreRepository;
@@ -20,6 +23,7 @@ namespace BackEnd.src.web_api.Controllers
         [HttpPost]
         [Consumes("multipart/form-data")]
         [Authorize(Roles = "1")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> CreateCadre([FromForm] CadreDto Cadre,IFormFile fileAnh){
             try{
                 //Kiểm tra đầu vào
@@ -39,7 +43,7 @@ namespace BackEnd.src.web_api.Controllers
                         -3 =>"Vai trò người dùng không tồn tại",
                         -4 =>"Đầu vào không hợp lệ hoặc bị để trống trường nào đó",
                         _ => "Lỗi không xác định"
-                    };
+                    }; 
                     return BadRequest(new {Status = "False", Message = errorMessage});
                 }
                     
@@ -68,7 +72,7 @@ namespace BackEnd.src.web_api.Controllers
                 return Ok(new{
                     Status = "Ok",
                     Message = "null",
-                    Data = result
+                    Data = result 
                 });
             }catch(Exception ex){
                 return StatusCode(500,new{
@@ -284,6 +288,76 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện gửi phản hồi: {ex.Message}"
+                });
+            }
+        }
+
+        //10.Thêm danh sách các cán bộ vào trực tại kỳ bầu cử
+        [HttpPost("add-cadre-list-to-election")]
+        [Authorize(Roles = "1")]
+        public async Task<IActionResult> AddListCadresToTheElection([FromBody] CadreListInElectionDto cadreListInElectionDto){
+            try{
+                //Kiểm tra đầu vào
+                if(
+                   cadreListInElectionDto.ListID_canbo.Count == 0 ||
+                   string.IsNullOrEmpty(cadreListInElectionDto.ngayBD.ToString()) ||
+                     string.IsNullOrEmpty(cadreListInElectionDto.ID_Ban.ToString())
+                ) 
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin."});
+                
+                var result = await _CadreRepository._AddListCadresToTheElection(cadreListInElectionDto);
+                if(result <=0){
+                    int status = result switch{
+                        0 => 400, -1 => 400, -2 => 500, -3 => 400, -4 => 500, -5 => 400, -6=>400,_ => 500
+                    };
+                    string errorMessage = result switch{
+                        0 => "Không thấy cán bộ nào hợp lệ để thêm vào",
+                        -1 => "Không tìm thấy ban",
+                        -2 => "Không tìm thấy thời điểm bắt đầu cuộc bầu cử",
+                        _ =>"Lỗi không xác định"
+                    };
+
+                    return StatusCode(status ,new{Status = "False", Message = errorMessage}); 
+                }
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = $"Thêm danh sách cán bộ vào cuộc bầu cử thành công. (Số lượng cán bộ hợp lệ là {result})"
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện thêm danh sách cán bộ vào kỳ bầu cử: {ex.Message}"
+                });
+            }
+        }
+
+        //13. Lấy danh sách các kỳ bầu cử mà cán bộ đã tham dự
+        [HttpGet]
+        [Route("get-list-of-cadre-joined-for-election")]
+        [Authorize(Roles = "1,8")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
+        public async Task<IActionResult> getListOfCadreJoinedForElection([FromQuery] string ID_CanBo){
+            try{
+                if(string.IsNullOrEmpty(ID_ucv) )
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền mã cán bộ."});
+
+                var result = await _CadreRepository._getListOfCadreJoinedForElection(ID_ucv);
+                if(result == null)
+                    return BadRequest(new{Status = "False", Message = "Không tìm thấy mã cán bộ"});
+
+                return Ok(new{
+                    Status = "Ok",
+                    Message = "null",
+                    Data = result
+                });
+            }catch(Exception ex){
+                return StatusCode(500,new{
+                    Status = "false",
+                    Message=$"Lỗi khi lấy danh sách kỳ bầu cử mã cán bộ đang trực thuộc: {ex.Message}"
                 });
             }
         }

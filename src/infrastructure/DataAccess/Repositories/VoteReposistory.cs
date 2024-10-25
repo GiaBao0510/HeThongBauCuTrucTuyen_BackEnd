@@ -173,7 +173,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
             int rowAffected = await command.ExecuteNonQueryAsync();
             return rowAffected > 0;
-        }
+        } 
 
         //Xóa phiếu theo kỳ bầu cử
         public async Task<bool> _DeleteVoteBy_Time(string time){

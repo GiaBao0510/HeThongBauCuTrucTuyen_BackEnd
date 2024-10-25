@@ -29,8 +29,12 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _CheckCadreExists(string ID, MySqlConnection connection);
         //cán bộ phản hồi
         Task<bool> _CadreSubmitReport(SendReportDto reportDto);
-        
+        //Kiểm tra xem ID cán bộ có tồn tại không
+        Task<bool> _CheckIfTheCadreCodeExists(string ID_CanBo, MySqlConnection connection);
         //Tạo nơi hoạt động của cán bộ
-
+        //10.thêm danh sách id cán bộ vào kỳ bầu cử
+        Task<int>  _AddListCadresToTheElection(CadreListInElectionDto cadreListInElectionDto);
+        //11.Thông tin các kỳ bầu cử mà cán bộ đã tham dự để trực
+        Task<List<CadreJoinedForElectionDTO>> _getListOfCadreJoinedForElection(string ID_CanBo);
     }
 }
