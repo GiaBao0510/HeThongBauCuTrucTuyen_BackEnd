@@ -1,27 +1,38 @@
 using System.Globalization;
+using BackEnd.src.core.Interfaces;
 using BackEnd.src.infrastructure.DataAccess.Context;
+using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.SignalR;
 using MySql.Data.MySqlClient;
 
 namespace BackEnd.src.infrastructure.Hubs
 {
-    public class NotificationHubs : Hub,IDisposable
+    public class NotificationHubs : Hub, IDisposable, INotificationHubs
     {
         private readonly DatabaseContext _context;
         private readonly IHubContext<NotificationHubs> _hubContext;
-
+        private readonly IVoterRepository _voterRepository;
+        private readonly ICandidateRepository _candidateRepository;
+        private readonly ICadreRepository _cadreRepository;
         public NotificationHubs(
             DatabaseContext context,
-            IHubContext<NotificationHubs> hubContext
+            IHubContext<NotificationHubs> hubContext,
+            IVoterRepository voterRepository,
+            ICandidateRepository candidateRepository,
+            ICadreRepository cadreRepository
         )
         {
             _context = context;
             _hubContext = hubContext;
+            _voterRepository = voterRepository;
+            _candidateRepository = candidateRepository;
+            _cadreRepository = cadreRepository;
         }
 
         //Hủy
-        public new void Dispose() => _context.Dispose();
+        public new void Dispose() => _context.Dispose(); 
 
         //0. Lấy ID thông báo cuối cùng trong bảng
         public async Task<int> _getLastestNoticeID(MySqlConnection connect){
@@ -41,29 +52,45 @@ namespace BackEnd.src.infrastructure.Hubs
             return ID_thongBao;
         }
 
-        //0.1 Tạo thông báo
+        //0.1 Tạo thông báo (có kiểu trả về)
         public async Task<bool> _createNotice(string content, MySqlConnection connect){
-            
-            //Kiểm tra trạng thái kết nối trước khi mở
-            if(connect.State != System.Data.ConnectionState.Open)
-                await connect.OpenAsync();
-            
-            if(string.IsNullOrEmpty(content)) return false; //Nội dung trống thì báo lỗi
-
-            const string sql = @"
-            INSERT INTO thongbao(NoiDungThongBao,ThoiDiem)
-            VALUES(@NoiDungThongBao,@ThoiDiem);";
-            using(var command = new MySqlCommand(sql, connect)){
-                command.Parameters.AddWithValue("@NoiDungThongBao", content);
-                command.Parameters.AddWithValue("@ThoiDiem", DateTime.Now);
+            try{
+                //Kiểm tra trạng thái kết nối trước khi mở
+                if(connect.State != System.Data.ConnectionState.Open)
+                    await connect.OpenAsync();
                 
-                await command.ExecuteNonQueryAsync();
-                return true;
+                if(string.IsNullOrEmpty(content)) return false; //Nội dung trống thì báo lỗi
+
+                const string sql = @"
+                INSERT INTO thongbao(NoiDungThongBao,ThoiDiem)
+                VALUES(@NoiDungThongBao,@ThoiDiem);";
+                using(var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@NoiDungThongBao", content);
+                    command.Parameters.AddWithValue("@ThoiDiem", DateTime.Now);
+                    
+                    int rowsAffected = await command.ExecuteNonQueryAsync();
+                    return rowsAffected > 0;
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
             }
         }
 
         //0.3 Lưu thông báo chi tiết
-        private async Task SaveNotificationDetail(string tableName, string userIdColumn, string userId, int noticeId, MySqlConnection connection)
+        public async Task SaveNotificationDetail(string tableName, string userIdColumn, string userId, int noticeId, MySqlConnection connection)
         {
             //Kiểm tra trạng thái kết nối trước khi mở
             if(connection.State != System.Data.ConnectionState.Open)
@@ -334,6 +361,106 @@ namespace BackEnd.src.infrastructure.Hubs
             {
                 Console.WriteLine($"Null reference error: {nre.Message}");
                 // Xử lý cụ thể cho lỗi null
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Thông báo kết quả bầu cử cho các đối tượng tham giá dựa trên ngày bắt đầu
+        public async Task _announceElectionResult(string ngayBD, MySqlConnection connect){
+            try{
+                //Kiểm tra trạng thái kết nối trước khi mở
+                if(connect.State != System.Data.ConnectionState.Open)
+                    await connect.OpenAsync();
+
+                //1.Tạo thông báo kết quả bầu cử
+                string message = $"Thông báo kết quả bầu cử tại kỳ: {ngayBD}";
+                bool createAnnouce = await _createNotice(message, connect);
+
+                //2. Lấy ID cuối cùng của bảng thông báo
+                int ID_notice = await _getLastestNoticeID(connect);
+
+                //Lấy danh sách ID các đối tượng dựa trên ngày BD
+                List<VoterID_DTO> listVoterID = await _voterRepository._getVoterID_ListBasedOnElection(ngayBD, connect);
+                List<CandidateID_DTO> listCandidateID = await _candidateRepository._getCandidateID_ListBasedOnElection(ngayBD, connect);
+                List<CadreID_DTO> listCadreID = await _cadreRepository._getCadreID_ListBasedOnElection(ngayBD, connect); 
+                
+                //Thông báo cho ứng cử viên
+                foreach(var e in listCandidateID){
+                    await SaveNotificationDetail("chitietthongbaoungcuvien", "ID_ucv", e.ID_ucv, ID_notice, connect);
+                }
+                //Thông báo cho cử tri
+                foreach(var e in listVoterID){
+                    await SaveNotificationDetail("chitietthongbaocutri", "ID_CuTri", e.ID_CuTri, ID_notice, connect);
+                }
+                //Thông báo cho cán bộ
+                foreach(var e in listCadreID){
+                    await SaveNotificationDetail("chitietthongbaocanbo", "ID_CanBo", e.ID_CanBo, ID_notice, connect);
+                }
+                // Gửi thông báo qua SignalR cho tất cả các đối tượng
+                await _hubContext.Clients.All.SendAsync("Kết quả bầu cử tại kỳ", message);
+            }catch (NullReferenceException nre)
+            {
+                Console.WriteLine($"Null reference error: {nre.Message}");// Xử lý cụ thể cho lỗi null
+                throw new Exception("Null reference error");
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Xem thông báo dựa trên ID đối tượng
+        public async Task<List<ViewNotificationBasedOnObjectsDTO>> NotificationViewer(string bangChiTiet, string ID_ObColumn, string ID_ob,  MySqlConnection connect){
+            try{
+                //Kiểm tra trạng thái kết nối trước khi mở
+                if(connect.State != System.Data.ConnectionState.Open)
+                    await connect.OpenAsync();
+                
+                var list = new List<ViewNotificationBasedOnObjectsDTO>();
+                string sql = $@"
+                SELECT tb.NoiDungThongBao, tb.ThoiDiem
+                FROM {bangChiTiet} ct
+                JOIN thongbao tb ON ct.ID_ThongBao = tb.ID_ThongBao
+                WHERE ct.{ID_ObColumn} = @ID_Object;";
+
+                using(var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@ID_Object", ID_ob);
+                    using var reader = await command.ExecuteReaderAsync();
+
+                    while(await reader.ReadAsync()){
+                        list.Add(new ViewNotificationBasedOnObjectsDTO{
+                            NoiDungThongBao = reader.GetString(reader.GetOrdinal("NoiDungThongBao")),
+                            ThoiDiem =reader.GetDateTime(reader.GetOrdinal("ThoiDiem")),
+                        });
+                    }
+                    return list;
+                }
+
             }catch(MySqlException ex){
                 Console.WriteLine($"Error message: {ex.Message}");
                 Console.WriteLine($"Error Code: {ex.Code}");

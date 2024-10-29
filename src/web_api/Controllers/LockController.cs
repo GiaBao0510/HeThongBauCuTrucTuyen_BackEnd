@@ -1,5 +1,6 @@
 
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -108,7 +109,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //GIải mã các phiếu dựa trên thời điểm kỳ bầu cử
         [HttpGet("get-list-of-decoded-votes-based-on-election-date")]
-        [Authorize(Roles= "1")]
+        [Authorize(Roles= "1,8")]
         public async Task<IActionResult> getListOfDecodedVotesBasedOnElection([FromQuery] string ngayBD){
             try{
                 if(string.IsNullOrEmpty(ngayBD) || string.IsNullOrEmpty(ngayBD))
@@ -144,29 +145,28 @@ namespace BackEnd.src.web_api.Controllers
 
         //Công bố kết quả
         [HttpPut("announce-election-results")]
-        [Authorize(Roles= "1")]
-        public async Task<IActionResult> CaculateAndAnnounceElectionResult([FromQuery] string ngayBD){
+        [Authorize(Roles= "1,8")]
+        public async Task<IActionResult> CaculateAndAnnounceElectionResult([FromBody] CadreResultAnnouncementDTO input){
             try{
-                if(string.IsNullOrEmpty(ngayBD) || string.IsNullOrEmpty(ngayBD))
+                if(string.IsNullOrEmpty(input.ID_CanBo) || string.IsNullOrEmpty(input.ngayBD))
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền ngày bắt đầu."});
                 
-                var result = await _lockRepository._CaculateAndAnnounceElectionResult(ngayBD);
+                var result = await _lockRepository._CaculateAndAnnounceElectionResult(input.ngayBD, input.ID_CanBo);
                 
-                if(result is int int_result ){
-                    int status = int_result switch{
+                if(result <= 0){
+                    int status = result switch{
                         0 => 400, -1 => 400, -2 => 400, -3 => 400, _ => 500
                     };
-                    string errorMessage = int_result switch{
+                    string errorMessage = result switch{
                         0 => "Lỗi không tìm thấy ngày bắt đầu bầu cử",
                         -1 => "Lỗi không tìm thấy nơi lưu trữ khóa mật",
                         -2 => "Lỗi kỳ bầu cử đã công bố rồi",
                        _ =>"Lỗi không xác định"
                     };
-
                     return StatusCode(status ,new{Status = "False", Message = errorMessage}); 
                 }
                     
-                return Ok(new{Status = true, Message = $"Đã thực hiện công bố kết quả bầu cử dự trên thời điểm {ngayBD}", data =""});
+                return Ok(new{Status = true, Message = $"Đã thực hiện công bố kết quả bầu cử dự trên thời điểm {input.ngayBD}", data =""});
 
             }catch(Exception ex){
                 // Log lỗi và xuất ra chi tiết lỗi

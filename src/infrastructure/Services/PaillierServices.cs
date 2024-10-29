@@ -33,9 +33,8 @@ namespace BackEnd.src.infrastructure.Services
         //5. Tính giá trị tối đa của phiếu bầu
         public BigInteger GiaTriToiDaCuaPhieuBau_M( int b,  int s){
             BigInteger result = 0;
-            
-            while(s >0){
-                result += (BigInteger)Math.Pow(b,(int)s);
+            while(s >0){ 
+                result += BigInteger.Pow(b,s);
                 s--;
             }
             return result;

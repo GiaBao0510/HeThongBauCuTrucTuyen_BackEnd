@@ -620,6 +620,47 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
+        //Lấy danh sách ID cán bộ theo ngày bầu cử
+        public async Task<List<CadreID_DTO>> _getCadreID_ListBasedOnElection(string ngayBD, MySqlConnection connect){
+            try{
+                //Kiểm tra trạng thái kết nối trước khi mở
+                if(connect.State != System.Data.ConnectionState.Open)
+                    await connect.OpenAsync();
 
+                var list = new List<CadreID_DTO>();
+                const string sql = @"
+                SELECT ID_CanBo
+                FROM hoatdong
+                WHERE ngayBD =@ngayBD;";
+
+                using(var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                    
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new CadreID_DTO{
+                            ID_CanBo = reader.GetString(reader.GetOrdinal("ID_CanBo"))
+                        });
+                    }
+                    return list;
+                }
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
     }
 }

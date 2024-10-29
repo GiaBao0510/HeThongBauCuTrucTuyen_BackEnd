@@ -39,7 +39,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Liệt kê các kỳ bầu cử trong tương lai
         [HttpGet("get-list-of-future-elections")]
-        [Authorize(Roles = "1,2,5")]
+        [Authorize(Roles = "1,2,5,8")]
         public async Task<IActionResult> GetListOfFutureElections(){
             try{
                 var result = await _electionsReposistory._GetListOfFutureElections();

@@ -36,5 +36,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<int>  _AddListCadresToTheElection(CadreListInElectionDto cadreListInElectionDto);
         //11.Thông tin các kỳ bầu cử mà cán bộ đã tham dự để trực
         Task<List<CadreJoinedForElectionDTO>> _getListOfCadreJoinedForElection(string ID_CanBo);
+        //Lấy danh sách ID cán bộ theo ngày bầu cử
+        Task<List<CadreID_DTO>> _getCadreID_ListBasedOnElection(string ngayBD, MySqlConnection connect);
     }
 }

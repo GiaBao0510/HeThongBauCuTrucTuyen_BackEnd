@@ -43,5 +43,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<List<ListCandidateOnElectionDateDTO>> _GetCandidateListBasedOnElectionDate(DateTime ngayBD);
         //14. Lấy danh sách các kỳ bầu cử mà ứng cử viên đã tham gia
         Task<List<CandidateRegistedForElectionsDTO>> _getListOfRegisteredCandidate(string ID_ucv);
+        //Lấy danh sách ID ứng cử viên theo ngày bầu cử
+        Task<List<CandidateID_DTO>> _getCandidateID_ListBasedOnElection(string ngayBD, MySqlConnection connect);
     }
 }

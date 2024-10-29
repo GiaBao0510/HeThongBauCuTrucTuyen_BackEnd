@@ -342,10 +342,10 @@ namespace BackEnd.src.web_api.Controllers
         [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> getListOfCadreJoinedForElection([FromQuery] string ID_CanBo){
             try{
-                if(string.IsNullOrEmpty(ID_ucv) )
+                if(string.IsNullOrEmpty(ID_CanBo) )
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền mã cán bộ."});
 
-                var result = await _CadreRepository._getListOfCadreJoinedForElection(ID_ucv);
+                var result = await _CadreRepository._getListOfCadreJoinedForElection(ID_CanBo);
                 if(result == null)
                     return BadRequest(new{Status = "False", Message = "Không tìm thấy mã cán bộ"});
 

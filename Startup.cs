@@ -22,12 +22,8 @@ using BackEnd.src.core.Models;
 using BackEnd.infrastructure.config;
 using BackEnd.src.core.Interfaces;
 using Newtonsoft.Json;
-using BackEnd.core.Entities;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNet.SignalR.Client;
 using BackEnd.src.infrastructure.Hubs;
 
 namespace BackEnd
@@ -167,9 +163,9 @@ namespace BackEnd
                         return Task.CompletedTask;
                     },
                     OnTokenValidated =  context => {
-                        Console.WriteLine($"OnTokenValidated: {context.SecurityToken}");
-                        Console.WriteLine($"HttpContext: {context.HttpContext}");
-                        Console.WriteLine($"Request: {context.Request}");
+                        // Console.WriteLine($"OnTokenValidated: {context.SecurityToken}");
+                        // Console.WriteLine($"HttpContext: {context.HttpContext}");
+                        // Console.WriteLine($"Request: {context.Request}");
                         return Task.CompletedTask;
                     },
                 };      
@@ -284,7 +280,9 @@ namespace BackEnd
             services.AddScoped<ILockRepository,LockRepository>();
             services.AddScoped<NotificationHubs>();
             services.AddHostedService<AotomaticNotificationService>();  //Thêm dịch vụ chạy tự động
-            
+            services.AddScoped<IResultsAnnouncementDetailsRepository,ResultsAnnouncementDetailsRepository>();
+            services.AddScoped<IDetailNoticeRepository,DetailNoticeRepository>();
+            services.AddScoped<IElectionResultsRepository,ElectionResultsRepository>();
         } 
 
         //Riêng các service muốn call thì sẽ goi trong đây

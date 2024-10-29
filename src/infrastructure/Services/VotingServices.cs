@@ -107,7 +107,10 @@ namespace BackEnd.src.infrastructure.Services
                 //17.4 Kiểm tra giá trị phiếu bầu có hợp lệ không
                 int SoLuotBinhChonToiDa = await _electionsRepository._MaximumNumberOfVotes(votingDay, connect);
                 int SoLuongToiDaCuTri = await _electionsRepository._MaximumNumberOfVoters(votingDay, connect);
+                Console.WriteLine($"SoLuotBinhChonToiDa(S): {SoLuotBinhChonToiDa}");
+                Console.WriteLine($"SoLuongToiDaCuTri(N): {SoLuongToiDaCuTri}");
                 BigInteger GiaTriPhieuLonNhat = _paillierServices.GiaTriToiDaCuaPhieuBau_M(SoLuongToiDaCuTri+1, SoLuotBinhChonToiDa);
+                Console.WriteLine($"GiaTriPhieuLonNhat: {GiaTriPhieuLonNhat} - Check:{GiaTriPhieuLonNhat < GiaTriPhieuBauHienTai}");
                 if(GiaTriPhieuLonNhat < GiaTriPhieuBauHienTai)
                     return -4;
 

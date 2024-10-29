@@ -1,21 +1,24 @@
-
+using BackEnd.src.infrastructure.Hubs;
 using System.Globalization;
 using System.Numerics;
-using BackEnd.src.core.Entities;
+using Microsoft.AspNetCore.SignalR;
 using BackEnd.src.core.Interfaces;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
+using Microsoft.Extensions.Hosting;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
-    public class LockRepository : IDisposable, ILockRepository
+    public class LockRepository :IDisposable, ILockRepository
     {
         private readonly DatabaseContext _context;
         private readonly IElectionsRepository _electionsRepository;
         private readonly IPaillierServices _paillierServices;
+        private readonly NotificationHubs _notificationHubs;
+        private readonly IResultsAnnouncementDetailsRepository _resultsAnnouncementDetails;
         public IConfiguration Configuration{get;}
 
         //khởi tạo
@@ -23,12 +26,16 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             DatabaseContext context, 
             IElectionsRepository electionsRepository, 
             IConfiguration configuration,
-            IPaillierServices paillierServices
+            IPaillierServices paillierServices,
+            IResultsAnnouncementDetailsRepository resultsAnnouncementDetails,
+            NotificationHubs notificationHubs
         ){
             _context = context;
             _electionsRepository = electionsRepository;
             Configuration = configuration;
             _paillierServices = paillierServices;
+            _resultsAnnouncementDetails = resultsAnnouncementDetails;
+            _notificationHubs = notificationHubs;
         }
 
         //Hàm hủy
@@ -37,7 +44,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //1.Lấy thông tin khóa công khai theo ngày bắt đầu
         public async Task<LockDTO> _getLockBasedOnElectionDate(string ngayBD){
             using var connection = await _context.Get_MySqlConnection();
-            try{
+            try{ 
 
                 //Kiểm tra ngày bắt đầu bầu cử có tồn tại không
                 CultureInfo provider = CultureInfo.InvariantCulture;
@@ -105,6 +112,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command.Parameters.AddWithValue("@ngayBD",ngayBD);
                     using var reader = await command.ExecuteReaderAsync();
                     if(await reader.ReadAsync()){
+                        //Kiểm tra N và G phải khác null
+                        if(reader.IsDBNull(reader.GetOrdinal("N")) || reader.IsDBNull(reader.GetOrdinal("G")))
+                            throw new Exception("N và G phải khác null");
+                        
                         return new LockDTO{
                             ID_Khoa = reader.GetInt32(reader.GetOrdinal("ID_Khoa")),
                             NgayTao = reader.GetDateTime(reader.GetOrdinal("NgayTao")),
@@ -151,7 +162,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                             list.Add(new LockDTO{
                                 ID_Khoa = reader.GetInt32(reader.GetOrdinal("ID_Khoa")),
                                 NgayTao = reader.GetDateTime(reader.GetOrdinal("NgayTao")),
-                                N = (BigInteger)reader.GetDecimal(reader.GetOrdinal("N")),
+                                N = (BigInteger)reader.GetInt64(reader.GetOrdinal("N")),
                                 G = (BigInteger)reader.GetDecimal(reader.GetOrdinal("G")),
                                 path_PK = reader.GetString(reader.GetOrdinal("path_PK")),
                             });
@@ -326,7 +337,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             using var connection = await _context.Get_MySqlConnection();
 
             try{
-                var list = new List<VoteDto>();
+                var list = new List<DecodingTheBallotsDTO>();
                 var pbKey = await _getLockBasedOnElectionDate(ngayBD, connection);
                 if(pbKey == null){
                     Console.WriteLine("ngày bắt đầu không tồn tại");
@@ -334,10 +345,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 }
 
                 const string sql = @"
-                SELECT pb.ID_Phieu, pb.GiaTriPhieuBau,pb.ID_cap
+                SELECT pb.ID_Phieu,pb.GiaTriPhieuBau,ctbc.ThoiDiem, nd.ID_user,nd.HoTen 
                 FROM phieubau pb 
-                JOIN khoa k ON pb.ngayBD = k.ngayBD
-                WHERE k.ngayBD = @ngayBD;";
+                JOIN chitietbaucu ctbc ON ctbc.ID_Phieu = pb.ID_Phieu
+                JOIN cutri ct ON ct.ID_CuTri = ctbc.ID_CuTri
+                JOIN nguoidung nd ON nd.ID_user = ct.ID_user
+                WHERE pb.ngayBD =  @ngayBD;";
 
                 //Kiểm tra đường dẫn tồn tại không 
                 if(!File.Exists(pbKey.path_PK)){
@@ -353,11 +366,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     while(await reader.ReadAsync()){
                         
                         //Đọc giá trị từng phiếu bầu
-                        var vote = new VoteDto{
+                        var vote = new DecodingTheBallotsDTO{
                             ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
                             GiaTriPhieuBau = (BigInteger)reader.GetDecimal(reader.GetOrdinal("GiaTriPhieuBau")),
-                            ID_cap = reader.GetInt32(reader.GetOrdinal("ID_cap")),
-                            ngayBD = ngayBD
+                            ThoiDiem = reader.GetDateTime(reader.GetOrdinal("ThoiDiem")),
+                            ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
+                            HoTen = reader.GetString(reader.GetOrdinal("HoTen"))
                         };
 
                         //Lấy đường dẫn khóa mật
@@ -477,7 +491,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //7.Công bố kết quả bầu cử dựa trên ngày bầu cử
-        public async Task<int> _CaculateAndAnnounceElectionResult(string ngayBD){
+        public async Task<int> _CaculateAndAnnounceElectionResult(string ngayBD, string ID_CanBo){
             using var connection = await _context.Get_MySqlConnection();
             using var transaction = await connection.BeginTransactionAsync();
 
@@ -522,15 +536,16 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 //Tính toán từng phiếu bầu để tìm số lượt bình chọn cho từng ứng củ viên
                 foreach(var vote in listOfDecodedVotesBasedOnElection){
-                    int vote_mi = vote;
+                    //Console.WriteLine($"Giá trị phiếu bầu: {vote.GiaTriPhieuBau}");
+                    BigInteger vote_mi = (BigInteger)vote.GiaTriPhieuBau;
                     int s_temp = s;
 
                     //Dựa trên từng số lần bỏ phiếu, tìm ứng viên được bầu
                     while(s_temp >=0){
 
-                        double power_b_s = Math.Pow(b, s_temp);  // Tính toán b^s_temp một lần
-                        if(vote_mi >= Math.Pow(b, s_temp)){
-                            vote_mi -= (int)power_b_s;      // Trừ giá trị vote
+                        BigInteger power_b_s = BigInteger.Pow(b,s_temp); //Math.Pow(b, s_temp);  // Tính toán b^s_temp một lần
+                        if(vote_mi >= power_b_s){
+                            vote_mi -= (BigInteger)power_b_s;      // Trừ giá trị vote
                             BallotPaper[s_temp]++;          // Tăng số lần bình chọn cho ứng viên
 
                             // Nếu giá trị còn lại là 1, thì cộng vào vị trí đầu tiên
@@ -542,7 +557,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         s_temp--;
                     }
                 }
-
                 //Tổng các giá trị phiếu
                 int TotalVotes = BallotPaper.Sum(item => (int)item);
 
@@ -556,15 +570,27 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
  
                 //Cập nhật thông tin số lượt bình chọn và tỷ lệ bình chọn cho từng ứng cử viên dựa trên ngày bầu cử
                 const string sql_updateResultElection = @"
-                UPDATE kybaucu
+                UPDATE ketquabaucu
                 SET SoLuotBinhChon =@SoLuotBinhChon ,TyLeBinhChon =@TyLeBinhChon 
                 WHERE ngayBD =@ngayBD AND ID_ucv =@ID_ucv;";
+
+                //Tìm kiếm ứng cử viên có lượt bình chọn nhiều nhất
+                int SoLuotBinhChonCaoNhat = -1;
+                String MaUngCuVienDacCu = "";
 
                 foreach (var item in listCandidateBasedOnElections)
                 {
                     string ID_ucv = item.ID_ucv;
                     int SoLuotBinhChon = BallotPaper[listCandidateBasedOnElections.IndexOf(item)];
                     float TyLeBinhChon = VotingScale[listCandidateBasedOnElections.IndexOf(item)];
+
+                    //Tìm ứng cử viên có số lượt bình chọn cao nhất
+                    if(SoLuotBinhChonCaoNhat <= SoLuotBinhChon){
+                        SoLuotBinhChonCaoNhat = SoLuotBinhChon;
+                        MaUngCuVienDacCu = ID_ucv;
+                    }
+
+                    //Cập nhật số lượt bình chọn và tỷ lệ bình chọn cho từng ứng cử viên
                     using(var command = new MySqlCommand(sql_updateResultElection, connection)){
                         command.Parameters.AddWithValue("@SoLuotBinhChon", SoLuotBinhChon);
                         command.Parameters.AddWithValue("@TyLeBinhChon", TyLeBinhChon);
@@ -581,6 +607,16 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     await transaction.RollbackAsync();
                     return -3;
                 }
+
+                //Lưu thông tin cán bộ công bố kết quả bầu cử
+                bool checkAddCadrePublicizations = await _resultsAnnouncementDetails._CadrePublicizeResult(ID_CanBo, MaUngCuVienDacCu, ngayBD, connection);
+                if(!checkAddCadrePublicizations){
+                    await transaction.RollbackAsync();
+                    return -4;
+                }
+                
+                //Thông báo kết quả bầu cử
+                await _notificationHubs._announceElectionResult(ngayBD, connection);
                 
                 await transaction.CommitAsync();
                 return 1;
@@ -590,7 +626,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 Console.WriteLine($"Error Source: {ex.Source}");
                 Console.WriteLine($"Error HResult: {ex.HResult}");
                 await transaction.RollbackAsync();
-                throw;
+                return -98;
             }
             catch(Exception ex){
                 Console.WriteLine($"Error message: {ex.Message}");
@@ -600,7 +636,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 Console.WriteLine($"Error HResult: {ex.HResult}");
                 Console.WriteLine($"Error InnerException: {ex.InnerException}");
                 await transaction.RollbackAsync();
-                throw;
+                return -99;
             }
         }
     }

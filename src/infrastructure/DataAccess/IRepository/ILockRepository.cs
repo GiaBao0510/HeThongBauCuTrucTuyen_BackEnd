@@ -18,6 +18,6 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //5. Lấy danh sách giá trị phiếu đã giải mã theo thời điểm bầu cử
         Task<dynamic> _ListOfDecodedVotesBasedOnElection(string ngayBD);
         //6.Công bố kết quả bầu cử dựa trên ngày bầu cử
-        Task<int> _CaculateAndAnnounceElectionResult(string ngayBD);
+        Task<int> _CaculateAndAnnounceElectionResult(string ngayBD, string ID_CanBo);
     }
 }

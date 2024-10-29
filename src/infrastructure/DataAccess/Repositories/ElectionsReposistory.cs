@@ -567,10 +567,13 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
             List<CandidateNamesBasedOnElectionDateDto> result = new List<CandidateNamesBasedOnElectionDateDto>();
             const string sql = @"
-            SELECT ID_ucv 
-            FROM kybaucu 
-            WHERE ngayBD = @ngayBD  
-            ORDER BY ID_ucv;";
+            SELECT kq.ID_ucv, nd.HoTen  
+            FROM kybaucu kbc 
+            JOIN ketquabaucu kq ON kbc.ngayBD = kq.ngayBD
+            JOIN ungcuvien ucv ON ucv.ID_ucv = kq.ID_ucv
+            JOIN nguoidung nd ON nd.ID_user = ucv.ID_user
+            WHERE kq.ngayBD = @ngayBD 
+            ORDER BY ucv.ID_ucv;";
 
             using(var command =  new MySqlCommand(sql, connection)){
                 command.Parameters.AddWithValue("@ngayBD", ngayBD);
@@ -644,7 +647,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //Cập nhật đã công bố kết quả bầu cử rồi dựa trên kỳ bầu cử
         public async Task<bool> _UpdateResultAnnouncementElectionBasedOnElectionDate(DateTime ngayBD, MySqlConnection connection){
             try{
-
                 //Kiểm tra trạng thái kết nối trước khi mở
                 if(connection.State != System.Data.ConnectionState.Open)
                     await connection.OpenAsync();
@@ -677,6 +679,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 throw;
             }
         }
+
+        
 
     }
 }

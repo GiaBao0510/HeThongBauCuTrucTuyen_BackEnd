@@ -831,5 +831,48 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 throw;
             }
         } 
+
+        //Lấy danh sách ID cử tri theo ngày bầu cử
+        public async Task<List<VoterID_DTO>> _getVoterID_ListBasedOnElection(string ngayBD, MySqlConnection connect){
+            try{
+                //Kiểm tra trạng thái kết nối trước khi mở
+                if(connect.State != System.Data.ConnectionState.Open)
+                    await connect.OpenAsync();
+
+                var list = new List<VoterID_DTO>();
+                const string sql = @"
+                SELECT ID_CuTri
+                FROM trangthaibaucu
+                WHERE ngayBD =@ngayBD;";
+
+                using(var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                    
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new VoterID_DTO{
+                            ID_CuTri = reader.GetString(reader.GetOrdinal("ID_CuTri"))
+                        });
+                    }
+                    return list;
+                }
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
     }
 }

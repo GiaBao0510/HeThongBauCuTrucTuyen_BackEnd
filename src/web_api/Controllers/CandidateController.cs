@@ -396,7 +396,7 @@ namespace BackEnd.src.web_api.Controllers
         //12. Lấydanh sách ứng cử viên dựa trên thời điểm bỏ phiếu
         [HttpGet]
         [Route("get-candidate-list-based-on-election-date")]
-        [Authorize(Roles = "1,2,5")]
+        [Authorize(Roles = "1,2,5,8")]
         [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> GetCandidateListBasedOnElectionDate([FromQuery] DateTime ngayBD){
             try{
