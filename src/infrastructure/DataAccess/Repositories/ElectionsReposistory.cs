@@ -257,8 +257,23 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
             //Lấy đường dẫn khóa riêng tư - và xóa tệp tin dựa trên đường dẫn
             string pathPK = await _getPrivateKeyPathBasedOnElectionDate(ID,connection);
-            if(File.Exists(pathPK))
+            
+            //Xóa tệp tin privatekey trên google drive
+            int lastIndex = pathPK.LastIndexOf('\\');
+            string fileName = pathPK.Substring(lastIndex + 1);
+            bool deleteFileOnDrive = await _googleDriveService.deleteFileAssync(fileName, "1lfcfq-fMMOMXQlXwSLYUGkpJDVDoMM7U");
+            if(!deleteFileOnDrive){
+                Console.WriteLine("Error: Xóa tệp tin trên google drive không thành công");
+                return false;
+            }
+
+            //Xóa tệp tin trên usb
+            if(File.Exists(pathPK)){
                 File.Delete(pathPK);
+            }else{
+                Console.WriteLine("Error: Không tìm thấy tệp tin privatekey");
+                return false;
+            }
 
             using var command = new MySqlCommand(sqlupdate2 + sqlupdate, connection);
             command.Parameters.AddWithValue("@ngayBD",ID);

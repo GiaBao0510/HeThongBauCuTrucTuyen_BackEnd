@@ -127,6 +127,7 @@ namespace BackEnd.src.infrastructure.Services
             });
         }
 
+        //Thêm tệp tin dựa trên ID thư mục
         public async Task<bool> UploadFileAsync(string filePath, string filename, string mimeType)
         {
             var fileMetaData = new Google.Apis.Drive.v3.Data.File
@@ -148,5 +149,34 @@ namespace BackEnd.src.infrastructure.Services
             Console.WriteLine($"File uploaded successfully: {filename} - request.ResponseBody.Id:{request.ResponseBody.Id}");
             return true;
         }
+
+        //Xóa tệp tin dựa trên ID thư mục
+        public async Task<bool> deleteFileAssync(string fileName, string folderId){
+            try{
+                //tim file dựa trên ID thư mục chứa nó
+                var request = _driveService.Files.List();
+                request.Q = $"name='{fileName}' and '{folderId}' in parents and trashed=false";
+                request.Fields = "files(id, name)";
+
+                var result = await request.ExecuteAsync();
+                var file = result.Files.FirstOrDefault();
+
+                if(file != null){
+                    //Xóa tệp tin 
+                    await _driveService.Files.Delete(file.Id).ExecuteAsync();
+                    Console.WriteLine($"File deleted successfully: {fileName}");
+                    return true;
+                }
+                else{
+                    Console.WriteLine($"File not found: {fileName}");
+                    return false;
+                }
+            }            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi xóa tệp tin: {ex.Message}");
+                return false;
+            }
+        }
+    
     }
 }
