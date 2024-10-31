@@ -7,7 +7,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
     public interface IElectionsRepository
     {
         Task<List<ElectionDto>> _GetListOfElections();
-        Task<int> _AddElections(Elections kybaucu);
+        Task<int> _AddElections(ElectionTempDTO kybaucu);
         Task<ElectionDto> _GetElectionsBy_ID(string id);
         Task<bool> _EditElectionsBy_ID(string ID, Elections Elections);
         Task<bool> _DeleteElectionsBy_ID(string ID);

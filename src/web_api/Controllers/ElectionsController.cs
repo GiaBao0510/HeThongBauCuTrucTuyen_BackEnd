@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Authorization;
+using BackEnd.src.web_api.DTOs;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -62,48 +63,108 @@ namespace BackEnd.src.web_api.Controllers
         //Thêm
         [HttpPost]
         [Authorize(Roles = "1")]
-        public async Task<IActionResult> CreateElections([FromBody] Elections Elections){
-            try{
-                //Kiểm tra đầu vào
-                if(Elections == null || string.IsNullOrEmpty(Elections.TenKyBauCu))
-                    return StatusCode(400,new{
+        public async Task<IActionResult> CreateElections([FromBody] ElectionTempDTO elections)
+        {
+            try
+            {
+                // Kiểm tra elections không null
+                if (elections == null)
+                {
+                    return BadRequest(new
+                    {
                         Status = "false",
-                        Message=$"Lỗi khi đầu vào không được rỗng"
+                        Message = "Dữ liệu đầu vào không hợp lệ"
                     });
+                }
 
-                //Nếu ngày bắt đầu lớn hơn ngày kết thúc thì trả về lỗi
-                if(Elections.ngayBD > Elections.ngayKT)
-                    return StatusCode(400,new{
+                // Kiểm tra TenKyBauCu
+                if (string.IsNullOrWhiteSpace(elections.TenKyBauCu))
+                {
+                    return BadRequest(new
+                    {
                         Status = "false",
-                        Message=$"Lỗi ngày bắt đầu kỳ bầu cử không được lớn hơn ngày kết thúc"
+                        Message = "Tên kỳ bầu cử không được để trống"
                     });
-                
-                //lấy kết quả thêm vào được hay không
-                var result = await _electionsReposistory._AddElections(Elections);
-                if(result <= 0){
-                    string errorMessage = result switch{
+                }
+
+                // Log an toàn hơn
+                Console.WriteLine($">>>.Thêm kỳ bầu cử: {elections.TenKyBauCu}");
+
+                // Validate các trường bắt buộc khác
+                if (elections.SoLuongToiDaCuTri <= 0 || 
+                    elections.SoLuongToiDaUngCuVien <= 0 || 
+                    elections.SoLuotBinhChonToiDa <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        Status = "false",
+                        Message = "Các giá trị số lượng phải lớn hơn 0"
+                    });
+                }
+
+                // Validate ngày tháng
+                if (elections.ngayBD == default || elections.ngayKT == default)
+                {
+                    return BadRequest(new
+                    {
+                        Status = "false",
+                        Message = "Ngày bắt đầu và ngày kết thúc không hợp lệ"
+                    });
+                }
+
+                if (elections.ngayBD > elections.ngayKT)
+                {
+                    return BadRequest(new
+                    {
+                        Status = "false",
+                        Message = "Ngày bắt đầu kỳ bầu cử không được lớn hơn ngày kết thúc"
+                    });
+                }
+
+                // Validate ID_Cap
+                if (elections.ID_Cap <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        Status = "false",
+                        Message = "ID cấp không hợp lệ"
+                    });
+                }
+
+                var result = await _electionsReposistory._AddElections(elections);
+                if (result <= 0)
+                {
+                    string errorMessage = result switch
+                    {
                         0 => "ID danh mục bầu cử không tồn tại",
-                        -1 =>"Không tìm thấy nơi lưu khóa cá nhân",
+                        -1 => "Không tìm thấy nơi lưu khóa cá nhân",
                         _ => "Lỗi không xác định"
                     };
-                    int statusCode = result switch{
-                        0 => 400, -1 =>400,  _ => 500
+                    int statusCode = result switch
+                    {
+                        0 => 400,
+                        -1 => 400,
+                        _ => 500
                     };
-                    Console.WriteLine($"Kết quả: {result}");
-                    return StatusCode(statusCode ,new {Status = "False", Message = errorMessage});
+                    return StatusCode(statusCode, new { Status = "False", Message = errorMessage });
                 }
-                
-                return Ok(new{
-                    Status = "OK", 
+
+                return Ok(new
+                {
+                    Status = "OK",
                     Message = "Thêm kỳ bầu cử thành công"
                 });
-            }catch(Exception ex){
-                Console.WriteLine($"Erro message: {ex.Message}");
-                Console.WriteLine($"Erro message: {ex.Source}");
-                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
-                return StatusCode(500, new{
-                    Status = "False", 
-                    Message = $"Lỗi khi thực hiện lấy kỳ bầu cử theo ID: {ex.Message}"
+            }
+            catch (Exception ex)
+            {
+                // Log chi tiết lỗi
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                
+                return StatusCode(500, new
+                {
+                    Status = "False",
+                    Message = "Lỗi server khi thêm kỳ bầu cử"
                 });
             }
         }

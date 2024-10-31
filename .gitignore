@@ -1,3 +1,4 @@
 .env
 appsettings.json
+credentials.json
 src/infrastructure/Config/.env

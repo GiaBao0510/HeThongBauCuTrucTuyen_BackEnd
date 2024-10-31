@@ -76,6 +76,14 @@
               "target": "Package",
               "version": "[3.1.1, )"
             },
+            "Google.Apis.Auth": {
+              "target": "Package",
+              "version": "[1.68.0, )"
+            },
+            "Google.Apis.Drive.v3": {
+              "target": "Package",
+              "version": "[1.68.0.3574, )"
+            },
             "Isopoh.Cryptography.Argon2": {
               "target": "Package",
               "version": "[2.0.0, )"

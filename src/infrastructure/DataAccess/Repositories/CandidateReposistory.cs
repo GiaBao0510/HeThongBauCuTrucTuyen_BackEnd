@@ -7,6 +7,7 @@ using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.core.Common;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.CodeAnalysis;
+using System.Data;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -686,7 +687,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                             TrangThai = reader.GetString(reader.GetOrdinal("TrangThai")),
                             TenDanToc = reader.GetString(reader.GetOrdinal("TenDanToc")),
                             SoLuotBinhChon = reader.GetInt32(reader.GetOrdinal("SoLuotBinhChon")),
-                            TyLeBinhChon = reader.GetInt32(reader.GetOrdinal("TyLeBinhChon")),
+                            TyLeBinhChon = reader.GetFloat(reader.GetOrdinal("TyLeBinhChon")),
                             TenTrinhDoHocVan = reader.GetString(reader.GetOrdinal("TenTrinhDoHocVan")),
                             GioiThieu = reader.GetString(reader.GetOrdinal("GioiThieu"))
                         });

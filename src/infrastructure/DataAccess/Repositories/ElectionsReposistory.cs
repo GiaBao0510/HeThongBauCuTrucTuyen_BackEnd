@@ -10,6 +10,7 @@ using System.Numerics;
 using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using BackEnd.src.infrastructure.Services;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -19,18 +20,21 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         private readonly IPaillierServices _PaillierServices;
         private readonly IListOfPositionRepository _listOfPositionRepository;
         public IConfiguration Configuration{get;}
+         private readonly GoogleDriveService _googleDriveService;
 
         //Khởi tạo
         public ElectionsReposistory(
             DatabaseContext context,
             IListOfPositionRepository listOfPositionRepository,
             IPaillierServices paillierServices,
-            IConfiguration configuration
+            IConfiguration configuration,
+            GoogleDriveService googleDriveService
         ){
             _context = context;
             _listOfPositionRepository = listOfPositionRepository;
             _PaillierServices = paillierServices;
             Configuration = configuration;
+            _googleDriveService = googleDriveService;
         } 
 
         //Hủy
@@ -85,9 +89,9 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //Thêm
-        public async Task<int> _AddElections(Elections kybaucu){
+        public async Task<int> _AddElections(ElectionTempDTO kybaucu){
             using var connection = await _context.Get_MySqlConnection();
-
+            using var transaction =await connection.BeginTransactionAsync();
             try{
                 //Lấy thời điểm hiện tại Và kiểm tra nếu ngày bắt đầu để rỗng thì nó lấy thời điểm hiện tại
                 DateTime currentDay = DateTime.Now;
@@ -119,13 +123,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 string filePath = Path.Combine(directoryPath, filePk);
                 Console.WriteLine($"\nĐường dẫn: {filePath}");
                 Console.WriteLine($"\nĐường dẫn đầy đủ: {directoryPath+filePath}");
-                //Kiểm tra xem thư mục có tồn tại không
-                if(!Directory.Exists(directoryPath))
-                    return -1;
                 
-                //Ghi nội dung vào tệp tin 
-                string content = $"{lamda},{muy}";
-                File.WriteAllText(directoryPath+filePath, content);
+                //Kiểm tra xem thư mục có tồn tại không
+                if(!Directory.Exists(directoryPath)){
+                    await transaction.RollbackAsync();
+                    return -1;
+                }
 
                 //Lưu vào csdl
                 using (var commandAdd = new MySqlCommand( Input + InputPublicKey, connection)){
@@ -141,16 +144,30 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     commandAdd.Parameters.AddWithValue("@N",N);
                     commandAdd.Parameters.AddWithValue("@G",G);
                     commandAdd.Parameters.AddWithValue("@path_PK",directoryPath+$"{now}.txt");
+                    commandAdd.Parameters.AddWithValue("@ID_Cap",kybaucu.ID_Cap);
 
                     await commandAdd.ExecuteNonQueryAsync();
                 }
 
+                //Ghi nội dung vào tệp tin 
+                string content = $"{lamda},{muy}";
+                File.WriteAllText(directoryPath+filePath, content);
+
+                //Thêm vào google drive
+                bool addFileToDrive = await _googleDriveService.UploadFileAsync(directoryPath+filePath, $"{now}.txt", "text/plain");
+                if(!addFileToDrive){
+                    await transaction.RollbackAsync();
+                    return -2;
+                }
+
+                await transaction.CommitAsync();
                 return 1; 
             }catch(MySqlException ex){
                 Console.WriteLine($"Error message: {ex.Message}");
                 Console.WriteLine($"Error Code: {ex.Code}");
                 Console.WriteLine($"Error Source: {ex.Source}");
                 Console.WriteLine($"Error HResult: {ex.HResult}");
+                await transaction.RollbackAsync();
                 throw;
             }
             catch(Exception ex){
@@ -160,6 +177,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
                 Console.WriteLine($"Error HResult: {ex.HResult}");
                 Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                await transaction.RollbackAsync();
                 throw;
             }
         }

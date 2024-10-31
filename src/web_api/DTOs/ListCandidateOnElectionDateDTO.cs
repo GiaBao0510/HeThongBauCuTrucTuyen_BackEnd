@@ -11,7 +11,7 @@ namespace BackEnd.src.web_api.DTOs
         public string? GioiThieu{set;get;} = "null";
         public string? TenDanToc {get; set;}
         public int SoLuotBinhChon {get; set;} = 0;
-        public int TyLeBinhChon {get; set;} = 0;
+        public float TyLeBinhChon {get; set;} = 0f;
         public string TenTrinhDoHocVan{ get; set; } = "null";
     }
 }

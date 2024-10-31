@@ -283,6 +283,11 @@ namespace BackEnd
             services.AddScoped<IResultsAnnouncementDetailsRepository,ResultsAnnouncementDetailsRepository>();
             services.AddScoped<IDetailNoticeRepository,DetailNoticeRepository>();
             services.AddScoped<IElectionResultsRepository,ElectionResultsRepository>();
+            // Đăng ký GoogleDriveService như một Singleton
+            services.AddSingleton<GoogleDriveService>(provider => new GoogleDriveService(
+                Configuration["GoogleDrive:CredentialsPath"],
+                Configuration["GoogleDrive:TokenPath"]
+            ));
         } 
 
         //Riêng các service muốn call thì sẽ goi trong đây
