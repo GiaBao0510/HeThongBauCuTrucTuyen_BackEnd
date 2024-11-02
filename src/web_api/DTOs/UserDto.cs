@@ -14,7 +14,7 @@ namespace BackEnd.src.web_api.DTOs
         [FromForm(Name ="DiaChiLienLac")]
         public string? DiaChiLienLac { set; get; }
         [FromForm(Name ="CCCD")]
-        public string? CCCD { set; get; }
+        public string? CCCD { set; get; } = "null";
         [FromForm(Name ="SDT")]
         public string? SDT { get; set; }
         [FromForm(Name ="Email")]
@@ -38,9 +38,9 @@ namespace BackEnd.src.web_api.DTOs
  
         //Khóa ngoại
         [FromForm(Name ="ID_DanToc")]
-        public int ID_DanToc{set; get;}
+        public int ID_DanToc{set; get;} = 1;
         [FromForm(Name ="RoleID")]
-        public int RoleID{set; get;}
+        public int RoleID{set; get;} = -1;
 
     }
 }

@@ -58,7 +58,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
                     TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
                     MoTa = reader.GetString(reader.GetOrdinal("MoTa")),
-                    ID_Cap = reader.GetInt32(reader.GetOrdinal("ID_Cap"))
+                    ID_Cap = reader.GetInt32(reader.GetOrdinal("ID_Cap")),
+                    CongBo = reader.GetString(reader.GetOrdinal("CongBo")),
                 });
             }
             return list;
@@ -82,7 +83,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
                     TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
                     MoTa = reader.GetString(reader.GetOrdinal("MoTa")),
-                    ID_Cap = reader.GetInt32(reader.GetOrdinal("ID_Cap"))
+                    ID_Cap = reader.GetInt32(reader.GetOrdinal("ID_Cap")),
+                    
                 });
             }
             return list;
@@ -248,12 +250,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
             const string sqlupdate = @"
                 DELETE FROM kybaucu
-                WHERE ngayBD = @ngayBD";
+                WHERE ngayBD = @ngayBD;";
             
             //Xóa khóa dự trên ngày BD
             const string sqlupdate2 = @"
                 DELETE FROM khoa
-                WHERE ngayBD = @ngayBD";
+                WHERE ngayBD = @ngayBD;";
 
             //Lấy đường dẫn khóa riêng tư - và xóa tệp tin dựa trên đường dẫn
             string pathPK = await _getPrivateKeyPathBasedOnElectionDate(ID,connection);
@@ -261,6 +263,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             //Xóa tệp tin privatekey trên google drive
             int lastIndex = pathPK.LastIndexOf('\\');
             string fileName = pathPK.Substring(lastIndex + 1);
+            Console.WriteLine($"Tên tệp tin cần xóa: {fileName}");
             bool deleteFileOnDrive = await _googleDriveService.deleteFileAssync(fileName, "1lfcfq-fMMOMXQlXwSLYUGkpJDVDoMM7U");
             if(!deleteFileOnDrive){
                 Console.WriteLine("Error: Xóa tệp tin trên google drive không thành công");
@@ -280,6 +283,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         
             //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
             int rowAffected = await command.ExecuteNonQueryAsync();
+            Console.WriteLine($"Số hàng tác động khi xóa:{rowAffected}");
             return rowAffected > 0;
         }
 

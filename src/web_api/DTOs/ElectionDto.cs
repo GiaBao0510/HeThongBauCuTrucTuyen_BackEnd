@@ -15,6 +15,7 @@ namespace BackEnd.src.web_api.DTOs
         public int SoLuongToiDaCuTri { get; set; }
         public int SoLuongToiDaUngCuVien { get; set; }
         public int SoLuotBinhChonToiDa { get; set; }
+        public string CongBo {get; set;} = "0";
 
         //KHóa ngoại
         public int ID_Cap { get; set; }

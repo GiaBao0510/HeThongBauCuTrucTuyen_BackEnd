@@ -200,7 +200,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 const string sqlNguoiDung = @"
                     UPDATE nguoidung 
                     SET HoTen = @HoTen, GioiTinh=@GioiTinh, NgaySinh=@NgaySinh,
-                        DiaChiLienLac=@DiaChiLienLac, CCCD=@CCCD, SDT=@SDT, ID_DanToc=@ID_DanToc,
+                        DiaChiLienLac=@DiaChiLienLac, SDT=@SDT, ID_DanToc=@ID_DanToc,
                         Email=@Email, RoleID=@RoleID
                     WHERE ID_user = @ID_user;";
                 const string sqlVoterAccount = @"
@@ -214,7 +214,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command1.Parameters.AddWithValue("@GioiTinh", voter.GioiTinh);
                     command1.Parameters.AddWithValue("@NgaySinh", voter.NgaySinh);
                     command1.Parameters.AddWithValue("@DiaChiLienLac", voter.DiaChiLienLac);
-                    command1.Parameters.AddWithValue("@CCCD", voter.CCCD);
                     command1.Parameters.AddWithValue("@SDT", voter.SDT);
                     command1.Parameters.AddWithValue("@Taikhoan", voter.TaiKhoan);
                     command1.Parameters.AddWithValue("@Email", voter.Email);
@@ -259,9 +258,11 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             using var connection = await _context.Get_MySqlConnection();
             if(connection.State != System.Data.ConnectionState.Open)
                 await connection.OpenAsync();
-
+ 
             const string sql = @"
-            SELECT * FROM nguoidung nd 
+            SELECT ct.ID_CuTri, nd.ID_user, nd.HoTen, nd.GioiTinh, nd.NgaySinh, 
+            nd.DiaChiLienLac, nd.Email, nd.SDT, nd.HinhAnh, nd.PublicID, nd.ID_DanToc 
+            FROM nguoidung nd 
             INNER JOIN cutri ct ON ct.ID_user = nd.ID_user";
             using var command = new MySqlCommand(sql, connection);
             using var reader = await command.ExecuteReaderAsync();
@@ -274,12 +275,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh")),
                     NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")).ToString("dd-MM-yyyy"),
                     DiaChiLienLac = reader.GetString(reader.GetOrdinal("DiaChiLienLac")),
-                    CCCD = reader.GetString(reader.GetOrdinal("CCCD")),
                     Email = reader.IsDBNull(reader.GetOrdinal("Email"))? null: reader.GetString(reader.GetOrdinal("Email")),
                     SDT = reader.GetString(reader.GetOrdinal("SDT")),
                     HinhAnh = reader.IsDBNull(reader.GetOrdinal("HinhAnh"))? null:reader.GetString(reader.GetOrdinal("HinhAnh")),
                     ID_DanToc = reader.GetInt32(reader.GetOrdinal("ID_DanToc")),
-                    RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
                     PublicID = reader.IsDBNull(reader.GetOrdinal("PublicID"))? null :reader.GetString(reader.GetOrdinal("PublicID"))
                 });
             }
