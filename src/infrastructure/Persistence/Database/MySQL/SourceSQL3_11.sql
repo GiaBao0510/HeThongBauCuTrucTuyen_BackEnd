@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `canbo` (
   CONSTRAINT `canbo_ibfk_1` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.canbo: ~0 rows (approximately)
+-- Dumping data for table baucutructuyen.canbo: ~4 rows (approximately)
 INSERT INTO `canbo` (`ID_CanBo`, `NgayCongTac`, `GhiChu`, `ID_user`) VALUES
 	('20241025151435', '1999-01-01 00:00:00', 'canbo8', 'Pv20241025151431'),
 	('20241025152418', '1999-01-01 00:00:00', 'canbo7', '7L20241025152412'),
@@ -66,10 +66,32 @@ CREATE TABLE IF NOT EXISTS `chitietbaucu` (
   CONSTRAINT `chitietbaucu_ibfk_2` FOREIGN KEY (`ID_Phieu`) REFERENCES `phieubau` (`ID_Phieu`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.chitietbaucu: ~2 rows (approximately)
+-- Dumping data for table baucutructuyen.chitietbaucu: ~6 rows (approximately)
 INSERT INTO `chitietbaucu` (`ThoiDiem`, `ID_Phieu`, `ID_CuTri`) VALUES
-	('2024-10-18 21:37:47', 'Nl2024101821374643', '20240930165802'),
-	('2024-10-18 22:16:43', 'WL2024101822164303', '20240919200022');
+	('2024-10-27 20:32:29', 'HL2024102720322871', '20240919194845'),
+	('2024-10-27 20:35:55', 'gg2024102720355539', '20240930165802'),
+	('2024-10-27 20:37:53', 'ok2024102720375308', '20240919200022'),
+	('2024-10-27 20:39:43', 'C42024102720394280', '20240916232132'),
+	('2024-10-27 20:41:23', 'gD2024102720412253', '20240916221039'),
+	('2024-10-27 20:42:47', 'a52024102720424695', '20240930165456');
+
+-- Dumping structure for table baucutructuyen.chitietcongboketqua
+CREATE TABLE IF NOT EXISTS `chitietcongboketqua` (
+  `ThoiDiemCongBo` datetime DEFAULT NULL,
+  `ID_CanBo` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `ID_ucv` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `ngayBD` datetime DEFAULT NULL,
+  KEY `ID_CanBo` (`ID_CanBo`),
+  KEY `ID_ucv` (`ID_ucv`),
+  KEY `ngayBD` (`ngayBD`),
+  CONSTRAINT `chitietcongboketqua_ibfk_1` FOREIGN KEY (`ID_CanBo`) REFERENCES `canbo` (`ID_CanBo`),
+  CONSTRAINT `chitietcongboketqua_ibfk_2` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`),
+  CONSTRAINT `chitietcongboketqua_ibfk_3` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dumping data for table baucutructuyen.chitietcongboketqua: ~1 rows (approximately)
+INSERT INTO `chitietcongboketqua` (`ThoiDiemCongBo`, `ID_CanBo`, `ID_ucv`, `ngayBD`) VALUES
+	('2024-10-28 15:21:28', '20241025151435', '20241017143409', '2024-10-22 12:12:12');
 
 -- Dumping structure for table baucutructuyen.chitietcutri
 CREATE TABLE IF NOT EXISTS `chitietcutri` (
@@ -91,7 +113,43 @@ CREATE TABLE IF NOT EXISTS `chitietthongbaocanbo` (
   CONSTRAINT `chitietthongbaocanbo_ibfk_2` FOREIGN KEY (`ID_CanBo`) REFERENCES `canbo` (`ID_CanBo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.chitietthongbaocanbo: ~0 rows (approximately)
+-- Dumping data for table baucutructuyen.chitietthongbaocanbo: ~35 rows (approximately)
+INSERT INTO `chitietthongbaocanbo` (`ID_ThongBao`, `ID_CanBo`) VALUES
+	(59, '20241025151435'),
+	(59, '20241025152418'),
+	(59, '20241025153453'),
+	(59, '20241025153720'),
+	(59, '20241025153942'),
+	(80, '20241025151435'),
+	(81, '20241025152418'),
+	(82, '20241025153453'),
+	(83, '20241025153720'),
+	(84, '20241025153942'),
+	(105, '20241025151435'),
+	(106, '20241025152418'),
+	(107, '20241025153453'),
+	(108, '20241025153720'),
+	(109, '20241025153942'),
+	(130, '20241025151435'),
+	(131, '20241025152418'),
+	(132, '20241025153453'),
+	(133, '20241025153720'),
+	(134, '20241025153942'),
+	(155, '20241025151435'),
+	(156, '20241025152418'),
+	(157, '20241025153453'),
+	(158, '20241025153720'),
+	(159, '20241025153942'),
+	(180, '20241025151435'),
+	(181, '20241025152418'),
+	(182, '20241025153453'),
+	(183, '20241025153720'),
+	(184, '20241025153942'),
+	(205, '20241025151435'),
+	(206, '20241025152418'),
+	(207, '20241025153453'),
+	(208, '20241025153720'),
+	(209, '20241025153942');
 
 -- Dumping structure for table baucutructuyen.chitietthongbaocutri
 CREATE TABLE IF NOT EXISTS `chitietthongbaocutri` (
@@ -103,7 +161,93 @@ CREATE TABLE IF NOT EXISTS `chitietthongbaocutri` (
   CONSTRAINT `chitietthongbaocutri_ibfk_2` FOREIGN KEY (`ID_ThongBao`) REFERENCES `thongbao` (`ID_ThongBao`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.chitietthongbaocutri: ~0 rows (approximately)
+-- Dumping data for table baucutructuyen.chitietthongbaocutri: ~85 rows (approximately)
+INSERT INTO `chitietthongbaocutri` (`ID_ThongBao`, `ID_CuTri`) VALUES
+	(59, '20240930165802'),
+	(59, '20240919200022'),
+	(59, '20240916232132'),
+	(59, '20240916220819'),
+	(59, '20240916221039'),
+	(59, '20240930165456'),
+	(59, '20240919194845'),
+	(60, '20240919200022'),
+	(61, '20240919194845'),
+	(62, '20240916221039'),
+	(63, '20240916220819'),
+	(64, '20240930165802'),
+	(65, '20240919200022'),
+	(66, '20240919194845'),
+	(67, '20240916221039'),
+	(68, '20240930165802'),
+	(69, '20240919200022'),
+	(70, '20240919194845'),
+	(71, '20240916221039'),
+	(72, '20240930165802'),
+	(85, '20240919200022'),
+	(86, '20240919194845'),
+	(87, '20240916221039'),
+	(88, '20240916220819'),
+	(89, '20240930165802'),
+	(90, '20240919200022'),
+	(91, '20240919194845'),
+	(92, '20240916221039'),
+	(93, '20240930165802'),
+	(94, '20240919200022'),
+	(95, '20240919194845'),
+	(96, '20240916221039'),
+	(97, '20240930165802'),
+	(110, '20240919200022'),
+	(111, '20240919194845'),
+	(112, '20240916221039'),
+	(113, '20240916220819'),
+	(114, '20240930165802'),
+	(115, '20240919200022'),
+	(116, '20240919194845'),
+	(117, '20240916221039'),
+	(118, '20240930165802'),
+	(119, '20240919200022'),
+	(120, '20240919194845'),
+	(121, '20240916221039'),
+	(122, '20240930165802'),
+	(135, '20240919200022'),
+	(136, '20240919194845'),
+	(137, '20240916221039'),
+	(138, '20240916220819'),
+	(139, '20240930165802'),
+	(140, '20240919200022'),
+	(141, '20240919194845'),
+	(142, '20240916221039'),
+	(143, '20240930165802'),
+	(144, '20240919200022'),
+	(145, '20240919194845'),
+	(146, '20240916221039'),
+	(147, '20240930165802'),
+	(160, '20240919200022'),
+	(161, '20240919194845'),
+	(162, '20240916221039'),
+	(163, '20240916220819'),
+	(164, '20240930165802'),
+	(165, '20240919200022'),
+	(166, '20240919194845'),
+	(167, '20240916221039'),
+	(168, '20240930165802'),
+	(169, '20240919200022'),
+	(170, '20240919194845'),
+	(171, '20240916221039'),
+	(172, '20240930165802'),
+	(185, '20240919200022'),
+	(186, '20240919194845'),
+	(187, '20240916221039'),
+	(188, '20240916220819'),
+	(189, '20240930165802'),
+	(190, '20240919200022'),
+	(191, '20240919194845'),
+	(192, '20240916221039'),
+	(193, '20240930165802'),
+	(194, '20240919200022'),
+	(195, '20240919194845'),
+	(196, '20240916221039'),
+	(197, '20240930165802');
 
 -- Dumping structure for table baucutructuyen.chitietthongbaoungcuvien
 CREATE TABLE IF NOT EXISTS `chitietthongbaoungcuvien` (
@@ -115,7 +259,55 @@ CREATE TABLE IF NOT EXISTS `chitietthongbaoungcuvien` (
   CONSTRAINT `chitietthongbaoungcuvien_ibfk_2` FOREIGN KEY (`ID_ThongBao`) REFERENCES `thongbao` (`ID_ThongBao`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.chitietthongbaoungcuvien: ~0 rows (approximately)
+-- Dumping data for table baucutructuyen.chitietthongbaoungcuvien: ~47 rows (approximately)
+INSERT INTO `chitietthongbaoungcuvien` (`ID_ThongBao`, `ID_ucv`) VALUES
+	(59, '20241017143132'),
+	(59, '20241017143237'),
+	(59, '20241017143328'),
+	(59, '20241017143409'),
+	(59, '20241017143445'),
+	(73, '20241003000921'),
+	(74, '20241003002121'),
+	(75, '20241003002930'),
+	(76, '20241003003050'),
+	(77, '20241003003142'),
+	(78, '20241012212410'),
+	(79, '20241012212527'),
+	(98, '20241003000921'),
+	(99, '20241003002121'),
+	(100, '20241003002930'),
+	(101, '20241003003050'),
+	(102, '20241003003142'),
+	(103, '20241012212410'),
+	(104, '20241012212527'),
+	(123, '20241003000921'),
+	(124, '20241003002121'),
+	(125, '20241003002930'),
+	(126, '20241003003050'),
+	(127, '20241003003142'),
+	(128, '20241012212410'),
+	(129, '20241012212527'),
+	(148, '20241003000921'),
+	(149, '20241003002121'),
+	(150, '20241003002930'),
+	(151, '20241003003050'),
+	(152, '20241003003142'),
+	(153, '20241012212410'),
+	(154, '20241012212527'),
+	(173, '20241003000921'),
+	(174, '20241003002121'),
+	(175, '20241003002930'),
+	(176, '20241003003050'),
+	(177, '20241003003142'),
+	(178, '20241012212410'),
+	(179, '20241012212527'),
+	(198, '20241003000921'),
+	(199, '20241003002121'),
+	(200, '20241003002930'),
+	(201, '20241003003050'),
+	(202, '20241003003142'),
+	(203, '20241012212410'),
+	(204, '20241012212527');
 
 -- Dumping structure for table baucutructuyen.chitiettrinhdohocvancanbo
 CREATE TABLE IF NOT EXISTS `chitiettrinhdohocvancanbo` (
@@ -215,9 +407,9 @@ CREATE TABLE IF NOT EXISTS `danhmucungcu` (
   PRIMARY KEY (`ID_Cap`),
   KEY `ID_DonViBauCu` (`ID_DonViBauCu`),
   CONSTRAINT `danhmucungcu_ibfk_1` FOREIGN KEY (`ID_DonViBauCu`) REFERENCES `donvibaucu` (`ID_DonViBauCu`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.danhmucungcu: ~8 rows (approximately)
+-- Dumping data for table baucutructuyen.danhmucungcu: ~9 rows (approximately)
 INSERT INTO `danhmucungcu` (`ID_Cap`, `TenCapUngCu`, `ID_DonViBauCu`) VALUES
 	(1, 'Trưởng khoa', 3),
 	(2, 'Phó trưởng khoa', 3),
@@ -226,7 +418,9 @@ INSERT INTO `danhmucungcu` (`ID_Cap`, `TenCapUngCu`, `ID_DonViBauCu`) VALUES
 	(5, 'Phó hiệu trưởng', 9),
 	(7, 'Trưởng Lớp A2 Khoa Khoa Học Máy Tính', 9),
 	(8, 'Trưởng Lớp A3 Khoa Khoa Học Máy Tính', 9),
-	(9, 'Trưởng Lớp A1 Khoa Khoa Học Máy Tính', 3);
+	(9, 'Trưởng Lớp A1 Khoa Khoa Học Máy Tính', 3),
+	(10, 'Phó bảo vệ', 9),
+	(11, 'Thủ quỹ', 3);
 
 -- Dumping structure for table baucutructuyen.dantoc
 CREATE TABLE IF NOT EXISTS `dantoc` (
@@ -351,7 +545,7 @@ CREATE TABLE IF NOT EXISTS `hoatdong` (
   CONSTRAINT `hoatdong_ibfk_4` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.hoatdong: ~0 rows (approximately)
+-- Dumping data for table baucutructuyen.hoatdong: ~10 rows (approximately)
 INSERT INTO `hoatdong` (`ID_canbo`, `ID_ChucVu`, `ID_Ban`, `ngayBD`) VALUES
 	('20241025151435', 14, 2, '2024-10-22 12:12:12'),
 	('20241025152418', 14, 2, '2024-10-22 12:12:12'),
@@ -374,14 +568,14 @@ CREATE TABLE IF NOT EXISTS `hosonguoidung` (
   CONSTRAINT `hosonguoidung_ibfk_1` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.hosonguoidung: ~20 rows (approximately)
+-- Dumping data for table baucutructuyen.hosonguoidung: ~24 rows (approximately)
 INSERT INTO `hosonguoidung` (`MaSo`, `TrangThaiDangKy`, `ID_user`) VALUES
-	(1, '0', 'sT20240916220819'),
-	(2, '0', 'Pe20240916221033'),
-	(3, '0', 'Zh20240916232125'),
+	(1, '1', 'sT20240916220819'),
+	(2, '1', 'Pe20240916221033'),
+	(3, '1', 'Zh20240916232125'),
 	(6, '1', 'iZ20240919194839'),
 	(7, '1', 'i420240919200017'),
-	(8, '0', 'jp20240930165451'),
+	(8, '1', 'jp20240930165451'),
 	(9, '1', 'uB20240930165759'),
 	(10, '1', 'Ds20241003000915'),
 	(11, '1', '7H20241003002115'),
@@ -427,11 +621,11 @@ INSERT INTO `ketquabaucu` (`SoLuotBinhChon`, `ThoiDiemDangKy`, `TyLeBinhChon`, `
 	(0, '2024-10-03 00:31:43', 0, '2024-11-03 10:15:00', '20241003003142', 9),
 	(0, '2024-10-12 21:24:10', 0, '2024-11-03 10:25:10', '20241012212410', 1),
 	(0, '2024-10-12 21:25:28', 0, '2024-11-03 10:25:10', '20241012212527', 1),
-	(0, '2024-10-17 14:31:32', 0, '2024-10-22 12:12:12', '20241017143132', 3),
-	(0, '2024-10-17 14:32:37', 0, '2024-10-22 12:12:12', '20241017143237', 3),
-	(0, '2024-10-17 14:33:28', 0, '2024-10-22 12:12:12', '20241017143328', 3),
-	(0, '2024-10-17 14:34:10', 0, '2024-10-22 12:12:12', '20241017143409', 3),
-	(0, '2024-10-17 14:34:45', 0, '2024-10-22 12:12:12', '20241017143445', 3);
+	(4, '2024-10-17 14:31:32', 20, '2024-10-22 12:12:12', '20241017143132', 3),
+	(3, '2024-10-17 14:32:37', 15, '2024-10-22 12:12:12', '20241017143237', 3),
+	(4, '2024-10-17 14:33:28', 20, '2024-10-22 12:12:12', '20241017143328', 3),
+	(5, '2024-10-17 14:34:10', 25, '2024-10-22 12:12:12', '20241017143409', 3),
+	(4, '2024-10-17 14:34:45', 20, '2024-10-22 12:12:12', '20241017143445', 3);
 
 -- Dumping structure for table baucutructuyen.khoa
 CREATE TABLE IF NOT EXISTS `khoa` (
@@ -444,9 +638,9 @@ CREATE TABLE IF NOT EXISTS `khoa` (
   PRIMARY KEY (`ID_Khoa`),
   KEY `ngayBD` (`ngayBD`),
   CONSTRAINT `khoa_ibfk_1` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.khoa: ~8 rows (approximately)
+-- Dumping data for table baucutructuyen.khoa: ~15 rows (approximately)
 INSERT INTO `khoa` (`ID_Khoa`, `NgayTao`, `N`, `G`, `path_PK`, `ngayBD`) VALUES
 	(1, '2024-10-15 00:00:00', 299939, 81168015365, 'F:\\PrivateKey\\2024-11-15_19-11-03.txt', '2024-10-15 19:11:03'),
 	(2, '2024-10-15 00:00:00', 455129, 152725822457, 'F:\\PrivateKey\\2024-14-15_19-14-42.txt', '2024-10-15 19:14:42'),
@@ -455,7 +649,14 @@ INSERT INTO `khoa` (`ID_Khoa`, `NgayTao`, `N`, `G`, `path_PK`, `ngayBD`) VALUES
 	(5, '2024-10-18 19:59:56', 377579, 4817600286, 'F:\\PrivateKey\\2024-59-18_19-59-56.txt', '2024-10-23 12:15:45'),
 	(6, '2024-10-18 20:01:20', 210451, 37863109925, 'F:\\PrivateKey\\2024-01-18_20-01-20.txt', '2024-10-23 12:17:35'),
 	(7, '2024-10-18 20:04:44', 254017, 21990754504, 'F:\\PrivateKey\\2024-04-18_20-04-43.txt', '2024-10-23 11:12:35'),
-	(10, '2024-10-18 21:02:22', 321337, 81703324318, 'F:\\PrivateKey\\2024-02-18_21-02-22.txt', '2024-10-22 12:12:12');
+	(10, '2024-10-18 21:02:22', 321337, 81703324318, 'F:\\PrivateKey\\2024-02-18_21-02-22.txt', '2024-10-22 12:12:12'),
+	(11, '2024-10-31 11:34:23', 436789, 64416581397, 'F:\\PrivateKey\\2024-34-31_11-34-23.txt', '2024-10-22 12:10:10'),
+	(12, '2024-10-31 11:35:32', 204863, 21042017494, 'F:\\PrivateKey\\2024-35-31_11-35-31.txt', '2024-10-22 12:50:10'),
+	(14, '2024-10-31 19:18:02', 227923, 23486733020, 'F:\\PrivateKey\\2024-18-31_19-18-01.txt', '2024-10-30 12:50:10'),
+	(16, '2024-10-31 19:26:00', 547693, 297973395241, 'F:\\PrivateKey\\2024-26-31_19-26-00.txt', '2024-10-31 12:50:00'),
+	(17, '2024-10-31 21:45:04', 319369, 68851783052, 'F:\\PrivateKey\\2024-45-31_21-45-04.txt', '2024-10-31 21:43:59'),
+	(18, '2024-10-31 21:48:15', 367063, 133865138971, 'F:\\PrivateKey\\2024-48-31_21-48-14.txt', '2024-10-31 21:46:50'),
+	(19, '2024-11-01 18:06:40', 217801, 21443713795, 'F:\\PrivateKey\\2024-06-01_18-06-39.txt', '2024-10-31 12:51:00');
 
 -- Dumping structure for table baucutructuyen.kybaucu
 CREATE TABLE IF NOT EXISTS `kybaucu` (
@@ -477,7 +678,7 @@ CREATE TABLE IF NOT EXISTS `kybaucu` (
   CONSTRAINT `Chk_kybaucuSoLuotBinhChon` CHECK ((`SoLuotBinhChonToiDa` < `SoLuongToiDaUngCuVien`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.kybaucu: ~15 rows (approximately)
+-- Dumping data for table baucutructuyen.kybaucu: ~22 rows (approximately)
 INSERT INTO `kybaucu` (`ngayBD`, `ngayKT`, `NgayKT_UngCu`, `TenKyBauCu`, `MoTa`, `SoLuongToiDaCuTri`, `SoLuongToiDaUngCuVien`, `SoLuotBinhChonToiDa`, `CongBo`, `ID_Cap`) VALUES
 	('2024-08-13 07:00:19', '2024-12-18 07:00:19', '2024-07-03 20:02:34', 'Bảo vệ luận văn', '', 30, 12, 5, '0', 5),
 	('2024-09-19 23:54:51', '2024-11-30 12:14:00', '2024-07-03 20:02:33', 'Bao', '', 50, 10, 5, '0', 2),
@@ -486,10 +687,17 @@ INSERT INTO `kybaucu` (`ngayBD`, `ngayKT`, `NgayKT_UngCu`, `TenKyBauCu`, `MoTa`,
 	('2024-10-15 19:14:42', '2024-12-15 12:15:55', '2024-10-18 00:00:00', 'Bầu cử trưởng xóm', 'Dealine2', 20, 6, 3, '0', 7),
 	('2024-10-19 12:15:55', '2024-11-15 12:15:55', '2024-10-18 00:00:00', 'Bầu cử phó trưởng xóm', 'Dealine3', 20, 5, 3, '0', 9),
 	('2024-10-21 12:15:55', '2024-11-16 12:15:55', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng', 'Dealine4', 20, 5, 3, '0', 3),
-	('2024-10-22 12:12:12', '2024-12-12 12:12:12', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng 12', 'Dealine12', 12, 5, 3, '0', 3),
+	('2024-10-22 12:10:10', '2024-11-09 10:10:10', '2024-11-05 11:34:23', 'Bầu cử phó trưởng phòng', 'Diễn ra tại phòng bảo vệ', 10, 5, 4, '0', 10),
+	('2024-10-22 12:12:12', '2024-12-12 12:12:12', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng 12', 'Dealine12', 12, 5, 4, '1', 3),
+	('2024-10-22 12:50:10', '2024-11-11 11:11:11', '2024-11-05 11:35:32', 'Bầu cử phó trưởng phòng2', 'Diễn ra tại phòng bảo vệ', 10, 5, 4, '0', 10),
 	('2024-10-23 11:12:35', '2024-11-17 12:15:55', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng5', 'Dealine5', 20, 5, 3, '0', 7),
 	('2024-10-23 12:15:45', '2024-11-17 12:15:55', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng3', 'Dealine5', 20, 5, 3, '0', 5),
 	('2024-10-23 12:17:35', '2024-11-17 12:15:55', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng4', 'Dealine5', 20, 5, 3, '0', 2),
+	('2024-10-30 12:50:10', '2024-11-13 11:13:13', '2024-11-05 19:18:01', 'Bầu cử phó trưởng phòng3', 'Diễn ra tại phòng bảo vệ', 10, 5, 4, '0', 10),
+	('2024-10-31 12:50:00', '2024-11-09 09:09:09', '2024-11-05 19:26:00', 'Bầu cử trưởng lớp KHMT', 'Diễn ra tại phòng 204', 10, 5, 4, '0', 9),
+	('2024-10-31 12:51:00', '2024-11-09 09:09:09', '2024-11-06 18:06:39', 'Bầu cử trưởng lớp KHMT ', 'Test có thể xóa (Xóa)', 10, 5, 4, '0', 9),
+	('2024-10-31 21:43:59', '2024-11-09 21:44:08', '2024-11-05 21:45:04', 'Bầu cử phó trưởng lớp KHMT A1', 'Diễn ra tại phòng 217', 15, 4, 3, '0', 8),
+	('2024-10-31 21:46:50', '2024-11-10 21:47:03', '2024-11-05 21:48:15', 'Bầu cử thủ quỹ', 'Diễn ra tại phòng 101', 10, 3, 2, '0', 11),
 	('2024-11-03 10:15:00', '2024-11-15 12:10:00', '2024-07-03 20:02:35', 'Bầu cử trưởng thôn', 'okok', 20, 5, 3, '0', 9),
 	('2024-11-03 10:25:10', '2024-11-15 12:10:00', '2024-10-25 20:02:36', 'Bầu cử trưởng làng', '', 10, 7, 3, '0', 1),
 	('2024-11-03 10:25:11', '2024-11-30 12:14:00', '2024-07-03 20:02:37', 'Bầu cử thị trưởng', '', 15, 4, 2, '0', 9),
@@ -505,9 +713,21 @@ CREATE TABLE IF NOT EXISTS `lichsudangnhap` (
   CONSTRAINT `lichsudangnhap_ibfk_1` FOREIGN KEY (`TaiKhoan`) REFERENCES `taikhoan` (`TaiKhoan`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.lichsudangnhap: ~0 rows (approximately)
+-- Dumping data for table baucutructuyen.lichsudangnhap: ~12 rows (approximately)
 INSERT INTO `lichsudangnhap` (`ThoiDiem`, `DiaChiIP`, `TaiKhoan`) VALUES
-	('2024-10-25 15:14:20', '127.0.0.1', 'admin2');
+	('2024-11-02 22:31:02', '127.0.0.1', 'admin2'),
+	('2024-10-25 22:04:56', '192.168.2.113', '098910005'),
+	('2024-10-29 19:20:16', '192.168.2.113', '098950005'),
+	('2024-10-27 20:39:26', '192.168.2.113', '0974000252'),
+	('2024-10-26 21:50:20', '192.168.2.113', '0974000452'),
+	('2024-10-29 18:44:32', '192.168.2.113', '0974000652'),
+	('2024-10-29 18:24:47', '192.168.2.113', '0974000352'),
+	('2024-10-27 19:57:27', '192.168.2.113', '0974000162'),
+	('2024-10-27 20:35:02', '192.168.2.113', '0974000752'),
+	('2024-10-30 14:38:01', '192.168.10.118', '0974000552'),
+	('2024-10-28 23:16:23', '192.168.1.228', '040714015'),
+	('2024-10-29 18:33:44', '192.168.2.113', '040714016'),
+	('2024-10-29 19:16:02', '192.168.2.113', '040714018');
 
 -- Dumping structure for table baucutructuyen.nguoidung
 CREATE TABLE IF NOT EXISTS `nguoidung` (
@@ -533,7 +753,7 @@ CREATE TABLE IF NOT EXISTS `nguoidung` (
   CONSTRAINT `nguoidung_ibfk_1` FOREIGN KEY (`ID_DanToc`) REFERENCES `dantoc` (`ID_DanToc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.nguoidung: ~20 rows (approximately)
+-- Dumping data for table baucutructuyen.nguoidung: ~25 rows (approximately)
 INSERT INTO `nguoidung` (`ID_user`, `HoTen`, `GioiTinh`, `NgaySinh`, `DiaChiLienLac`, `CCCD`, `Email`, `SDT`, `HinhAnh`, `PublicID`, `ID_DanToc`, `RoleID`) VALUES
 	('5520241012212400', 'NguyenVanF', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001053', 'nguyenvanf@gmail.com', '040714013', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1728743049/NguoiDung/pdcpemhuohcom13ph71z.jpg', 'NguoiDung/pdcpemhuohcom13ph71z', 1, 2),
 	('7H20241003002115', 'NguyenVanB', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170000652', 'nguyenvanb@gmail.com', '040714008', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727889680/NguoiDung/mecgdcdk13queaimrygw.jpg', 'NguoiDung/mecgdcdk13queaimrygw', 1, 2),
@@ -541,25 +761,25 @@ INSERT INTO `nguoidung` (`ID_user`, `HoTen`, `GioiTinh`, `NgaySinh`, `DiaChiLien
 	('Do20241003003139', 'NguyenVanE', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170000952', 'nguyenvane@gmail.com', '040714011', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727890302/NguoiDung/svxuiuxvdgjcm9wm49v7.jpg', 'NguoiDung/svxuiuxvdgjcm9wm49v7', 1, 2),
 	('Dp20241025153713', 'PhamVanE', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'phamvane@ctu.edu.vn', '098920005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729845440/NguoiDung/axuxnvasmnaurocimz2j.jpg', 'NguoiDung/axuxnvasmnaurocimz2j', 1, 8),
 	('Ds20241003000915', 'NguyenVanA', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170000552', 'nguyenvana@gmail.com', '040714007', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727888960/NguoiDung/zztvpcs0hopvem3gsnel.jpg', 'NguoiDung/zztvpcs0hopvem3gsnel', 1, 2),
-	('Dz20241017143406', 'TranVanD', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001058', 'tranvand@gmail.com', '040714018', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150449/NguoiDung/g95k0de68o0nizgdhntn.jpg', 'NguoiDung/g95k0de68o0nizgdhntn', 1, 2),
+	('Dz20241017143406', 'TranVanD', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001058', 'liyor6okey@aleitar.com', '040714018', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150449/NguoiDung/g95k0de68o0nizgdhntn.jpg', 'NguoiDung/g95k0de68o0nizgdhntn', 1, 2),
 	('Gu20241003002922', 'NguyenVanC', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170000752', 'nguyenvanc@gmail.com', '040714009', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727890169/NguoiDung/cu16bwbu1tbr3jhq47yp.jpg', 'NguoiDung/cu16bwbu1tbr3jhq47yp', 1, 2),
-	('i420240919200017', 'Trần Lộc Đỉnh', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '123456789', 'pgiabao2002@gmail.com', '0974000552', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726750819/NguoiDung/giajvu1tmzpixlqhxmyb.jpg', 'NguoiDung/giajvu1tmzpixlqhxmyb', 1, 5),
+	('i420240919200017', 'Tiểu Xuân Tử', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '123456789', 'liyor63942@aleitar.com', '0974000552', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726750819/NguoiDung/giajvu1tmzpixlqhxmyb.jpg', 'NguoiDung/giajvu1tmzpixlqhxmyb', 1, 5),
 	('in20241025153445', 'PhamVanF', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'phamvanf@ctu.edu.vn', '098930005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729845293/NguoiDung/a6wiydsmwefoojijtp05.jpg', 'NguoiDung/a6wiydsmwefoojijtp05', 1, 8),
-	('iZ20240919194839', 'Võ Hoàng Tuấn Đạt', '1', '2002-10-29', ' tp.Cà Mau', NULL, 'vhtdat2002@gmail.com', '0974000162', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726750121/NguoiDung/b0pyecdhyid0q37zlpy2.jpg', 'NguoiDung/b0pyecdhyid0q37zlpy2', 1, 5),
-	('jp20240930165451', 'Hồ Minh Trường', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', NULL, 'httruong2002@gmail.com', '0974000652', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727690096/NguoiDung/cpvj0gxxgzyevrbw7hgl.jpg', 'NguoiDung/cpvj0gxxgzyevrbw7hgl', 1, 5),
-	('ME20241017143125', 'TranVanA', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001055', 'dicako9489@adosnan.com', '040714015', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150291/NguoiDung/mzo3aew6ixn1asas3bno.jpg', 'NguoiDung/mzo3aew6ixn1asas3bno', 1, 2),
-	('Pe20240916221033', 'Lê Hữu Đức', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '000322327445', 'ducb2013070@student.ctu.edu.vn', '0974000352', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726499436/NguoiDung/nhdc4uzjfwwpwmbcmcpr.jpg', 'NguoiDung/nhdc4uzjfwwpwmbcmcpr', 1, 5),
-	('Pv20241025151431', 'PhamVanH', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'phamvanh@ctu.edu.vn', '098950005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729844076/NguoiDung/qfyf9uwti3adcqptxg6d.jpg', 'NguoiDung/qfyf9uwti3adcqptxg6d', 1, 8),
+	('iZ20240919194839', 'Võ Hoàng Tuấn Đạt', '1', '2002-10-29', ' tp.Cà Mau', NULL, 'riwopaplah@regishub.com', '0974000162', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726750121/NguoiDung/b0pyecdhyid0q37zlpy2.jpg', 'NguoiDung/b0pyecdhyid0q37zlpy2', 1, 5),
+	('jp20240930165451', 'Hồ Minh Trường', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', NULL, 'liyorhala@aleitar.com', '0974000652', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727690096/NguoiDung/cpvj0gxxgzyevrbw7hgl.jpg', 'NguoiDung/cpvj0gxxgzyevrbw7hgl', 1, 5),
+	('ME20241017143125', 'TranVanA', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001055', 'wobaxa1@acroins.com', '040714015', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150291/NguoiDung/mzo3aew6ixn1asas3bno.jpg', 'NguoiDung/mzo3aew6ixn1asas3bno', 1, 2),
+	('Pe20240916221033', 'Lê Hữu Đức', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '000322327445', 'wobaxa3469@acroins.com', '0974000352', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726499436/NguoiDung/nhdc4uzjfwwpwmbcmcpr.jpg', 'NguoiDung/nhdc4uzjfwwpwmbcmcpr', 1, 5),
+	('Pv20241025151431', 'PhamVanH', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'liyor63412@aleitar.com', '098950005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729844076/NguoiDung/qfyf9uwti3adcqptxg6d.jpg', 'NguoiDung/qfyf9uwti3adcqptxg6d', 1, 8),
 	('RM20241003003046', 'NguyenVanD', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170000852', 'nguyenvand@gmail.com', '040714010', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727890250/NguoiDung/bun34h6wktbzda5o5tug.jpg', 'NguoiDung/bun34h6wktbzda5o5tug', 1, 2),
-	('rw20241025153937', 'PhamVanD', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'phamvand@ctu.edu.vn', '098910005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729845582/NguoiDung/hvqbyz73wrultd40uy9c.jpg', 'NguoiDung/hvqbyz73wrultd40uy9c', 1, 8),
+	('rw20241025153937', 'PhamVanD', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'rad12162@inohm.com', '098910005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729845582/NguoiDung/hvqbyz73wrultd40uy9c.jpg', 'NguoiDung/hvqbyz73wrultd40uy9c', 1, 8),
 	('rY20240918210506', 'Đỗ Thánh', '1', '2002-10-19', 'Q.Ninh Kiều, tp.Càn Thơ', '10000000008', 'pgbaop4@gmail.com', 'admin2', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726668312/NguoiDung/whyuizgynfpg63zrogdp.jpg', 'NguoiDung/whyuizgynfpg63zrogdp', 1, 1),
-	('sT20240916220819', 'Lý Gia Nguyên', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '000422327445', 'pgiabao2003@gmail.com', '0974000452', NULL, NULL, 1, 5),
+	('sT20240916220819', 'Lý Gia Nguyên', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '000422327445', 'daxato3045@nestvia.com', '0974000452', 'null', 'null', 1, 5),
 	('sX20241017143325', 'TranVanC', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001057', 'tranvanc@gmail.com', '040714017', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150408/NguoiDung/wp07ucvdpzo3yo1lf3mr.jpg', 'NguoiDung/wp07ucvdpzo3yo1lf3mr', 1, 2),
 	('TC20241017143443', 'TranVanE', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001059', 'tranvane@gmail.com', '040714019', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150485/NguoiDung/t2pq9paw4kjszl7gs7zm.jpg', 'NguoiDung/t2pq9paw4kjszl7gs7zm', 1, 2),
 	('uB20240930165759', 'Đường Bá Hổ', '1', '2024-10-17', '3/2, q.Ninh Kiều, tp.Cần Thơ', NULL, 'baob2016947@student.ctu.edu.vn', '0974000752', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727690282/NguoiDung/r7stiwbtawuff8xcjqhn.jpg', 'NguoiDung/r7stiwbtawuff8xcjqhn', 1, 5),
-	('ui20241017143233', 'TranVanB', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001056', 'tranvanb@gmail.com', '040714016', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150356/NguoiDung/hgxqmkv6kjubrodqvubt.jpg', 'NguoiDung/hgxqmkv6kjubrodqvubt', 1, 2),
+	('ui20241017143233', 'TranVanB', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001056', 'liyor63542@aleitar.com', '040714016', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150356/NguoiDung/hgxqmkv6kjubrodqvubt.jpg', 'NguoiDung/hgxqmkv6kjubrodqvubt', 1, 2),
 	('uO20241012212509', 'NguyenVanT', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001054', 'nguyenvant@gmail.com', '040714014', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1728743128/NguoiDung/odehghnembqoqctknl0d.jpg', 'NguoiDung/odehghnembqoqctknl0d', 1, 2),
-	('Zh20240916232125', 'Phạm Thế HIển', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '000122327445', 'baob2016987@student.ctu.edu.vn', '0974000252', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726503689/NguoiDung/uiumpqhsuwsfri9anamz.jpg', 'NguoiDung/uiumpqhsuwsfri9anamz', 1, 5);
+	('Zh20240916232125', 'Phạm Thế HIển', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '000122327445', 'riwopaokey@regishub.com', '0974000252', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726503689/NguoiDung/uiumpqhsuwsfri9anamz.jpg', 'NguoiDung/uiumpqhsuwsfri9anamz', 1, 5);
 
 -- Dumping structure for table baucutructuyen.phanhoicanbo
 CREATE TABLE IF NOT EXISTS `phanhoicanbo` (
@@ -610,10 +830,14 @@ CREATE TABLE IF NOT EXISTS `phieubau` (
   CONSTRAINT `phieubau_ibfk_1` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.phieubau: ~2 rows (approximately)
+-- Dumping data for table baucutructuyen.phieubau: ~6 rows (approximately)
 INSERT INTO `phieubau` (`ID_Phieu`, `GiaTriPhieuBau`, `ngayBD`, `ID_cap`) VALUES
-	('Nl2024101821374643', 68536306727, '2024-10-22 12:12:12', 3),
-	('WL2024101822164303', 99094252714, '2024-10-22 12:12:12', 3);
+	('a52024102720424695', 1069714063, '2024-10-22 12:12:12', 3),
+	('C42024102720394280', 81748566241, '2024-10-22 12:12:12', 3),
+	('gD2024102720412253', 75715792743, '2024-10-22 12:12:12', 3),
+	('gg2024102720355539', 40278313698, '2024-10-22 12:12:12', 3),
+	('HL2024102720322871', 79519378900, '2024-10-22 12:12:12', 3),
+	('ok2024102720375308', 85427687397, '2024-10-22 12:12:12', 3);
 
 -- Dumping structure for table baucutructuyen.quanhuyen
 CREATE TABLE IF NOT EXISTS `quanhuyen` (
@@ -668,7 +892,7 @@ CREATE TABLE IF NOT EXISTS `taikhoan` (
   CONSTRAINT `taikhoan_ibfk_1` FOREIGN KEY (`RoleID`) REFERENCES `vaitro` (`RoleID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.taikhoan: ~21 rows (approximately)
+-- Dumping data for table baucutructuyen.taikhoan: ~25 rows (approximately)
 INSERT INTO `taikhoan` (`TaiKhoan`, `MatKhau`, `BiKhoa`, `LyDoKhoa`, `NgayTao`, `SuDung`, `RoleID`) VALUES
 	('040714007', '$argon2id$v=19$m=65536,t=3,p=1$LnAOv4nQnHKrtc/QfRGRRg$lCBt51MfGEerZKFngJRzvAIaWP/aYAWF6KEtd6fG100', '0', 'null', '2024-10-03 00:09:21', 1, 2),
 	('040714008', '$argon2id$v=19$m=65536,t=3,p=1$uoUAWWz7IR7LR221OAcj1A$RR0TqvUb2i3upCD3b10Pz6cJIMnUbbIkvuhbwTwoHEA', '0', 'null', '2024-10-03 00:21:21', 1, 2),
@@ -683,12 +907,12 @@ INSERT INTO `taikhoan` (`TaiKhoan`, `MatKhau`, `BiKhoa`, `LyDoKhoa`, `NgayTao`, 
 	('040714018', '$argon2id$v=19$m=65536,t=3,p=1$8Aq2oMjGD1QJeMat3afktg$TAbXzX3OsfOPfv1sdjOVm7uXwITpwZVGBt3FxcRBmP0', '0', 'null', '2024-10-17 14:34:09', 1, 2),
 	('040714019', '$argon2id$v=19$m=65536,t=3,p=1$PKWiBfsRm46qi0pGYyN8TQ$Z/SV8+vUKjijFzlTEXu3rfBYOE2zsCZw/4R+Zr9xgfM', '0', 'null', '2024-10-17 14:34:45', 1, 2),
 	('0974000162', '$argon2id$v=19$m=65536,t=3,p=1$9X213jZA5D3IQ3fTHUD/Kg$jkdrrtKPM0kQN9t5ssvcwDDRHIzwJL8Qb02BM9HRwR8', '0', 'null', '2024-09-19 19:48:45', 1, 5),
-	('0974000252', '$argon2id$v=19$m=65536,t=3,p=1$lwt7t+OJt4K3oEcmupdcYQ$YIbZ5HEaY1wsvA7hP+ESq2mSK9fSfrf8OyEd/JysZlE', '0', 'null', '2024-09-16 23:21:32', 1, 5),
-	('0974000352', '$argon2id$v=19$m=65536,t=3,p=1$v/bdb5wVD5iXngisZShJHA$q53DQFKYl9vxKwYaWJhj3znh8CAaSKone78S5IKtLe8', '0', 'null', '2024-09-16 22:10:39', 1, 5),
-	('0974000452', '$argon2id$v=19$m=65536,t=3,p=1$JyiCqpdm/IQM1aW12lWLMQ$zHZ/ymjKBqfE8Ev76fw4ImRxOUWZby7ycGMZxoLYpaI', '0', 'null', '2024-09-16 22:08:19', 1, 5),
-	('0974000552', '$argon2id$v=19$m=65536,t=3,p=1$M/h5VDFWeAU49YtonSu1Eg$au9/sUwul2z1aDAK12C5YhoAe56DRctx9/nqsxStTww', '0', 'null', '2024-09-19 20:00:22', 1, 5),
-	('0974000652', '$argon2id$v=19$m=65536,t=3,p=1$pAMFVQjpjAdilCuLf3q5yg$0IvLc0AFeB6QruC323fedUoMMdgnlFwr0rTEqx+S83Q', '0', 'null', '2024-09-30 16:54:56', 1, 5),
-	('0974000752', '$argon2id$v=19$m=65536,t=3,p=1$Zjcn2mFPwOIq51Vf2IiXnQ$nQxiOUzB7mbIyPOQSCAGxF7KHtxGzhljcfTd+rJ62yg', '0', 'null', '2024-09-30 16:58:02', 1, 5),
+	('0974000252', '$argon2id$v=19$m=65536,t=3,p=1$XRd1Nk4gP6vLTZoGP5fIaQ$MMZV6UTKcjvX/DqrZWID66KfWux81bCFjMo2VrH9Ffc', '0', 'null', '2024-09-16 23:21:32', 1, 5),
+	('0974000352', '$argon2id$v=19$m=65536,t=3,p=1$EyaIakq2nLN3FumoP9cPTQ$xLF09ge+h6hTd8YXqBGlVDlyKCTYmg80QY6Xz5ppzVM', '0', 'null', '2024-09-16 22:10:39', 1, 5),
+	('0974000452', '$argon2id$v=19$m=65536,t=3,p=1$xKk6fb1jvXh0Ys6eZDG/Gg$EsHDttfk8Lp9V3sLEVqSiu1eHmkjpRGxaUuFHpHHQYs', '0', 'null', '2024-09-16 22:08:19', 1, 5),
+	('0974000552', '$argon2id$v=19$m=65536,t=3,p=1$5dnHAQUKnugZ7P/RXY10sg$aIhTrCG440ign1ZtoRQJU5pHvMkFRlGmgOf3cIkToBA', '0', 'null', '2024-09-19 20:00:22', 1, 5),
+	('0974000652', '$argon2id$v=19$m=65536,t=3,p=1$GJltnBx0XqLkHK7YhKWNzg$7TqoG31MwUe694TBhZytH6kyG7OkQw54wd+TLvskDy0', '0', 'null', '2024-09-30 16:54:56', 1, 5),
+	('0974000752', '$argon2id$v=19$m=65536,t=3,p=1$ZBZQmzk6awvKlkjRMA+WSA$mBoieyV1+gSj6A3oc5HSTZCv8PNaa0yI0iY4oxa9qzY', '0', 'null', '2024-09-30 16:58:02', 1, 5),
 	('098910005', '$argon2id$v=19$m=65536,t=3,p=1$DNJr/NGXxMiBukWReNhogQ$2n5vOuC1AfcJfdecTlMJocUXkhudiRjgde7QxPqkce8', '0', 'null', '2024-10-25 15:39:42', 1, 8),
 	('098920005', '$argon2id$v=19$m=65536,t=3,p=1$7HSj4A9ow4uGmISgjOKW7A$d3VLg1qXO1+5Q124e5NPvnfLb8SxjfIH0BpOd26ZRCg', '0', 'null', '2024-10-25 15:37:20', 1, 8),
 	('098930005', '$argon2id$v=19$m=65536,t=3,p=1$C8nUcEt1BDjal7+J7PByYQ$TvjFt5FysArjRi7YoSEVvxEaHtLRw5mrS347CkOzt64', '0', 'null', '2024-10-25 15:34:53', 1, 8),
@@ -703,13 +927,164 @@ CREATE TABLE IF NOT EXISTS `thongbao` (
   `NoiDungThongBao` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `ThoiDiem` datetime DEFAULT NULL,
   PRIMARY KEY (`ID_ThongBao`)
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=210 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.thongbao: ~3 rows (approximately)
+-- Dumping data for table baucutructuyen.thongbao: ~154 rows (approximately)
 INSERT INTO `thongbao` (`ID_ThongBao`, `NoiDungThongBao`, `ThoiDiem`) VALUES
 	(1, 'Ngày bầu cử', '2024-12-18 10:15:44'),
 	(2, 'Ngay đắt cử', '2024-12-18 11:30:44'),
-	(3, 'Chuẩn bị cuộc bầu cử', '2024-10-02 09:21:34');
+	(3, 'Chuẩn bị cuộc bầu cử', '2024-10-02 09:21:34'),
+	(59, 'Thông báo kết quả bầu cử tại kỳ: 2024-10-22 12:12:12', '2024-10-28 15:21:28'),
+	(60, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 14:01:57'),
+	(61, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 14:01:57'),
+	(62, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 14:01:57'),
+	(63, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 14:01:57'),
+	(64, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 14:01:58'),
+	(65, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 14:01:58'),
+	(66, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 14:01:58'),
+	(67, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 14:01:58'),
+	(68, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 14:01:58'),
+	(69, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 14:01:58'),
+	(70, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 14:01:58'),
+	(71, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 14:01:58'),
+	(72, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 14:01:58'),
+	(73, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 14:01:58'),
+	(74, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 14:01:59'),
+	(75, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 14:01:59'),
+	(76, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 14:01:59'),
+	(77, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 14:01:59'),
+	(78, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 14:01:59'),
+	(79, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 14:01:59'),
+	(80, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 14:01:59'),
+	(81, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 14:01:59'),
+	(82, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 14:01:59'),
+	(83, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 14:01:59'),
+	(84, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 14:01:59'),
+	(85, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 14:44:45'),
+	(86, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 14:44:46'),
+	(87, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 14:44:46'),
+	(88, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 14:44:46'),
+	(89, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 14:44:46'),
+	(90, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 14:44:46'),
+	(91, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 14:44:46'),
+	(92, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 14:44:46'),
+	(93, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 14:44:46'),
+	(94, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 14:44:46'),
+	(95, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 14:44:46'),
+	(96, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 14:44:46'),
+	(97, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 14:44:46'),
+	(98, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 14:44:46'),
+	(99, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 14:44:46'),
+	(100, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 14:44:46'),
+	(101, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 14:44:46'),
+	(102, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 14:44:46'),
+	(103, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 14:44:46'),
+	(104, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 14:44:46'),
+	(105, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 14:44:46'),
+	(106, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 14:44:47'),
+	(107, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 14:44:47'),
+	(108, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 14:44:47'),
+	(109, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 14:44:47'),
+	(110, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 18:34:40'),
+	(111, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 18:34:40'),
+	(112, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 18:34:40'),
+	(113, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 18:34:40'),
+	(114, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 18:34:40'),
+	(115, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 18:34:40'),
+	(116, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 18:34:40'),
+	(117, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 18:34:40'),
+	(118, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 18:34:41'),
+	(119, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 18:34:41'),
+	(120, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 18:34:41'),
+	(121, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 18:34:41'),
+	(122, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 18:34:41'),
+	(123, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 18:34:41'),
+	(124, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 18:34:41'),
+	(125, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 18:34:41'),
+	(126, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 18:34:41'),
+	(127, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 18:34:41'),
+	(128, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 18:34:41'),
+	(129, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 18:34:41'),
+	(130, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 18:34:41'),
+	(131, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 18:34:41'),
+	(132, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 18:34:41'),
+	(133, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 18:34:41'),
+	(134, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 18:34:41'),
+	(135, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 21:33:27'),
+	(136, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 21:33:27'),
+	(137, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 21:33:27'),
+	(138, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 21:33:27'),
+	(139, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 21:33:27'),
+	(140, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 21:33:27'),
+	(141, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 21:33:27'),
+	(142, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 21:33:27'),
+	(143, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 21:33:27'),
+	(144, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 21:33:27'),
+	(145, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 21:33:27'),
+	(146, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 21:33:27'),
+	(147, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 21:33:27'),
+	(148, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 21:33:27'),
+	(149, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 21:33:27'),
+	(150, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 21:33:27'),
+	(151, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 21:33:27'),
+	(152, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 21:33:27'),
+	(153, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 21:33:27'),
+	(154, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 21:33:28'),
+	(155, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 21:33:28'),
+	(156, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 21:33:28'),
+	(157, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 21:33:28'),
+	(158, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 21:33:28'),
+	(159, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 21:33:28'),
+	(160, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 23:33:07'),
+	(161, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 23:33:07'),
+	(162, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 23:33:07'),
+	(163, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 23:33:07'),
+	(164, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 23:33:07'),
+	(165, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 23:33:07'),
+	(166, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 23:33:07'),
+	(167, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 23:33:07'),
+	(168, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 23:33:07'),
+	(169, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 23:33:07'),
+	(170, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 23:33:07'),
+	(171, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 23:33:07'),
+	(172, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 23:33:07'),
+	(173, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 23:33:08'),
+	(174, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 23:33:08'),
+	(175, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 23:33:08'),
+	(176, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 23:33:08'),
+	(177, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 23:33:08'),
+	(178, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 23:33:08'),
+	(179, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 23:33:08'),
+	(180, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:33:08'),
+	(181, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:33:08'),
+	(182, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:33:08'),
+	(183, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:33:08'),
+	(184, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:33:08'),
+	(185, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 23:34:35'),
+	(186, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 23:34:35'),
+	(187, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 23:34:35'),
+	(188, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 23:34:35'),
+	(189, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:15:00 SA.', '2024-11-01 23:34:35'),
+	(190, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 23:34:35'),
+	(191, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 23:34:35'),
+	(192, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 23:34:35'),
+	(193, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:10 SA.', '2024-11-01 23:34:35'),
+	(194, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:35'),
+	(195, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:35'),
+	(196, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:35'),
+	(197, 'Ngày bầu cử sắp tới của bạn tham dự là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:35'),
+	(198, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 23:34:35'),
+	(199, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 23:34:35'),
+	(200, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 23:34:35'),
+	(201, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 23:34:35'),
+	(202, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:15:00 SA.', '2024-11-01 23:34:35'),
+	(203, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 23:34:35'),
+	(204, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:10 SA.', '2024-11-01 23:34:35'),
+	(205, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:35'),
+	(206, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:36'),
+	(207, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:36'),
+	(208, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:36'),
+	(209, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:36');
 
 -- Dumping structure for table baucutructuyen.tinhthanh
 CREATE TABLE IF NOT EXISTS `tinhthanh` (
@@ -818,7 +1193,7 @@ CREATE TABLE IF NOT EXISTS `trangthaibaucu` (
   CONSTRAINT `trangthaibaucu_ibfk_3` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.trangthaibaucu: ~24 rows (approximately)
+-- Dumping data for table baucutructuyen.trangthaibaucu: ~29 rows (approximately)
 INSERT INTO `trangthaibaucu` (`GhiNhan`, `ID_CuTri`, `ID_DonViBauCu`, `ngayBD`) VALUES
 	('0', '20240919200022', 3, '2024-09-19 23:54:51'),
 	('0', '20240919194845', 3, '2024-09-19 23:54:51'),
@@ -843,7 +1218,12 @@ INSERT INTO `trangthaibaucu` (`GhiNhan`, `ID_CuTri`, `ID_DonViBauCu`, `ngayBD`) 
 	('0', '20240930165802', 3, '2024-10-15 19:11:03'),
 	('0', '20240930165802', 1, '2024-10-19 12:15:55'),
 	('1', '20240930165802', 1, '2024-10-22 12:12:12'),
-	('1', '20240919200022', 1, '2024-10-22 12:12:12');
+	('1', '20240919200022', 1, '2024-10-22 12:12:12'),
+	('1', '20240916232132', 1, '2024-10-22 12:12:12'),
+	('0', '20240916220819', 1, '2024-10-22 12:12:12'),
+	('1', '20240916221039', 1, '2024-10-22 12:12:12'),
+	('1', '20240930165456', 1, '2024-10-22 12:12:12'),
+	('1', '20240919194845', 1, '2024-10-22 12:12:12');
 
 -- Dumping structure for table baucutructuyen.trinhdohocvan
 CREATE TABLE IF NOT EXISTS `trinhdohocvan` (
@@ -896,7 +1276,7 @@ CREATE TABLE IF NOT EXISTS `vaitro` (
   `RoleID` tinyint NOT NULL AUTO_INCREMENT,
   `TenVaiTro` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`RoleID`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.vaitro: ~7 rows (approximately)
 INSERT INTO `vaitro` (`RoleID`, `TenVaiTro`) VALUES
@@ -906,7 +1286,7 @@ INSERT INTO `vaitro` (`RoleID`, `TenVaiTro`) VALUES
 	(4, 'Ban kiểm phiếu'),
 	(5, 'Cử tri'),
 	(8, 'Cán bộ'),
-	(9, 'Test');
+	(11, 'Test 123456888');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

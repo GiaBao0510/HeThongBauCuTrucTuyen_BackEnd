@@ -8,7 +8,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
     {
         Task<List<ConstituencyDto>> _GetListOfConstituency();
         Task<bool> _AddConstituency(Constituency donvibaucu);
-        Task<bool> _EditConstituencyBy_ID(string ID, Constituency Constituency);
+        Task<bool> _EditConstituencyBy_ID(string ID, ConstituencyDto Constituency);
         Task<Constituency> _GetConstituencyBy_ID(string id);
         Task<bool> _DeleteConstituencyBy_ID(string ID);
         Task<bool> _CheckIfConstituencyExists(string ID, MySqlConnection connection);

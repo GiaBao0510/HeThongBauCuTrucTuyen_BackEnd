@@ -89,7 +89,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //Sửa
-        public async Task<bool> _EditConstituencyBy_ID(string ID, Constituency Constituency){
+        public async Task<bool> _EditConstituencyBy_ID(string ID, ConstituencyDto Constituency){
             using var connection = await _context.Get_MySqlConnection();
 
             //Tìm kiếm quận huyện có tồn tại không
@@ -103,7 +103,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
 
             //Cập nhật
-            const string sqlupdate = @"UPDATE donvibaucu SET TenDonViBauCu = @TenDonViBauCu, DiaChi = @DiaChi ,ID_QH = @ID_QH WHERE ID_DonViBauCu = @ID_DonViBauCu";
+            const string sqlupdate = @"
+            UPDATE donvibaucu 
+            SET TenDonViBauCu = @TenDonViBauCu, DiaChi = @DiaChi ,ID_QH = @ID_QH 
+            WHERE ID_DonViBauCu = @ID_DonViBauCu;";
             using( var command = new MySqlCommand(sqlupdate, connection)){
                 command.Parameters.AddWithValue("@ID_DonViBauCu",ID);
                 command.Parameters.AddWithValue("@TenDonViBauCu",Constituency.TenDonViBauCu);

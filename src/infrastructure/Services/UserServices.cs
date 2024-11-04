@@ -102,47 +102,42 @@ namespace BackEnd.src.infrastructure.Services
 
             //Lấy số điện thoại, kiểm tra xem có không .Nếu không thì trả về false
             const string CheckSDT = @"
-            SELECT tk.TaiKhoan,tk.MatKhau,tk.RoleID,tk.BiKhoa,tk.SuDung, nd.Email, hs.TrangThaiDangKy 
+            SELECT tk.TaiKhoan, tk.MatKhau, tk.RoleID, tk.SuDung, nd.Email
             FROM taikhoan tk 
-            JOIN nguoidung nd ON nd.SDT = tk.TaiKhoan
-            JOIN hosonguoidung hs ON hs.ID_user = nd.ID_user
-            WHERE tk.TaiKhoan =  @TaiKhoan;";
+            INNER JOIN nguoidung nd ON nd.SDT = tk.TaiKhoan
+            WHERE tk.TaiKhoan = @taikhoan 
+            AND EXISTS ( 
+            SELECT 1 FROM hosonguoidung hs 
+            WHERE hs.ID_user = nd.ID_user 
+            AND hs.TrangThaiDangKy = '1')
+            AND tk.BiKhoa = '0'
+            LIMIT 1;";
 
             using var command = new MySqlCommand(CheckSDT, connection);
             command.Parameters.AddWithValue("@TaiKhoan", loginDto.account);
-            using var reader = await command.ExecuteReaderAsync();
+            using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
             
-            if(!await reader.ReadAsync()){
-                _log.WarnExt("Đăng nhập thất bại vì không tìm thấy số điện thoại");
+            if(!await reader.ReadAsync().ConfigureAwait(false)){
+                //_log.WarnExt("Đăng nhập thất bại vì không tìm thấy số điện thoại");
                 Console.WriteLine("Đăng nhập thất bại vì không tìm thấy số điện thoại");
                 return null;
             }
 
             string HashedPwd = reader.GetString(reader.GetOrdinal("MatKhau")),
                     role = reader.GetInt32(reader.GetOrdinal("RoleID")).ToString(),
-                    BiKhoa = reader.GetString(reader.GetOrdinal("BiKhoa")),
-                    Email = reader.GetString(reader.GetOrdinal("Email")),
-                    DaDangKy = reader.GetString(reader.GetOrdinal("TrangThaiDangKy"));
+                    Email = reader.GetString(reader.GetOrdinal("Email"));
+
             int SuDung = reader.GetInt32(reader.GetOrdinal("SuDung"));
 
-            if(string.IsNullOrEmpty(role) || string.IsNullOrEmpty(HashedPwd)){
-                _log.WarnExt("Đăng nhập thất bại vì không tìm thấy số điện thoại");
-                Console.WriteLine("Đăng nhập thất bại vì không tìm thấy số điện thoại");
-                return null;
-            }
-
-            if(DaDangKy == "0"){
-                _log.WarnExt("Tài khoản này chưa đăng ký");
-                Console.WriteLine("Tài khoản này chưa đăng ký");
-                return null;
-            }
-
             //Thực hiện vệc xác thực mật khẩu. Nếu không đúng thì không đăng nhập được
-            if(!Argon2.Verify(HashedPwd, loginDto.password)){
-                _log.WarnExt("Đăng nhập thất bại: Sai mật khẩu");
-                Console.WriteLine("Đăng nhập thất bại: Sai mật khẩu");
-                return null;
-            }
+                var isPasswordValid = await Task.Run(() => 
+                    Argon2.Verify(HashedPwd, loginDto.password)).ConfigureAwait(false);
+
+                if (!isPasswordValid)
+                {
+                    _log.WarnExt("Đăng nhập thất bại: Sai mật khẩu");
+                    return null;
+                }
 
             //Tạo đối tượng. Rồi trả về đối tượng này
             return new LoginModel{
@@ -150,7 +145,6 @@ namespace BackEnd.src.infrastructure.Services
                 Email = Email,
                 password = HashedPwd,
                 Role = role,
-                BiKhoa = BiKhoa,
                 SuDung = SuDung
             };
         }
@@ -183,13 +177,20 @@ namespace BackEnd.src.infrastructure.Services
         //2. Gửi mã otp khi đăng nhập 
         public async Task _SendVerificationOTPcodeAfterLogin(string email){
             // --- Thực hiển gửi mã
-            string title = "Xác thực mã otp sau khi đăng nhập";
-            string opt = RandomString.DaySoNgauNhien(6);        //Chuỗi ngẫu nhiên
+            string opt = await Task.Run(() => RandomString.DaySoNgauNhien(6)).ConfigureAwait(false);        //Chuỗi ngẫu nhiên
             EmailOTP emailopt = new EmailOTP();
             var emailBody = emailopt.GenerateOtpEmail(opt);     //Nội dung email
+            
+            //Thiết lập lưu mã otp vào bộ nhớ đệm
             var cacheKey = $"OTP_{email}";                      //Đặt Key lưu vào bộ nhớ đệm
             _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
-            await _emailSender.SendEmailAsync(email, title+":"+opt, emailBody); //Gửi
+            
+            //Gửi
+            await _emailSender.SendEmailAsync(
+                email, 
+                "Xác thực mã otp"+":"+opt, 
+                emailBody
+            ); 
         }
 
         //3. Xác thực mã otp sau khi đăng nhập

@@ -74,7 +74,7 @@ namespace BackEnd.src.web_api.Controllers
                 if(string.IsNullOrEmpty(loginModel.account) || string.IsNullOrEmpty(loginModel.password))
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin đăng nhập."});
 
-                var result = await _userServices._Login(loginModel);
+                var result = await _userServices._Login(loginModel).ConfigureAwait(false);
                 if(result == null)          //Đăng nhập thất bại
                     return BadRequest(
                         new ApiRespons{Success = false, Message = "Tài khoản hoặc mật khẩu không chính xác."}

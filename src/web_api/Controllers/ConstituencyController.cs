@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Authorization;
+using BackEnd.src.web_api.DTOs;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -94,15 +95,15 @@ namespace BackEnd.src.web_api.Controllers
         //Sửa
         [HttpPut("{id}")]
         [Authorize(Roles = "1")]
-        public async Task<IActionResult> EditConstituencyBy_ID(string id, Constituency Constituency){
+        public async Task<IActionResult> EditConstituencyBy_ID(string id,[FromBody] ConstituencyDto constituency){
             try{
-                if(Constituency == null || string.IsNullOrEmpty(Constituency.TenDonViBauCu))
+                if(constituency == null || string.IsNullOrEmpty(constituency.TenDonViBauCu))
                     return StatusCode(400, new{
                         Status = "False", 
                         Message = $"Lỗi đầu vào không được để trống"
                     });
 
-                var result = await _constituencyReposistory._EditConstituencyBy_ID(id, Constituency);
+                var result = await _constituencyReposistory._EditConstituencyBy_ID(id, constituency);
                 if(result == false)
                     return StatusCode(400, new{
                         Status = "False", 
@@ -112,7 +113,7 @@ namespace BackEnd.src.web_api.Controllers
                 return Ok(new{
                     Status = "Ok",
                     Message = "Cập nhật thành công",
-                    Data = Constituency
+                    Data = constituency
                 });
             }catch(Exception ex){
                 return StatusCode(500, new{

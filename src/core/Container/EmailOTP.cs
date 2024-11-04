@@ -3,146 +3,162 @@ namespace BackEnd.src.core.Container
 {
     public class EmailOTP
     {
-        public string GenerateOtpEmail(string otp){
-            var body = $@"
-                <!DOCTYPE html>
-                <html lang='vi'>
-                <head>
-                    <meta charset='UTF-8'>
-                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                    <title>VoteSecure - Mã xác thực OTP</title>
-                    <style>
-                        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-                        
-                        :root {{
-                            --primary-color: #4a90e2;
-                            --secondary-color: #50c878;
-                            --accent-color: #ff6b6b;
-                            --text-color: #333;
-                            --background-color: #f0f4f8;
-                        }}
-                        body {{
-                            font-family: 'Poppins', sans-serif;
-                            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            min-height: 100vh;
-                            margin: 0;
-                            padding: 20px;
-                            box-sizing: border-box;
-                        }}
-                        .container {{
-                            background: rgba(255, 255, 255, 0.9);
-                            padding: 2.5rem;
-                            border-radius: 20px;
-                            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-                            text-align: center;
-                            max-width: 450px;
-                            width: 100%;
-                            backdrop-filter: blur(10px);
-                            animation: fadeIn 0.5s ease-out;
-                        }}
-                        @keyframes fadeIn {{
-                            from {{ opacity: 0; transform: translateY(-20px); }}
-                            to {{ opacity: 1; transform: translateY(0); }}
-                        }}
-                        h1 {{
-                            color: #3557FF;
-                            margin-bottom: 1rem;
-                            font-size: 2.5rem;
-                            text-transform: uppercase;
-                            letter-spacing: 2px;
-                            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-                            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-                            -webkit-background-clip: text;
-                            -webkit-text-fill-color: transparent;
-                        }}
-                        p {{
-                            color: var(--text-color);
-                            margin-bottom: 1.5rem;
-                            line-height: 1.6;
-                            font-size: 1.1rem;
-                        }}
-                        .otp-display {{
-                            font-size: 2.2rem;
-                            font-weight: bold;
-                            color: #EF8924;
-                            padding: 15px;
-                            background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
-                            border-radius: 15px;
-                            margin: 25px 0;
-                            letter-spacing: 8px;
-                            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                            transition: all 0.3s ease;
-                            animation: pulse 2s infinite;
-                        }}
-                        @keyframes pulse {{
-                            0% {{ transform: scale(1); }}
-                            50% {{ transform: scale(1.05); }}
-                            100% {{ transform: scale(1); }}
-                        }}
-                        .otp-display:hover {{
-                            transform: translateY(-5px);
-                            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-                        }}
-                        .image-container {{
-                            width: 100%;
-                            max-width: 300px;
-                            margin: 25px auto 0;
-                            overflow: hidden;
-                            border-radius: 15px;
-                            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-                            transition: all 0.3s ease;
-                        }}
-                        .image-container:hover {{
-                            transform: translateY(-10px);
-                            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-                        }}
-                        .responsive-image {{
-                            width: 100%;
-                            height: auto;
-                            display: block;
-                            object-fit: cover;
-                            object-position: center;
-                            transition: transform 0.3s ease;
-                        }}
-                        .responsive-image:hover {{
-                            transform: scale(1.1);
-                        }}
-                        @media (max-width: 600px) {{
-                            .container {{
-                                padding: 2rem;
-                            }}
-                            h1 {{
-                                font-size: 2rem;
-                            }}
-                            .otp-display {{
-                                font-size: 1.8rem;
-                                letter-spacing: 6px;
-                            }}
-                            p {{
-                                font-size: 1rem;
-                            }}
-                        }}
-                    </style>
-                </head>
-                <body>
-                    <div class='container'>
-                        <h1>VoteSecure</h1>
-                        <p>Để hoàn tất quá trình đăng nhập, vui lòng nhập mã OTP dưới đây:</p>
-                        <div class='otp-display'>{otp}</div>
-                        <p>Lưu ý rằng mã OTP này chỉ có hiệu lực trong vòng 5 phút kể từ khi email được gửi. Sau thời gian này, mã sẽ hết hạn và bạn cần yêu cầu một mã mới nếu vẫn chưa hoàn thành đăng nhập.</p>
-                        <p>Đây là email tự động được gửi từ hệ thống, vui lòng không trả lời trực tiếp vào email này.</p>
-                        <div class='image-container'>
-                            <img class='responsive-image' src='https://res.cloudinary.com/dkajnklq6/image/upload/v1726309469/NguoiDung/x101hxwcmigiywmodxlo.png' alt='Hình ảnh minh họa bầu cử'>
+        public string GenerateOtpEmail(string otp)
+        {
+            return $@"
+            <!DOCTYPE html>
+            <html lang='vi'>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <title>VoteSecure - Xác thực OTP</title>
+                <style>
+                    /* Sử dụng system fonts để tối ưu hiệu suất */
+                    :root {{
+                        --primary: #2563eb;
+                        --secondary: #1e40af;
+                        --background: #f8fafc;
+                        --text: #0f172a;
+                        --success: #059669;
+                    }}
+                    
+                    * {{
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }}
+
+                    body {{
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
+                        line-height: 1.6;
+                        background-color: var(--background);
+                        color: var(--text);
+                        padding: 20px;
+                    }}
+
+                    .email-container {{
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background: white;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                        overflow: hidden;
+                    }}
+
+                    .header {{
+                        background: var(--primary);
+                        padding: 24px;
+                        text-align: center;
+                    }}
+
+                    .header h1 {{
+                        color: rgba(30, 176, 217, 1);
+                        font-size: 24px;
+                        font-weight: 600;
+                        margin: 0;
+                        letter-spacing: 0.5px;
+                    }}
+
+                    .content {{
+                        padding: 32px 24px;
+                        text-align: center;
+                    }}
+
+                    .message {{
+                        margin-bottom: 24px;
+                        font-size: 16px;
+                        color: var(--text);
+                    }}
+
+                    .otp-code {{
+                        font-family: monospace;
+                        font-size: 32px;
+                        font-weight: 700;
+                        letter-spacing: 4px;
+                        color: var(--primary);
+                        background: #f1f5f9;
+                        padding: 16px 24px;
+                        border-radius: 8px;
+                        margin: 24px 0;
+                        border: 2px dashed var(--primary);
+                    }}
+
+                    .timer {{
+                        display: inline-block;
+                        color: var(--secondary);
+                        font-size: 14px;
+                        background: #e2e8f0;
+                        padding: 6px 12px;
+                        border-radius: 16px;
+                        margin-top: 16px;
+                    }}
+
+                    .footer {{
+                        background: #f8fafc;
+                        padding: 16px;
+                        text-align: center;
+                        font-size: 12px;
+                        color: #64748b;
+                        border-top: 1px solid #e2e8f0;
+                    }}
+
+                    .security-notice {{
+                        margin-top: 24px;
+                        font-size: 13px;
+                        color: #64748b;
+                        padding: 12px;
+                        background: #f1f5f9;
+                        border-radius: 6px;
+                    }}
+
+                    .tech-badge {{
+                        display: inline-block;
+                        background: var(--success);
+                        color: white;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        margin-top: 8px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='email-container'>
+                    <div class='header'>
+                        <h1>🔐 VoteSecure</h1>
+                    </div>
+                    
+                    <div class='content'>
+                        <div class='message'>
+                            <strong>Xin chào!</strong>
+                            <p>Đây là mã xác thực OTP cho tài khoản của bạn:</p>
+                        </div>
+
+                        <div class='otp-code'>{otp}</div>
+
+                        <div class='timer'>
+                            ⏱️ Mã có hiệu lực trong 5 phút
+                        </div>
+
+                        <div class='security-notice'>
+                            🛡️ Vì lý do bảo mật, tuyệt đối không chia sẻ mã này với bất kỳ ai.
+                            <br>
+                            Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.
+                        </div>
+
+                        <div class='tech-badge'>
+                            Secured by VoteSecure Technology
                         </div>
                     </div>
-                </body>
-                </html>
-            ";
 
-            return body;
+                    <div class='footer'>
+                        © 2024 VoteSecure - Hệ thống bảo mật hai lớp
+                        <br>
+                        Email này được gửi tự động, vui lòng không phản hồi.
+                    </div>
+                </div>
+            </body>
+            </html>";
         }
     }
 }
