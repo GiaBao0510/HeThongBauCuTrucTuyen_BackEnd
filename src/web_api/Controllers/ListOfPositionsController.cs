@@ -1,4 +1,4 @@
-using BackEnd.src.infrastructure.DataAccess.Repositories;
+using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
@@ -110,7 +110,7 @@ namespace BackEnd.src.web_api.Controllers
         //Sửa
         [HttpPut("{id}")]
         [Authorize(Roles= "1,2,5,8")]
-        public async Task<IActionResult> EditListOfPositionsBy_ID(string id, ListOfPositions ListOfPositions){
+        public async Task<IActionResult> EditListOfPositionsBy_ID(string id,[FromBody] ListOfPositionDTO ListOfPositions){
             try{
                 if(ListOfPositions == null || string.IsNullOrEmpty(ListOfPositions.TenCapUngCu))
                     return StatusCode(400, new{

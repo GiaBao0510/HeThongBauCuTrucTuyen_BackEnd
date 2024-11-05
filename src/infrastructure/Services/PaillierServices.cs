@@ -98,7 +98,7 @@ namespace BackEnd.src.infrastructure.Services
                     if(gcd( Lu, N) == 1){
                         G = g;
                         break;      //Dừng
-                    }
+                    } 
                 }
             }
 

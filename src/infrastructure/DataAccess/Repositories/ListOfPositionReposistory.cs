@@ -1,6 +1,7 @@
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using BackEnd.src.web_api.DTOs;
 using MySql.Data.MySqlClient;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
@@ -8,10 +9,14 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
     public class ListOfPositionReposistory : IDisposable,IListOfPositionRepository
     {
         private readonly DatabaseContext _context;
+        private readonly IConstituencyRepository _constituencyRepository;
 
         //Khởi tạo
 
-        public ListOfPositionReposistory(DatabaseContext context) => _context = context;
+        public ListOfPositionReposistory(DatabaseContext context) {
+            _context = context;
+            _constituencyRepository = new ConstituencyReposistory(context);
+        }
 
         //hủy
         public void Dispose() => _context.Dispose();
@@ -82,47 +87,81 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //Sửa
-        public async Task<bool> _EditListOfPositionsBy_ID(string ID, ListOfPositions ListOfPositions){
+        public async Task<bool> _EditListOfPositionsBy_ID(string ID, ListOfPositionDTO listOfPositions){
             using var connection = await _context.Get_MySqlConnection();
-
-            //Tìm kiếm quận huyện có tồn tại không
-            const string sqlCheck = "SELECT COUNT(*) FROM donvibaucu WHERE ID_DonViBauCu = @ID_DonViBauCu";
-            using(var command0 = new MySqlCommand(sqlCheck, connection)){
-                command0.Parameters.AddWithValue("@ID_DonViBauCu",ListOfPositions.ID_DonViBauCu);
-                int count = Convert.ToInt32(await command0.ExecuteScalarAsync());
-                
-                if(count < 1)
+            Console.WriteLine($"Đầu vào");
+            Console.WriteLine($"ID: {ID}");
+            Console.WriteLine($"TenCapUngCu: {listOfPositions.TenCapUngCu}");
+            Console.WriteLine($"ID_DonViBauCu: {listOfPositions.ID_DonViBauCu}");
+            //Tìm kiếm mã đơn vị có tồn tại không
+            try{
+                //Kiêmr tra mã số đơn vị bầu cử tại danhmucungcu có tồn tại không
+                bool checkDonViBauCu = await _constituencyRepository._CheckIfConstituencyExists(listOfPositions.ID_DonViBauCu.ToString() , connection);
+                if(checkDonViBauCu == false)
                     return false;
-            }
 
-            //Cập nhật
-            const string sqlupdate = @"UPDATE danhmucungcu SET TenCapUngCu = @TenCapUngCu, ID_DonViBauCu = @ID_DonViBauCu WHERE ID_Cap = @ID_Cap";
-            using( var command = new MySqlCommand(sqlupdate, connection)){
-                command.Parameters.AddWithValue("@ID_Cap",ID);
-                command.Parameters.AddWithValue("@TenCapUngCu",ListOfPositions.TenCapUngCu);
-                command.Parameters.AddWithValue("@ID_DonViBauCu",ListOfPositions.ID_DonViBauCu);
+                //Cập nhật
+                const string sqlupdate = @"UPDATE danhmucungcu SET TenCapUngCu = @TenCapUngCu, ID_DonViBauCu = @ID_DonViBauCu WHERE ID_Cap = @ID_Cap";
+                using( var command = new MySqlCommand(sqlupdate, connection)){
+                    command.Parameters.AddWithValue("@ID_Cap",ID);
+                    command.Parameters.AddWithValue("@TenCapUngCu",listOfPositions.TenCapUngCu);
+                    command.Parameters.AddWithValue("@ID_DonViBauCu",listOfPositions.ID_DonViBauCu);
 
-                //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
-                int rowAffected = await command.ExecuteNonQueryAsync();
-                return rowAffected > 0;
+                    //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
+                    int rowAffected = await command.ExecuteNonQueryAsync();
+                    return rowAffected > 0;
+                }
+                
+            }catch(MySqlException ex){
+                Console.WriteLine($"Lỗi tại kiểm tra email trùng trong MYSQL");
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
             }
-            
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         }
 
         //Xóa
         public async Task<bool> _DeleteListOfPositionsBy_ID(string ID){
             using var connection = await _context.Get_MySqlConnection();
-
-            const string sqlupdate = @"
+            try{
+                const string sqlupdate = @"
                 DELETE FROM danhmucungcu
                 WHERE ID_Cap = @ID_Cap";
             
-            using var command = new MySqlCommand(sqlupdate, connection);
-            command.Parameters.AddWithValue("@ID_Cap",ID);
-        
-            //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
-            int rowAffected = await command.ExecuteNonQueryAsync();
-            return rowAffected > 0;
+                using var command = new MySqlCommand(sqlupdate, connection);
+                command.Parameters.AddWithValue("@ID_Cap",ID);
+            
+                //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
+                int rowAffected = await command.ExecuteNonQueryAsync();
+                return rowAffected > 0;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Lỗi tại kiểm tra email trùng trong MYSQL");
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         }
 
         //Kiểm tra mã chức vụ xem có tồn tại chưa

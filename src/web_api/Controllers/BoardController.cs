@@ -1,9 +1,8 @@
-using BackEnd.src.infrastructure.DataAccess.Repositories;
+using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Caching.Memory;
 
 
 namespace BackEnd.src.web_api.Controllers
@@ -112,7 +111,7 @@ namespace BackEnd.src.web_api.Controllers
         //Sửa
         [HttpPut("{id}")]
         [Authorize(Roles = "1")]
-        public async Task<IActionResult> EditBoardBy_ID(string id, Board Board){
+        public async Task<IActionResult> EditBoardBy_ID(string id,[FromBody] BoardDto Board){
             try{
                 if(Board == null || string.IsNullOrEmpty(Board.TenBan))
                     return StatusCode(400, new{

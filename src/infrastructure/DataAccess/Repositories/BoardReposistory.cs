@@ -2,7 +2,7 @@ using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
-using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient; 
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -103,31 +103,52 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //Sửa
-        public async Task<bool> _EditBoardBy_ID(string ID, Board Board){
+        public async Task<bool> _EditBoardBy_ID(string ID, BoardDto Board){
             using var connection = await _context.Get_MySqlConnection();
+            try{
+                Console.WriteLine("Đầu vào:");
+                Console.WriteLine($"ID: {ID}");
+                Console.WriteLine($"Tên bàn: {Board.TenBan}");
+                Console.WriteLine($"ID đơn vị bầu cử: {Board.ID_DonViBauCu}");
 
-            //Tìm kiếm quận huyện có tồn tại không
-            const string sqlCheck = "SELECT COUNT(*) FROM donvibaucu WHERE ID_DonViBauCu = @ID_DonViBauCu";
-            using(var command0 = new MySqlCommand(sqlCheck, connection)){
-                command0.Parameters.AddWithValue("@ID_DonViBauCu",Board.ID_DonViBauCu);
-                int count = Convert.ToInt32(await command0.ExecuteScalarAsync());
-                
-                if(count < 1)
-                    return false;
+                //Tìm kiếm quận huyện có tồn tại không
+                const string sqlCheck = "SELECT COUNT(*) FROM donvibaucu WHERE ID_DonViBauCu = @ID_DonViBauCu";
+                using(var command0 = new MySqlCommand(sqlCheck, connection)){
+                    command0.Parameters.AddWithValue("@ID_DonViBauCu",Board.ID_DonViBauCu);
+                    int count = Convert.ToInt32(await command0.ExecuteScalarAsync());
+                    
+                    if(count < 1)
+                        return false;
+                }
+
+                //Cập nhật
+                const string sqlupdate = @"UPDATE ban SET TenBan = @TenBan, ID_DonViBauCu = @ID_DonViBauCu WHERE ID_Ban = @ID_Ban";
+                using( var command = new MySqlCommand(sqlupdate, connection)){
+                    command.Parameters.AddWithValue("@ID_Ban",ID);
+                    command.Parameters.AddWithValue("@TenBan",Board.TenBan);
+                    command.Parameters.AddWithValue("@ID_DonViBauCu",Board.ID_DonViBauCu);
+
+                    //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
+                    int rowAffected = await command.ExecuteNonQueryAsync();
+                    return rowAffected > 0;
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Lỗi tại kiểm tra email trùng trong MYSQL");
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
             }
-
-            //Cập nhật
-            const string sqlupdate = @"UPDATE ban SET TenBan = @TenBan, ID_DonViBauCu = @ID_DonViBauCu WHERE ID_Ban = @ID_Ban";
-            using( var command = new MySqlCommand(sqlupdate, connection)){
-                command.Parameters.AddWithValue("@ID_Ban",ID);
-                command.Parameters.AddWithValue("@TenBan",Board.TenBan);
-                command.Parameters.AddWithValue("@ID_DonViBauCu",Board.ID_DonViBauCu);
-
-                //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
-                int rowAffected = await command.ExecuteNonQueryAsync();
-                return rowAffected > 0;
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
             }
-            
         }
 
         //Xóa
