@@ -93,7 +93,7 @@ namespace HeThongBauCuTrucTuyen_BackEnd.src.web_api.Controllers
         //Sửa
         [HttpPut("{id}")]
         [Authorize(Roles = "1")]
-        public async Task<IActionResult> EditDistrictBy_ID(string id, DistrictDto District){
+        public async Task<IActionResult> EditDistrictBy_ID(string id,[FromBody] DistrictDto District){
             try{
                 if(District == null || string.IsNullOrEmpty(District.TenQH))
                     return StatusCode(400, new{

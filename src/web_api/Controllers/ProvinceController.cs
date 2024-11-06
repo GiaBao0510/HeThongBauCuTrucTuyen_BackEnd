@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using BackEnd.core.Entities;
-using BackEnd.src.infrastructure.DataAccess.Repositories;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Authorization;
+using BackEnd.src.web_api.DTOs;
 
 namespace BackEnd.src.web_api.Controllers
 {
@@ -37,7 +36,7 @@ namespace BackEnd.src.web_api.Controllers
         //Thêm
         [HttpPost]
         [Authorize(Roles= "1")]
-        public async Task<IActionResult> CreateProvince([FromBody] Province province){
+        public async Task<IActionResult> CreateProvince([FromBody] ProvinceDTO province){
             try{
                 //Kiểm tra đầu vào
                 if(province == null || string.IsNullOrEmpty(province.TenTinhThanh))
@@ -94,7 +93,7 @@ namespace BackEnd.src.web_api.Controllers
         //Sửa
         [HttpPut("{id}")]
         [Authorize(Roles= "1")]
-        public async Task<IActionResult> EditProvinceBy_ID(string id, Province province){
+        public async Task<IActionResult> EditProvinceBy_ID(string id,[FromBody] ProvinceDTO province){
             try{
                 if(province == null || string.IsNullOrEmpty(province.TenTinhThanh))
                     return StatusCode(400, new{
@@ -112,7 +111,7 @@ namespace BackEnd.src.web_api.Controllers
                 return Ok(new{
                     Status = "Ok",
                     Message = "Cập nhật thành công",
-                    Data = province
+                    Data =""
                 });
             }catch(Exception ex){
                 return StatusCode(500, new{

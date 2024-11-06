@@ -9,7 +9,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
 {
     public interface IDistrictRepository
     {
-        Task<List<District>> _GetListOfDistrict();
+        Task<List<DistrictDto>> _GetListOfDistrict();
         Task<bool> _AddDistrict(DistrictDto quanhuyen);
         Task<District> _GetDistrictBy_ID(string id);
         Task<List<District>> _GetListOfDistrictBy_STT(string stt);

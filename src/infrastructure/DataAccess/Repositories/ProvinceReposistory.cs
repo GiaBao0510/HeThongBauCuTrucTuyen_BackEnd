@@ -1,6 +1,7 @@
 using BackEnd.core.Entities;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using BackEnd.src.web_api.DTOs;
 using MySql.Data.MySqlClient; 
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
@@ -13,15 +14,15 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         public ProvinceReposistory(DatabaseContext context) => _context = context;
 
         //Liệt kê
-        public async Task<List<Province>> _GetListOfProvice(){
-            var list = new List<Province>();
+        public async Task<List<ProvinceDTO>> _GetListOfProvice(){
+            var list = new List<ProvinceDTO>();
 
             using var connection = await _context.Get_MySqlConnection();
             using var command = new MySqlCommand("SELECT * FROM tinhthanh", connection);
             using var reader = await command.ExecuteReaderAsync();
             
             while(await reader.ReadAsync()){
-                list.Add(new Province{
+                list.Add(new ProvinceDTO{
                     STT = reader.GetInt32(reader.GetOrdinal("STT")),
                     TenTinhThanh = reader.GetString(reader.GetOrdinal("TenTinhThanh"))
                 });
@@ -30,7 +31,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //Thêm
-        public async Task<bool> _AddProvince(Province tinhthanh){
+        public async Task<bool> _AddProvince(ProvinceDTO tinhthanh){
             using var connection = await _context.Get_MySqlConnection();
             
             //Kiểm tra số thứ tự có trùng không nếu trùng thì khoog thêm được
@@ -76,13 +77,16 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //Sửa
-        public async Task<bool> _EditProvinceBy_ID(string ID, Province province){
+        public async Task<bool> _EditProvinceBy_ID(string ID, ProvinceDTO province){
             using var connection = await _context.Get_MySqlConnection();
 
             const string sqlupdate = @"
                 UPDATE tinhthanh 
                 SET TenTinhThanh = @TenTinhThanh
                 WHERE STT = @STT";
+
+            Console.WriteLine($"ID: {ID}");
+            Console.WriteLine($"TenTinhThanh: {province.TenTinhThanh}");
             
             using var command = new MySqlCommand(sqlupdate, connection);
             command.Parameters.AddWithValue("@STT",ID);

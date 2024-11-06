@@ -13,17 +13,17 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         public DistrictReposistory(DatabaseContext context) => _context = context;
 
         //Liệt kê
-        public async Task<List<District>> _GetListOfDistrict(){
-            var list = new List<District>();
+        public async Task<List<DistrictDto>> _GetListOfDistrict(){
+            var list = new List<DistrictDto>();
 
             using var connection = await _context.Get_MySqlConnection();
             using var command = new MySqlCommand("SELECT * FROM quanhuyen", connection);
             using var reader = await command.ExecuteReaderAsync();
             
             while(await reader.ReadAsync()){
-                list.Add(new District{
+                list.Add(new DistrictDto{
                     STT = reader.GetInt32(reader.GetOrdinal("STT")),
-                    ID_QH = reader.GetInt32(reader.GetOrdinal("ID_QH")),
+                    iD_QH = reader.GetInt32(reader.GetOrdinal("ID_QH")),
                     TenQH = reader.GetString(reader.GetOrdinal("TenQH"))
                 });
             }
