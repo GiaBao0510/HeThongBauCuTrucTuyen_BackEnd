@@ -242,7 +242,6 @@ namespace BackEnd.src.web_api.Controllers
         }
 
         //Lấy thông tin chi tiết phiếu bầu dựa trên ngày bầu cử
-        //Lấy theo ID
         [HttpGet("get-details-about-votes-based-on-election-date")]
         [Authorize(Roles= "1,8")]
         [EnableRateLimiting("SlidingWindowLimiter")]
@@ -274,6 +273,42 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện lấy thông tin các phiếu bầu dựa trên ngày bầu cử: {ex.Message}"
+                });
+            }
+        }
+
+        //Lấy thông tin chi tiết phiếu bầu dựa trên năm
+        [HttpGet("get-details-about-votes-based-on-year")]
+        [Authorize(Roles= "1,8")]
+        [EnableRateLimiting("SlidingWindowLimiter")]
+        public async Task<IActionResult> GetDetailsAboutVotesBasedOnElectionYear([FromQuery]string year){
+            try{
+                if(year.ToString().IsNullOrEmpty()){
+                    return StatusCode(400, new{
+                        Status = "False", 
+                        Message = $"Lỗi năm không được để trống"
+                    });
+                }
+
+                var Vote = await _voteReposistory._getDetailsAboutVotesBasedOnElectionYear(year);
+                if(Vote == null)
+                    return StatusCode(400, new{
+                    Status = "False", 
+                    Message = $"Lỗi năm không tồn tại"
+                });
+
+                return Ok(new{
+                    Status = "Ok",
+                    Message = "null",
+                    Data = Vote
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro message: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy thông tin các phiếu bầu dựa trên năm: {ex.Message}"
                 });
             }
         }

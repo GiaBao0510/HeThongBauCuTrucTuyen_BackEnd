@@ -253,8 +253,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //4. Lấy tất cả thông tin cử tri
-        public async Task<List<VoterDto>> _GetListOfVoter(){
-            var list = new List<VoterDto>();
+        public async Task<List<VoterInfoDTO>> _GetListOfVoter(){
+            var list = new List<VoterInfoDTO>();
             using var connection = await _context.Get_MySqlConnection();
             if(connection.State != System.Data.ConnectionState.Open)
                 await connection.OpenAsync();
@@ -268,7 +268,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             using var reader = await command.ExecuteReaderAsync();
             
             while(await reader.ReadAsync()){
-                list.Add(new VoterDto{
+                list.Add(new VoterInfoDTO{
                     ID_CuTri =reader.GetString(reader.GetOrdinal("ID_CuTri")), 
                     ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
                     HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
@@ -359,30 +359,54 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
 
             return 1;
-        }
+        } 
 
         //7. Xóa tài khoảng người dùng dựa trên ID cư tri
         public async Task<bool> _DeleteVoterBy_ID(string IDvoter){
             using var connect = await _context.Get_MySqlConnection();
+            using var transaction =await connect.BeginTransactionAsync();
+            try{
+                //Truy xuất lấy ID cử tri
+                string ID_user = await GetIDUserBaseOnIDCuTri(IDvoter, connect);
+                if(string.IsNullOrEmpty(ID_user)) return false;
 
-            //Truy xuất lấy ID cử tri
-            string ID_user = await GetIDUserBaseOnIDCuTri(IDvoter, connect);
-            if(string.IsNullOrEmpty(ID_user)) return false;
+                //Xóa tài khoản cử tri trước rồi xóa tài khoản người dùng sau
+                const string sqlDeleteVoter = @"DELETE FROM cutri WHERE ID_CuTri = @ID_CuTri;";
+                using(var command1 = new MySqlCommand(sqlDeleteVoter, connect)){
+                    command1.Parameters.AddWithValue("@ID_CuTri", IDvoter);
+                    
+                    int rowAffect = await command1.ExecuteNonQueryAsync();
+                    if(rowAffect < 0){
+                        await transaction.RollbackAsync();
+                        return false;
+                    }
+                }
 
-            //Xóa tài khoản cử tri trước rồi xóa tài khoản người dùng sau
-            const string sqlDeleteVoter = @"DELETE FROM cutri WHERE ID_CuTri = @ID_CuTri;";
-            using(var command1 = new MySqlCommand(sqlDeleteVoter, connect)){
-                command1.Parameters.AddWithValue("@ID_CuTri", IDvoter);
-                
-                int rowAffect = await command1.ExecuteNonQueryAsync();
-                if(rowAffect < 0)
+                if(await _DeleteUserBy_ID_withConnection(ID_user, connect) == false){
+                    await transaction.RollbackAsync();
                     return false;
+                }
+
+                await transaction.CommitAsync();
+                return true;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                await transaction.RollbackAsync();
+                throw;
             }
-
-            if(await _DeleteUserBy_ID_withConnection(ID_user, connect) == false)
-                return false;
-
-            return true;
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         //8. Lấy thông tin cử tri và kèm theo tài khoản
@@ -854,6 +878,86 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         });
                     }
                     return list;
+                }
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Lấy số lượng các kỳ bầu cử mà cử tri tham gia
+        public async Task<int> _countTheNumberOfElections_VotersParticipated(string ID_CuTri){
+            try{
+
+                using var connection = await _context.Get_MySqlConnection();
+
+                //Kiểm tra xem cử tri có tồn tại không
+                bool checkVoterExist = await _CheckVoterExists(ID_CuTri, connection);
+                if(!checkVoterExist) return -1;
+
+                //Đếm số lượng kỳ bầu cử mà cử tri đã tham gia
+                const string sql = @"
+                SELECT COUNT(ngayBD)
+                FROM trangthaibaucu
+                WHERE ID_CuTri = @ID_CuTri;";
+
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ID_CuTri", ID_CuTri);
+                    int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                    return count;
+                }
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Lấy số lượng các kỳ bầu cử mà cử tri sắp bỏ phiếu trong tương lai
+         public async Task<int> _countTheNumberOfElections_VoterWillVote_Future(string ID_CuTri){
+            try{
+
+                using var connection = await _context.Get_MySqlConnection();
+
+                //Kiểm tra xem cử tri có tồn tại không
+                bool checkVoterExist = await _CheckVoterExists(ID_CuTri, connection);
+                if(!checkVoterExist) return -1;
+
+                //Đếm số lượng kỳ bầu cử mà cử tri đã tham gia
+                const string sql = @"
+                SELECT COUNT(ngayBD)
+                FROM trangthaibaucu
+                WHERE ID_CuTri = @ID_CuTri AND ngayBD > NOW();";
+
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ID_CuTri", ID_CuTri);
+                    int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                    return count;
                 }
 
             }catch(MySqlException ex){

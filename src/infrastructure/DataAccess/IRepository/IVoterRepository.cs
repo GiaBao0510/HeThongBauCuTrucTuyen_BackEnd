@@ -15,7 +15,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //Lấy thông tin theo ID cử tri
         Task<VoterDto> _GetVoterBy_ID(string IDvoter);
         //Lấy ALL
-        Task<List<VoterDto>> _GetListOfVoter();
+        Task<List<VoterInfoDTO>> _GetListOfVoter();
         //Đặt mật khẩu cử tri - admin
         Task<bool> _SetVoterPassword(string id,string newPwd);
         //Thay đổi mật khẩu - cử tri
@@ -49,5 +49,9 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<List<ElectionsDto>> _ListElectionsVotersHavePaticipated(string ID_cutri);
         //Lấy danh sách ID cử tri theo ngày bầu cử
         Task<List<VoterID_DTO>> _getVoterID_ListBasedOnElection(string ngayBD, MySqlConnection connect);
+        //Lấy số lượng các kỳ bầu cử sắp đến mà cử tri tham gia
+        Task<int> _countTheNumberOfElections_VotersParticipated(string ID_CuTri);
+        //Lấy số lượng các kỳ bầu cử mà cử tri sắp bỏ phiếu trong tương lai
+        Task<int> _countTheNumberOfElections_VoterWillVote_Future(string ID_CuTri);
     }
 }

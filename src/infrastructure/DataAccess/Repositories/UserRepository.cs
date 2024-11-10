@@ -375,7 +375,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             const string sqlNguoiDung = @"
                 UPDATE nguoidung 
                 SET HoTen = @HoTen, GioiTinh=@GioiTinh, NgaySinh=@NgaySinh,
-                    DiaChiLienLac=@DiaChiLienLac, CCCD=@CCCD, SDT=@SDT, ID_DanToc=@ID_DanToc,
+                    DiaChiLienLac=@DiaChiLienLac, SDT=@SDT, ID_DanToc=@ID_DanToc,
                     Email=@Email, HinhAnh=@HinhAnh, RoleID=@RoleID, PublicID=@PublicID
                 WHERE ID_user = @ID_user;";
             
@@ -386,7 +386,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 command.Parameters.AddWithValue("@GioiTinh", user.GioiTinh);
                 command.Parameters.AddWithValue("@NgaySinh", user.NgaySinh);
                 command.Parameters.AddWithValue("@DiaChiLienLac", user.DiaChiLienLac);
-                command.Parameters.AddWithValue("@CCCD", user.CCCD);
                 command.Parameters.AddWithValue("@SDT", user.SDT);
                 command.Parameters.AddWithValue("@Email", user.Email);
                 command.Parameters.AddWithValue("@HinhAnh", user.HinhAnh);
@@ -471,6 +470,56 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 if(rowAffected < 1) return false;
             }
             return true;
+        }
+
+        //11. Xóa thông tin người dùng theo ID
+        public async Task<bool> _DeleteUserBy_ID(string ID, MySqlConnection connection){
+            try{
+                //Tìm số điện thoại theo ID người dùng
+                const string sql_SDT = "SELECT SDT,PublicID FROM nguoidung WHERE ID_user = @ID_user";
+                string acc = null, publicID = null;
+                using(var command0 = new MySqlCommand(sql_SDT,connection)){
+                    command0.Parameters.AddWithValue("@ID_user",ID);
+
+                    //Nếu tìm thấy người dùng
+                    using var reader = await command0.ExecuteReaderAsync();
+                    if(await reader.ReadAsync()){
+                        acc = reader.GetString(reader.GetOrdinal("SDT"));
+                        publicID = reader.GetString(reader.GetOrdinal("PublicID"));
+                    }
+                }
+
+                //Nếu khồn tìm thấy thì trả về false
+                if(string.IsNullOrEmpty(acc) || string.IsNullOrEmpty(publicID) ) return false;
+
+                //Xóa ảnh đã lưu trên cloudinary
+                await _cloudinaryService.DeleteImage(publicID);
+
+                //Xóa thông tin người dùng
+                const string deleteInfor = "DELETE FROM nguoidung WHERE ID_user = @ID_user";
+                using (var command2 = new MySqlCommand(deleteInfor, connection)){
+                    command2.Parameters.AddWithValue("@ID_user",ID);
+
+                    int rowAffected = await command2.ExecuteNonQueryAsync();
+                    if(rowAffected < 1) return false;
+                }
+                return true;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
         }
 
         //12. Kiểm tra sự tồn tại của người dùng
@@ -624,8 +673,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 }
 
                 //Thêm thông tin người dùng - tài khoản
-                string Input = @"INSERT INTO nguoidung(ID_user,HoTen,GioiTinh,NgaySinh,DiaChiLienLac,CCCD,SDT,Email,HinhAnh,PublicID,RoleID,ID_DanToc) 
-                VALUES(@ID_user,@HoTen,@GioiTinh,@NgaySinh,@DiaChiLienLac,@CCCD,@SDT,@Email,@HinhAnh,@PublicID,@RoleID,@ID_DanToc);";
+                string Input = @"INSERT INTO nguoidung(ID_user,HoTen,GioiTinh,NgaySinh,DiaChiLienLac,SDT,Email,HinhAnh,PublicID,RoleID,ID_DanToc) 
+                VALUES(@ID_user,@HoTen,@GioiTinh,@NgaySinh,@DiaChiLienLac,@SDT,@Email,@HinhAnh,@PublicID,@RoleID,@ID_DanToc);";
                 string inputAccount = @"INSERT INTO taikhoan(TaiKhoan,MatKhau,BiKhoa,LyDoKhoa,NgayTao,SuDung,RoleID)
                 VALUES(@TaiKhoan,@MatKhau,@BiKhoa,@LyDoKhoa,@NgayTao,@SuDung,@RoleID);";
 
@@ -635,7 +684,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command.Parameters.AddWithValue("@GioiTinh", user.GioiTinh);
                     command.Parameters.AddWithValue("@NgaySinh", user.NgaySinh);
                     command.Parameters.AddWithValue("@DiaChiLienLac", user.DiaChiLienLac);
-                    command.Parameters.AddWithValue("@CCCD", user.CCCD);
                     command.Parameters.AddWithValue("@SDT", user.SDT);
                     command.Parameters.AddWithValue("@Email", user.Email);
                     command.Parameters.AddWithValue("@HinhAnh", user.HinhAnh);
@@ -773,45 +821,55 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //18. Xóa thông tin người dùng theo ID
         public async Task<bool> _DeleteUserBy_ID_withConnection(string ID, MySqlConnection connection){
+            try{
+                //Kiểm tra kết nối
+                if(connection.State != System.Data.ConnectionState.Open)
+                    await connection.OpenAsync();
 
-            //Tìm số điện thoại theo ID người dùng
-            const string sql_SDT = "SELECT SDT,PublicID FROM nguoidung WHERE ID_user = @ID_user";
-            string acc = null, publicID = null;
-            using(var command0 = new MySqlCommand(sql_SDT,connection)){
-                command0.Parameters.AddWithValue("@ID_user",ID);
+                //Tìm số điện thoại theo ID người dùng
+                const string sql_SDT = "SELECT PublicID FROM nguoidung WHERE ID_user = @ID_user";
+                string publicID = null;
+                using(var command0 = new MySqlCommand(sql_SDT,connection)){
+                    command0.Parameters.AddWithValue("@ID_user",ID);
 
-                //Nếu tìm thấy người dùng
-                using var reader = await command0.ExecuteReaderAsync();
-                if(await reader.ReadAsync()){
-                    acc = reader.GetString(reader.GetOrdinal("SDT"));
-                    publicID = reader.GetString(reader.GetOrdinal("PublicID"));
+                    //Nếu tìm thấy người dùng
+                    using var reader = await command0.ExecuteReaderAsync();
+                    if(await reader.ReadAsync()){
+                        publicID = reader.GetString(reader.GetOrdinal("PublicID"));
+                    }
                 }
+
+                //Nếu khồn tìm thấy thì trả về false
+                if(string.IsNullOrEmpty(publicID) ) return false;
+
+                //Xóa ảnh đã lưu trên cloudinary
+                await _cloudinaryService.DeleteImage(publicID);
+
+                //Xóa thông tin người dùng
+                const string deleteInfor = "DELETE FROM nguoidung WHERE ID_user = @ID_user";
+                using (var command2 = new MySqlCommand(deleteInfor, connection)){
+                    command2.Parameters.AddWithValue("@ID_user",ID);
+
+                    int rowAffected = await command2.ExecuteNonQueryAsync();
+                    if(rowAffected < 1) return false;
+                }
+                return true;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
             }
-
-            //Nếu khồn tìm thấy thì trả về false
-            if(string.IsNullOrEmpty(acc) || string.IsNullOrEmpty(publicID) ) return false;
-
-            //Xóa ảnh đã lưu trên cloudinary
-            await _cloudinaryService.DeleteImage(publicID);
-
-            //xóa tài khoản
-            const string deleteAcc = "DELETE FROM taikhoan WHERE taikhoan = @taikhoan";
-            using (var command1 = new MySqlCommand(deleteAcc, connection)){
-                command1.Parameters.AddWithValue("@taikhoan",acc);
-
-                int rowAffected = await command1.ExecuteNonQueryAsync();
-                if(rowAffected < 1) return false;
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
             }
-
-            //Xóa thông tin người dùng
-            const string deleteInfor = "DELETE FROM nguoidung WHERE ID_user = @ID_user";
-            using (var command2 = new MySqlCommand(deleteInfor, connection)){
-                command2.Parameters.AddWithValue("@ID_user",ID);
-
-                int rowAffected = await command2.ExecuteNonQueryAsync();
-                if(rowAffected < 1) return false;
-            }
-            return true;
         }
 
         //19.Liệt kê all -account

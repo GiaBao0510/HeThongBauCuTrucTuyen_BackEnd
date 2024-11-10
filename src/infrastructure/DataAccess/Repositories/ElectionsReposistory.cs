@@ -717,7 +717,59 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
-        
+        //Lấy danh sách chi tiết các kỳ bầu cử
+        public async Task<List<CadreJoinedForElectionDTO>> _getDetailsListOfElectionBassedOnYear(string year){
+            try{
+                using var connection = await _context.Get_MySqlConnection();
+                
+                var list = new List<CadreJoinedForElectionDTO>();
+                const string sql = @"
+                SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, 
+                kbc.MoTa, kbc.SoLuongToiDaCuTri, kbc.SoLuongToiDaUngCuVien, 
+                kbc.SoLuotBinhChonToiDa, kbc.CongBo, dm.TenCapUngCu, dv.TenDonViBauCu
+                FROM kybaucu kbc 
+                JOIN danhmucungcu dm ON dm.ID_Cap = kbc.ID_Cap
+                JOIN donvibaucu dv ON dv.ID_DonViBauCu = dm.ID_DonViBauCu
+                WHERE year(kbc.ngayBD) = @year;";
+
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@year", year);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new CadreJoinedForElectionDTO{
+                            ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")),
+                            ngayKT = reader.GetDateTime(reader.GetOrdinal("ngayKT")),
+                            TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
+                            MoTa = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
+                            SoLuongToiDaCuTri = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaCuTri")),
+                            SoLuongToiDaUngCuVien = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
+                            SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuotBinhChonToiDa")),
+                            CongBo =reader.GetString(reader.GetOrdinal("CongBo")),
+                            TenCapUngCu = reader.GetString(reader.GetOrdinal("TenCapUngCu")),
+                            TenDonViBauCu = reader.GetString(reader.GetOrdinal("TenDonViBauCu")),
+                        });
+                    }
+                }
+                return list;
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
 
     }
 }

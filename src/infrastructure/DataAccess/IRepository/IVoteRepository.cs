@@ -15,5 +15,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _DeleteVoteBy_Time(string time);
         Task<int> _CreateVoteByNumber(int number, VoteDto vote );
         Task<List<VoteDetailsDTO>> _getDetailsAboutVotesBasedOnElectionDate(DateTime ngayBD);
+        //Lấy thông tin chi tiết phiếu bầu dựa trên năm
+        Task<List<VoteDetailsDTO>> _getDetailsAboutVotesBasedOnElectionYear(String year);
     }
 }

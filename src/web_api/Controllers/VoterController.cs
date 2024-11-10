@@ -31,8 +31,15 @@ namespace BackEnd.src.web_api.Controllers
         [Authorize(Roles= "1")]
         public async Task<IActionResult> CreateVouter([FromForm] VoterDto vouter,  IFormFile fileAnh){
             try{
+                Console.WriteLine($"Họ tên: {vouter.HoTen}");
+                Console.WriteLine($"Giới tính: {vouter.GioiTinh}");
+                Console.WriteLine($"Ngày sinh: {vouter.NgaySinh}");
+                Console.WriteLine($"Địa chỉ: {vouter.DiaChiLienLac}");
+                Console.WriteLine($"Số điện thoại: {vouter.SDT}");
+                Console.WriteLine($"Email: {vouter.Email}");
+                Console.WriteLine($"ID_ChucVu: {vouter.ID_ChucVu}");
                 //Kiểm tra đầu vào
-                if(vouter == null || string.IsNullOrEmpty(vouter.HoTen))
+                if(string.IsNullOrEmpty(vouter.HoTen))
                     return StatusCode(400,new{
                         Status = "false",
                         Message="Lỗi khi đầu vào không được rỗng"
@@ -508,5 +515,70 @@ namespace BackEnd.src.web_api.Controllers
                 });
             }
         }
+
+        //16. Đếm số lượng các kỳ bầu cử mà cử tri đã tham gia
+        [HttpGet("count-the-number-of-elections-voters-participated")]
+        [Authorize(Roles= "1,5")]
+        public async Task<IActionResult> CountTheNumberOfElections_VotersParticipated([FromQuery]string ID_cutri){
+            try{
+                if(string.IsNullOrEmpty(ID_cutri))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền mã cử tri."});
+
+                var result = await _voterReposistory._countTheNumberOfElections_VotersParticipated(ID_cutri);
+                if(result == -1)
+                    return BadRequest(new{Status = "False", Message = "Không tìm thấy ID cử tri."});
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Số lượng các kỳ bầu cử mà cử tri đã tham gia",
+                    Data = new {
+                        count = result,
+                    },
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy thông tin cử tri trước khi đăng ký: {ex.Message}"
+                });
+            }
+        }
+
+        //17. Đếm số lượng các kỳ bầu cử mà cử tri sắp bỏ phiếu trong tương lai
+        [HttpGet("count-the-number-of-elections-voter-will-vote-future")]
+        [Authorize(Roles= "1,5")]
+        public async Task<IActionResult> CountTheNumberOfElections_VoterWillVote_Future([FromQuery]string ID_cutri){
+            try{
+                if(string.IsNullOrEmpty(ID_cutri))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền mã cử tri."});
+
+                var result = await _voterReposistory._countTheNumberOfElections_VoterWillVote_Future(ID_cutri);
+                if(result == -1)
+                    return BadRequest(new{Status = "False", Message = "Không tìm thấy ID cử tri."});
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Số lượng các kỳ bầu cử mà cử tri đã tham gia",
+                    Data = new {
+                        count = result,
+                    },
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy thông tin cử tri trước khi đăng ký: {ex.Message}"
+                });
+            }
+        }
+
     }
 }

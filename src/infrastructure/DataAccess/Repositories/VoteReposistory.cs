@@ -316,6 +316,51 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
+        //Lấy thông tin chi tiết phiếu bầu dựa trên năm
+        public async Task<List<VoteDetailsDTO>> _getDetailsAboutVotesBasedOnElectionYear(String year){
+            using var connection = await _context.Get_MySqlConnection();
+            try{
 
+                var list = new List<VoteDetailsDTO>();
+                const string sql = @"
+                SELECT pb.ID_Phieu, pb.GiaTriPhieuBau, ctp.ThoiDiem, nd.ID_user, nd.HoTen
+                FROM phieubau pb 
+                INNER JOIN chitietbaucu ctp ON ctp.ID_Phieu = pb.ID_Phieu
+                INNER JOIN cutri ct ON ct.ID_CuTri = ctp.ID_CuTri
+                INNER JOIN nguoidung nd ON nd.ID_user = ct.ID_user
+                WHERE year(pb.ngayBD) = @year;";
+                
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@year", year);
+                    using var reader = await command.ExecuteReaderAsync();
+
+                    while(await reader.ReadAsync()){
+                        list.Add( new VoteDetailsDTO{
+                            ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
+                            GiaTriPhieuBau =(BigInteger)reader.GetDecimal(reader.GetOrdinal("GiaTriPhieuBau")),
+                            ThoiDiem = reader.GetDateTime(reader.GetOrdinal("ThoiDiem")),
+                            ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
+                            HoTen = reader.GetString(reader.GetOrdinal("HoTen"))
+                        });
+                    }
+                }
+                return list;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
     } 
 }

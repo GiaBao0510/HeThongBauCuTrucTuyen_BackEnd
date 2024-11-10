@@ -42,6 +42,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<List<ElectionsDto>> _getListOfElectionsByUserPhone(string sdt); 
         //Người dùng tự cập nhật thong tin cá nhân
         Task<int> _UpdatePersonalInfomation(PersonalInformationDTO personalInfo);
-        
+        //11. Xóa thông tin người dùng theo ID
+        Task<bool> _DeleteUserBy_ID(string ID, MySqlConnection connection);
     }
 }

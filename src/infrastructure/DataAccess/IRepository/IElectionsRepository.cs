@@ -40,5 +40,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _updateVoteCountAndVotePercentage(DateTime ngayBD, int SoLuotBinhChon, float tiLeBinhChon, string ID_ucv ,MySqlConnection connection);
         //Cập nhật đã công bố kết quả bầu cử rồi dựa trên kỳ bầu cử
         Task<bool> _UpdateResultAnnouncementElectionBasedOnElectionDate(DateTime ngayBD, MySqlConnection connection);
+        //Lấy danh sách chi tiết các kỳ bầu cử
+        Task<List<CadreJoinedForElectionDTO>> _getDetailsListOfElectionBassedOnYear(string year);
     }
 }

@@ -290,5 +290,27 @@ namespace BackEnd.src.web_api.Controllers
                 });
             }
         }
+
+        //Liệt kê
+        [HttpGet("get-details-list-of-election-bassed-on-year")]
+        [Authorize(Roles = "1")]
+        public async Task<IActionResult> GetDetailsListOfElectionBassedOnYear([FromQuery] string year){
+            try{
+                var result = await _electionsReposistory._getDetailsListOfElectionBassedOnYear(year);
+                return Ok(new{
+                    Status = "Ok",
+                    Message = "null",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro Source: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
+                return StatusCode(500,new{
+                    Status = "false",
+                    Message=$"Lỗi khi truy xuất danh sách chi tiết các kỳ bầu cử: {ex.Message}"
+                });
+            }
+        }
     }
 }
