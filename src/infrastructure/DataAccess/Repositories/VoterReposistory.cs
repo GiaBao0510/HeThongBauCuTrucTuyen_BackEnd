@@ -958,7 +958,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command.Parameters.AddWithValue("@ID_CuTri", ID_CuTri);
                     int count = Convert.ToInt32(await command.ExecuteScalarAsync());
                     return count;
-                }
+                } 
 
             }catch(MySqlException ex){
                 Console.WriteLine($"Error message: {ex.Message}");

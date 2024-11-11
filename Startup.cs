@@ -289,6 +289,7 @@ namespace BackEnd
                 Configuration["GoogleDrive:TokenPath"]
             ));
             services.AddScoped<IFeedbackRepository,FeedbackReposistory>();
+            services.AddScoped<IStatisticsRepository,StatisticsRepository>();
         } 
 
         //Riêng các service muốn call thì sẽ goi trong đây

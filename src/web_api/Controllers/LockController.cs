@@ -148,6 +148,8 @@ namespace BackEnd.src.web_api.Controllers
         [Authorize(Roles= "1,8")]
         public async Task<IActionResult> CaculateAndAnnounceElectionResult([FromBody] CadreResultAnnouncementDTO input){
             try{
+                Console.WriteLine($"Mã cán bộ: {input.ID_CanBo}");
+                Console.WriteLine($"kỳ bầu cử: {input.ngayBD}");
                 if(string.IsNullOrEmpty(input.ID_CanBo) || string.IsNullOrEmpty(input.ngayBD))
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền ngày bắt đầu."});
                 

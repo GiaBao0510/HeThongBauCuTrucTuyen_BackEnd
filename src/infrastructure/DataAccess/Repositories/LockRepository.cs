@@ -494,6 +494,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         public async Task<int> _CaculateAndAnnounceElectionResult(string ngayBD, string ID_CanBo){
             using var connection = await _context.Get_MySqlConnection();
             using var transaction = await connection.BeginTransactionAsync();
+            Console.WriteLine("\t\t == Chuẩn bị cập nhật công bố kết quả bầu cử ==");
 
             try{
                 //Đưa ngày bắt đầu về dạng DateTime
@@ -553,7 +554,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                                 BallotPaper[0]++;
                                 break;
                             }
-                        }
+                        } 
                         s_temp--;
                     }
                 }
@@ -619,6 +620,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 await _notificationHubs._announceElectionResult(ngayBD, connection);
                 
                 await transaction.CommitAsync();
+                Console.WriteLine("\t\t ====> công bố thành công");
                 return 1;
             }catch(MySqlException ex){
                 Console.WriteLine($"Error message: {ex.Message}");

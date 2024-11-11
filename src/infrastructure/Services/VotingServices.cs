@@ -130,7 +130,7 @@ namespace BackEnd.src.infrastructure.Services
 
                     //Lấy N và G dựa trên ngày bầu cử
                 LockDTO Lock = await  _lockRepository._getLockBasedOnElectionDate(voterVoteDTO.ngayBD,connect);
-                Console.WriteLine($"N: {Lock.N}");
+                Console.WriteLine($"N: {Lock.N}"); 
                 Console.WriteLine($"G: {Lock.G}");
                 Console.WriteLine($"GiaTriPhieuBauHienTai: {GiaTriPhieuBauHienTai}");
                     
@@ -168,6 +168,7 @@ namespace BackEnd.src.infrastructure.Services
                 }
 
                 await transaction.CommitAsync();
+                Console.WriteLine($"Đã ghi nhận bỏ phiếu");
                 return 1;
 
             }catch(MySqlException ex){
