@@ -166,7 +166,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 };
             }
             return null;
-        }
+        } 
 
         //3. Sửa thông tin cử tri dựa trên ID cử tri
         public async Task<int> _EditVoterBy_ID(string IDvoter ,VoterDto voter){
@@ -203,19 +203,14 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         DiaChiLienLac=@DiaChiLienLac, SDT=@SDT, ID_DanToc=@ID_DanToc,
                         Email=@Email, RoleID=@RoleID
                     WHERE ID_user = @ID_user;";
-                const string sqlVoterAccount = @"
-                UPDATE taikhoan
-                SET taikhoan = @SDT
-                WHERE Taikhoan = @Taikhoan;";
 
-                using(var command1 = new MySqlCommand($"{sqlNguoiDung} {sqlVoterAccount}", connection)){
+                using(var command1 = new MySqlCommand($"{sqlNguoiDung}", connection)){
                     command1.Parameters.AddWithValue("@ID_user", ID_user);
                     command1.Parameters.AddWithValue("@HoTen", voter.HoTen);
                     command1.Parameters.AddWithValue("@GioiTinh", voter.GioiTinh);
                     command1.Parameters.AddWithValue("@NgaySinh", voter.NgaySinh);
                     command1.Parameters.AddWithValue("@DiaChiLienLac", voter.DiaChiLienLac);
                     command1.Parameters.AddWithValue("@SDT", voter.SDT);
-                    command1.Parameters.AddWithValue("@Taikhoan", voter.TaiKhoan);
                     command1.Parameters.AddWithValue("@Email", voter.Email);
                     command1.Parameters.AddWithValue("@RoleID", voter.RoleID);
                     command1.Parameters.AddWithValue("@ID_DanToc", voter.ID_DanToc);

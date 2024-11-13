@@ -11,7 +11,8 @@ namespace BackEnd.src.web_api.Controllers
     public class StatisticsController: ControllerBase
     {
         private readonly IStatisticsRepository _statisticsRepository;
-        
+         private static readonly SemaphoreSlim _throttler = new SemaphoreSlim(5); // Limit concurrent requests
+
         public StatisticsController(IStatisticsRepository statisticsRepository)
         {
             _statisticsRepository = statisticsRepository;
@@ -24,6 +25,7 @@ namespace BackEnd.src.web_api.Controllers
             string queryDescription
         ){
             try{
+                await _throttler.WaitAsync(); // Limit concurrent requests
                 var result = await query();
                 return Ok(new ApiRespons{
                     Success = true,
@@ -42,6 +44,8 @@ namespace BackEnd.src.web_api.Controllers
                     Status = "False", 
                     Message = $"${errorMessage}: {ex.Message}"
                 });
+            }finally{
+                _throttler.Release();   // Release the semaphore
             }
         }
 

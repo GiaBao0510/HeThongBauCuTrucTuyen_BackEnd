@@ -34,7 +34,7 @@ namespace BackEnd.src.web_api.DTOs
         [FromForm(Name ="SuDung")]
         public int SuDung { get; set; } = 1;
 
-        public int ID_ChucVu { get; set; } = 0;
+        public int ID_ChucVu { get; set; } = 13;
  
         //Khóa ngoại
         public int ID_DanToc{set; get;} = 1;

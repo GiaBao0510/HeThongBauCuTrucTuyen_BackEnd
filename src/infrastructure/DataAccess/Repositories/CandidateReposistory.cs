@@ -249,17 +249,27 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 //Cập nhật thông tin ứng cử viên - Và cập nhật phần tài khoảng ứng cử viên, nếu SDT thay đổi
                 const string sqlNguoiDung = @"
                     UPDATE nguoidung 
-                    SET HoTen = @HoTen, GioiTinh=@GioiTinh, NgaySinh=@NgaySinh, GioiThieu=@GioiThieu,
-                        DiaChiLienLac=@DiaChiLienLac, CCCD=@CCCD, SDT=@SDT, ID_DanToc=@ID_DanToc,
+                    SET HoTen = @HoTen, GioiTinh=@GioiTinh, NgaySinh=@NgaySinh,
+                        DiaChiLienLac=@DiaChiLienLac, SDT=@SDT, ID_DanToc=@ID_DanToc,
                         Email=@Email, RoleID=@RoleID
                     WHERE ID_user = @ID_user;";
-                const string sqlCandidateAccount = @"
-                UPDATE taikhoan
-                SET taikhoan = @SDT
-                WHERE Taikhoan = @Taikhoan;";
-                const string sqlCandidate = @"UPDATE ungcuvien SET TrangThai = @TrangThai WHERE ID_ucv = @ID_ucv;";
 
-                using(var command1 = new MySqlCommand($"{sqlNguoiDung} {sqlCandidateAccount} {sqlCandidate}", connection)){
+                const string sqlCandidate = @"
+                UPDATE ungcuvien SET TrangThai = @TrangThai, GioiThieu=@GioiThieu 
+                WHERE ID_ucv = @ID_ucv;";
+
+                const string sqlCandidatePositions = @"
+                INSERT INTO chitietungcuvien (ID_ChucVu,ID_ucv)
+                VALUES (@ID_ChucVu,@ID_ucv)
+                ON DUPLICATE KEY UPDATE ID_ChucVu = @ID_ChucVu;
+                ";
+
+                const string sqlCandidateDegree = @"
+                UPDATE chitiettrinhdohocvanungcuvien
+                SET ID_TrinhDo =@ID_TrinhDo, ID_ucv= @ID_ucv
+                WHERE ID_ucv=@ID_ucv;";
+
+                using(var command1 = new MySqlCommand($"{sqlNguoiDung} {sqlCandidate} {sqlCandidatePositions} {sqlCandidateDegree}", connection)){
                     command1.Parameters.AddWithValue("@ID_user", ID_user);
                     command1.Parameters.AddWithValue("@ID_ucv", IDCandidate);
                     command1.Parameters.AddWithValue("@TrangThai", Candidate.TrangThai);
@@ -267,13 +277,14 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command1.Parameters.AddWithValue("@GioiTinh", Candidate.GioiTinh);
                     command1.Parameters.AddWithValue("@NgaySinh", Candidate.NgaySinh);
                     command1.Parameters.AddWithValue("@DiaChiLienLac", Candidate.DiaChiLienLac);
-                    command1.Parameters.AddWithValue("@CCCD", Candidate.CCCD);
                     command1.Parameters.AddWithValue("@SDT", Candidate.SDT);
                     command1.Parameters.AddWithValue("@Taikhoan", Candidate.TaiKhoan);
                     command1.Parameters.AddWithValue("@Email", Candidate.Email);
                     command1.Parameters.AddWithValue("@RoleID", Candidate.RoleID);
                     command1.Parameters.AddWithValue("@ID_DanToc", Candidate.ID_DanToc);
                     command1.Parameters.AddWithValue("@GioiThieu", Candidate.GioiThieu);
+                    command1.Parameters.AddWithValue("@ID_ChucVu", Candidate.ID_ChucVu);
+                    command1.Parameters.AddWithValue("@ID_TrinhDo", Candidate.ID_TrinhDo);
                 
                     int rowAffected = await command1.ExecuteNonQueryAsync();
                     if(rowAffected < 0) return -6;
@@ -297,6 +308,9 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         else
                             return -7;
                     default:
+                        Console.WriteLine($"Error in mySQL Message: {ex.Message}");
+                        Console.WriteLine($"Error in mySQL StackTrace: {ex.StackTrace}");
+                        Console.WriteLine($"Error in mySQL Code: {ex.Code}");
                         return -8;
                 }
 
@@ -308,8 +322,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //4. Lấy tất cả thông tin ứng cử viên
-        public async Task<List<CandidateDto>> _GetListOfCandidate(){
-            var list = new List<CandidateDto>();
+        public async Task<List<CandidateInfoDTO>> _GetListOfCandidate(){
+            var list = new List<CandidateInfoDTO>();
             using var connection = await _context.Get_MySqlConnection();
             if(connection.State != System.Data.ConnectionState.Open)
                 await connection.OpenAsync();
@@ -321,7 +335,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             using var reader = await command.ExecuteReaderAsync();
             
             while(await reader.ReadAsync()){
-                list.Add(new CandidateDto{
+                list.Add(new CandidateInfoDTO{
                     ID_ucv =reader.GetString(reader.GetOrdinal("ID_ucv")),
                     TrangThai =reader.GetString(reader.GetOrdinal("TrangThai")),  
                     ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
@@ -329,7 +343,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh")),
                     NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")).ToString("dd-MM-yyyy"),
                     DiaChiLienLac = reader.GetString(reader.GetOrdinal("DiaChiLienLac")),
-                    CCCD = reader.GetString(reader.GetOrdinal("CCCD")),
                     Email = reader.GetString(reader.GetOrdinal("Email")),
                     SDT = reader.GetString(reader.GetOrdinal("SDT")),
                     HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
@@ -421,25 +434,50 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //7. Xóa tài khoảng người dùng dựa trên ID cư tri
         public async Task<bool> _DeleteCandidateBy_ID(string IDCandidate){
             using var connect = await _context.Get_MySqlConnection();
+            using var transaction =await connect.BeginTransactionAsync();
 
-            //Truy xuất lấy ID ứng cử viên
-            string ID_user = await GetIDUserBaseOnIDUngCuVien(IDCandidate, connect);
-            if(string.IsNullOrEmpty(ID_user)) return false;
+            try{
+                //Truy xuất lấy ID ứng cử viên
+                string ID_user = await GetIDUserBaseOnIDUngCuVien(IDCandidate, connect);
+                if(string.IsNullOrEmpty(ID_user)) return false;
 
-            //Xóa tài khoản ứng cử viên trước rồi xóa tài khoản người dùng sau
-            const string sqlDeleteCandidate = @"DELETE FROM UngCuVien WHERE ID_ucv = @ID_ucv;";
-            using(var command1 = new MySqlCommand(sqlDeleteCandidate, connect)){
-                command1.Parameters.AddWithValue("@ID_ucv", IDCandidate);
-                
-                int rowAffect = await command1.ExecuteNonQueryAsync();
-                if(rowAffect < 0)
+                //Xóa tài khoản ứng cử viên trước rồi xóa tài khoản người dùng sau
+                const string sqlDeleteCandidate = @"DELETE FROM UngCuVien WHERE ID_ucv = @ID_ucv;";
+                using(var command1 = new MySqlCommand(sqlDeleteCandidate, connect)){
+                    command1.Parameters.AddWithValue("@ID_ucv", IDCandidate);
+                    
+                    int rowAffect = await command1.ExecuteNonQueryAsync();
+                    if(rowAffect < 0){
+                        await transaction.RollbackAsync();
+                        return false;
+                    }
+                }
+
+                if(await _DeleteUserBy_ID_withConnection(ID_user, connect) == false){
+                    await transaction.RollbackAsync();
                     return false;
+                }
+                
+                await transaction.CommitAsync();
+                return true;
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                await transaction.RollbackAsync();
+                throw;
             }
-
-            if(await _DeleteUserBy_ID_withConnection(ID_user, connect) == false)
-                return false;
-
-            return true;
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         //8. Lấy thông tin ứng cử viên và kèm theo tài khoản

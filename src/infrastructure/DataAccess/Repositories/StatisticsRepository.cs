@@ -1,6 +1,8 @@
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using MySql.Data.MySqlClient;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -8,11 +10,16 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
     {
         private readonly DatabaseContext _context;
         private const int CommandTimeout = 30;
+        private readonly IMemoryCache _cache;
+        private Random random = new Random();
+        private int CacheDurationMinutes = 5;
 
         // khởi tạo
-        public StatisticsRepository(DatabaseContext context)
+        public StatisticsRepository(DatabaseContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
+            CacheDurationMinutes += random.Next(1,4);       //Tránh tường hợp tất cả các key hết hạn cùng lúc
         }
         
         //Hàm hủy
@@ -21,41 +28,46 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             _context.Dispose();
         }
 
-        // Hàm thực thi câu lệnh truy vấn
+        // Hàm thực thi câu lệnh truy vấn từ csdl
         private async Task<int> ExecuteCountQuery(string sql, Dictionary<string, object> parameters = null){
-            try
-            {
-                using var connection = await _context.Get_MySqlConnection();
-                using var command = new MySqlCommand(sql, connection)
-                {
-                    CommandTimeout = CommandTimeout
-                };
-
-                if (parameters != null)
-                {
-                    foreach (var param in parameters)
+            for (int retry = 0; retry < 3; retry++){
+                try {
+                    using var connection = await _context.Get_MySqlConnection();
+                    using var command = new MySqlCommand(sql, connection)
                     {
-                        command.Parameters.AddWithValue(param.Key, param.Value);
-                    }
-                }
+                        CommandTimeout = CommandTimeout
+                    };
 
-                return Convert.ToInt32(await command.ExecuteScalarAsync());
-            }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                throw;
+                    if (parameters != null)
+                    {
+                        foreach (var param in parameters)
+                        {
+                            command.Parameters.AddWithValue(param.Key, param.Value);
+                        }
+                    }
+
+                    return Convert.ToInt32(await command.ExecuteScalarAsync());
+                }
+                catch (MySqlException ex) when (ex.Number == 1042 || ex.Number == 0){
+                    if (retry == 2) throw;
+                    await Task.Delay(100 * (retry + 1));
+                }
             }
-            catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
-                throw;
+
+            throw new Exception("Max retries reached");
+        }
+
+        //Hàm thực lưu lưu trong cache
+        private async Task<int> ExecuteCountQueryWithCache(string cacheKey, Func<Task<int>> query){
+            // Nếu có trong cache thì trả về
+            if(_cache.TryGetValue(cacheKey, out int cachedResult)){
+                return cachedResult;
             }
+
+            //Nếu không có thì thực thi truy vấn và lưu vào cache
+            var result = await query();
+            _cache.Set(cacheKey, result, TimeSpan.FromMinutes(5));
+            return result;
         }
 
         //1.Số lượng các kỳ bầu cử trong năm
@@ -114,34 +126,44 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //7.Số lượng đơn vị bầu cử
         public async Task<int> _NumberOfConstituencies(){
-            const string sql = @"
-                SELECT COUNT(ID_DonViBauCu) FROM donvibaucu;";
             
-            return await ExecuteCountQuery(sql);
+            return await ExecuteCountQueryWithCache("NumberOfConstituencies", async () =>{
+                const string sql = @"
+                    SELECT COUNT(ID_DonViBauCu) FROM donvibaucu;";
+                
+                return await ExecuteCountQuery(sql);
+            });
         }
         
         //8. Số lượng danh mục ứng cử 
         public async Task<int> _NumberOfNominations(){
-            const string sql = @"
+
+            return await ExecuteCountQueryWithCache("NumberOfNominations",async () =>{
+                const string sql = @"
                 SELECT COUNT(ID_Cap) FROM danhmucungcu;";
             
-            return await ExecuteCountQuery(sql);
+                return await ExecuteCountQuery(sql);
+            });
         }
 
         //9. Số lượng chức vụ
         public async Task<int> _NumberOfPositions(){
-            const string sql = @"
-                SELECT COUNT(ID_ChucVu) FROM chucvu;";
-            
-            return await ExecuteCountQuery(sql);
+            return await ExecuteCountQueryWithCache("NumberOfPositions",async () =>{
+                const string sql = @"
+                    SELECT COUNT(ID_ChucVu) FROM chucvu;";
+                
+                return await ExecuteCountQuery(sql);
+            });
         }
 
         //10. Số lượng ban
         public async Task<int> _NumberOfBoards(){
-            const string sql = @"
+            return await ExecuteCountQueryWithCache("NumberOfBoards",async () =>{
+                const string sql = @"
                 SELECT COUNT(ID_ChucVu) FROM chucvu;";
                 
-            return await ExecuteCountQuery(sql);
+                return await ExecuteCountQuery(sql);
+            });
         }
     }
 }

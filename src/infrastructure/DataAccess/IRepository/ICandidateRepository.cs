@@ -19,7 +19,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //Lấy thông tin theo ID ứng cử viên
         Task<CandidateDto> _GetCandidateBy_ID(string IDCandidate);
         //Lấy ALL
-        Task<List<CandidateDto>> _GetListOfCandidate();
+        Task<List<CandidateInfoDTO>> _GetListOfCandidate();
         //Đặt mật khẩu ứng cử viên - admin
         Task<bool> _SetCandidatePassword(string id,string newPwd);
         //Thay đổi mật khẩu - ứng cử viên
