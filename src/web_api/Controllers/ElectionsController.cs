@@ -312,5 +312,71 @@ namespace BackEnd.src.web_api.Controllers
                 });
             }
         }
+
+        //Liệt kê danh sách cử tri chưa tham dự bầu cử
+        [HttpGet("list-of-voters-who-have-not-yet-participated-election")]
+        [Authorize(Roles = "1")]
+        public async Task<IActionResult> ListOfVotersWhoHaveNotYetParticipatedElection([FromQuery] string ngayBD){
+            try{
+                var result = await _electionsReposistory._listOfVotersWhoHaveNotYetParticipatedElection(ngayBD);
+                return Ok(new{
+                    Status = "Ok",
+                    Message = "null",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro Source: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
+                return StatusCode(500,new{
+                    Status = "false",
+                    Message=$"Lỗi khi truy xuất danh sách chi tiết các kỳ bầu cử: {ex.Message}"
+                });
+            }
+        }
+
+        //Liệt kê danh sách ứng cử viên chưa tham dự bầu cử
+        [HttpGet("list-of-candidates-who-have-not-yet-participated-election")]
+        [Authorize(Roles = "1")]
+        public async Task<IActionResult> ListOfCandidatesWhoHaveNotYetParticipatedElection([FromQuery] string ngayBD){
+            try{
+                var result = await _electionsReposistory._listOfCandidatesWhoHaveNotYetParticipatedElection(ngayBD);
+                return Ok(new{
+                    Status = "Ok",
+                    Message = "null",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro Source: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
+                return StatusCode(500,new{
+                    Status = "false",
+                    Message=$"Lỗi khi truy xuất danh sách chi tiết các kỳ bầu cử: {ex.Message}"
+                });
+            }
+        }
+
+        //Liệt kê danh sách cán bộ chưa tham dự bầu cử
+        [HttpGet("list-of-cadres-who-have-not-yet-participated-election")]
+        [Authorize(Roles = "1")]
+        public async Task<IActionResult> ListOfCadresWhoHaveNotYetParticipatedElection([FromQuery] string ngayBD){
+            try{
+                var result = await _electionsReposistory._listOfCadresWhoHaveNotYetParticipatedElection(ngayBD);
+                return Ok(new{
+                    Status = "Ok",
+                    Message = "null",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Erro message: {ex.Message}");
+                Console.WriteLine($"Erro Source: {ex.Source}");
+                Console.WriteLine($"Erro InnerException: {ex.InnerException}");
+                return StatusCode(500,new{
+                    Status = "false",
+                    Message=$"Lỗi khi truy xuất danh sách chi tiết các kỳ bầu cử: {ex.Message}"
+                });
+            }
+        }
     }
 }

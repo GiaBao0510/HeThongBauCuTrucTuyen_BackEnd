@@ -35,6 +35,7 @@ namespace BackEnd.src.web_api.DTOs
         public int SuDung { get; set; } = 1;
 
         public int ID_ChucVu { get; set; } = 13;
+        public int ID_Cap { get; set; } = 12;
  
         //Khóa ngoại
         public int ID_DanToc{set; get;} = 1;

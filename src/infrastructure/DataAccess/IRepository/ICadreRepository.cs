@@ -16,7 +16,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //Lấy thông tin theo ID cán bộ
         Task<CadreDto> _GetCadreBy_ID(string IDCadre);
         //Lấy ALL
-        Task<List<CadreDto>> _GetListOfCadre();
+        Task<List<CadreInfoDTO>> _GetListOfCadre();
         //Đặt mật khẩu cán bộ - admin
         Task<bool> _SetCadrePassword(string id,string newPwd);
         //Thay đổi mật khẩu - cán bộ

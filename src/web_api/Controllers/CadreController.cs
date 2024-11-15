@@ -300,8 +300,7 @@ namespace BackEnd.src.web_api.Controllers
                 //Kiểm tra đầu vào
                 if(
                    cadreListInElectionDto.ListID_canbo.Count == 0 ||
-                   string.IsNullOrEmpty(cadreListInElectionDto.ngayBD.ToString()) ||
-                     string.IsNullOrEmpty(cadreListInElectionDto.ID_Ban.ToString())
+                   string.IsNullOrEmpty(cadreListInElectionDto.ngayBD.ToString())
                 ) 
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền đầy đủ thông tin."});
                 

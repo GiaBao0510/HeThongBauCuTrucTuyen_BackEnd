@@ -9,7 +9,6 @@ namespace BackEnd.src.web_api.DTOs
         public DateTime ThoiDiemDangKy{set;get;} = DateTime.Now;
         public float TyLeBinhChon{set;get;} = 0f;
         public DateTime ngayBD {set;get;}
-        public int ID_Cap {set;get;}
         public int ID_TrinhDo {set; get;} = 12;
     }
 }

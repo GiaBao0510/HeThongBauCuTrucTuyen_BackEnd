@@ -724,13 +724,25 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 
                 var list = new List<CadreJoinedForElectionDTO>();
                 const string sql = @"
-                SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, 
-                kbc.MoTa, kbc.SoLuongToiDaCuTri, kbc.SoLuongToiDaUngCuVien, 
-                kbc.SoLuotBinhChonToiDa, kbc.CongBo, dm.TenCapUngCu, dv.TenDonViBauCu
-                FROM kybaucu kbc 
-                JOIN danhmucungcu dm ON dm.ID_Cap = kbc.ID_Cap
-                JOIN donvibaucu dv ON dv.ID_DonViBauCu = dm.ID_DonViBauCu
-                WHERE year(kbc.ngayBD) = @year;";
+                SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, kbc.ID_Cap,
+                    kbc.MoTa, kbc.SoLuongToiDaCuTri,  kbc.SoLuongToiDaUngCuVien, 
+                    kbc.SoLuotBinhChonToiDa, kbc.CongBo, dm.TenCapUngCu, 
+                    dv.ID_DonViBauCu, dv.TenDonViBauCu,
+                    COUNT(DISTINCT kq.ID_ucv) AS SoLuongUngCuVienHienTai,
+                    COUNT(DISTINCT tt.ID_CuTri) AS SoLuongCuTriHienTai,
+                    COUNT(DISTINCT hd.ID_CanBO) AS SoLuongCanBoHienTai
+                FROM kybaucu kbc
+                INNER JOIN danhmucungcu dm ON dm.ID_Cap = kbc.ID_Cap
+                INNER JOIN donvibaucu dv ON dv.ID_DonViBauCu = dm.ID_DonViBauCu
+                LEFT JOIN ketquabaucu kq ON kq.ngayBD = kbc.ngayBD
+                LEFT JOIN trangthaibaucu tt ON tt.ngayBD = kbc.ngayBD
+                LEFT JOIN hoatdong hd ON hd.ngayBD = kbc.ngayBD
+                WHERE YEAR(kbc.ngayBD) = @year
+                GROUP BY 
+                    kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, 
+                    kbc.MoTa, kbc.SoLuongToiDaCuTri, kbc.SoLuongToiDaUngCuVien, 
+                    kbc.SoLuotBinhChonToiDa, kbc.CongBo, dm.TenCapUngCu, 
+                    dv.ID_DonViBauCu, dv.TenDonViBauCu;";
 
                 using(var command = new MySqlCommand(sql, connection)){
                     command.Parameters.AddWithValue("@year", year);
@@ -747,7 +759,158 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                             SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuotBinhChonToiDa")),
                             CongBo =reader.GetString(reader.GetOrdinal("CongBo")),
                             TenCapUngCu = reader.GetString(reader.GetOrdinal("TenCapUngCu")),
+                            ID_DonViBauCu = reader.GetInt32(reader.GetOrdinal("ID_DonViBauCu")),
+                            ID_Cap = reader.GetInt32(reader.GetOrdinal("ID_Cap")),
                             TenDonViBauCu = reader.GetString(reader.GetOrdinal("TenDonViBauCu")),
+                            SoLuongCuTriHienTai = reader.GetInt32(reader.GetOrdinal("SoLuongCuTriHienTai")),
+                            SoLuongUngCuVienHienTai = reader.GetInt32(reader.GetOrdinal("SoLuongUngCuVienHienTai")),
+                            SoLuongCanBoHienTai = reader.GetInt32(reader.GetOrdinal("SoLuongCanBoHienTai"))
+                        });
+                    }
+                }
+                return list;
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Lấy danh sách các cử tri chưa tham dự bầu cử
+        public async Task<List<UserNotYetJoinedDTO>> _listOfVotersWhoHaveNotYetParticipatedElection(string ngayBD){
+            try{
+                using var connection = await _context.Get_MySqlConnection();
+                
+                var list = new List<UserNotYetJoinedDTO>();
+                const string sql = @"
+                SELECT ct.ID_CuTri, nd.HoTen, nd.HinhAnh
+                FROM cutri ct 
+                INNER JOIN nguoidung nd ON nd.ID_user = ct.ID_user 
+                WHERE NOT EXISTS ( 
+                	SELECT 1
+                	FROM trangthaibaucu tt
+                	WHERE tt.ID_CuTri = ct.ID_CuTri 
+                	AND tt.ngayBD = @ngayBD
+                );";
+
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD", ngayBD);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new UserNotYetJoinedDTO{
+                            ID_object = reader.GetString(reader.GetOrdinal("ID_CuTri")),
+                            HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
+                            HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
+                        });
+                    }
+                }
+                return list;
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Lấy danh sách ứng cử viên chưa tham dự bầu cử
+        public async Task<List<UserNotYetJoinedDTO>> _listOfCandidatesWhoHaveNotYetParticipatedElection(string ngayBD){
+            try{
+                using var connection = await _context.Get_MySqlConnection();
+                
+                var list = new List<UserNotYetJoinedDTO>();
+                const string sql = @"
+                SELECT ucv.ID_ucv, nd.HoTen, nd.HinhAnh
+                FROM ungcuvien ucv
+                INNER JOIN nguoidung nd ON ucv.ID_user = nd.ID_user
+                WHERE NOT EXISTS(
+                	SELECT 1 FROM ketquabaucu kq
+                    WHERE kq.ID_ucv = ucv.ID_ucv 
+                    AND kq.ngayBD = @ngayBD
+                );";
+
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD", ngayBD);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new UserNotYetJoinedDTO{
+                            ID_object = reader.GetString(reader.GetOrdinal("ID_ucv")),
+                            HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
+                            HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
+                        });
+                    }
+                }
+                return list;
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Lấy danh sách cán bộ chưa tham dự bầu cử
+        public async Task<List<UserNotYetJoinedDTO>> _listOfCadresWhoHaveNotYetParticipatedElection(string ngayBD){
+            try{
+                using var connection = await _context.Get_MySqlConnection();
+                
+                var list = new List<UserNotYetJoinedDTO>();
+                const string sql = @"
+                SELECT cb.ID_CanBo, nd.HoTen, nd.HinhAnh
+                FROM canbo cb
+                INNER JOIN nguoidung nd ON nd.ID_user = cb.ID_user 
+                WHERE NOT EXISTS ( 
+                	SELECT 1
+                    FROM hoatdong hd
+                    WHERE hd.ID_canbo = cb.ID_canbo 
+                    AND hd.ngayBD = @ngayBD
+                );";
+
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD", ngayBD);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new UserNotYetJoinedDTO{
+                            ID_object = reader.GetString(reader.GetOrdinal("ID_CanBo")),
+                            HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
+                            HinhAnh = reader.GetString(reader.GetOrdinal("HinhAnh")),
                         });
                     }
                 }

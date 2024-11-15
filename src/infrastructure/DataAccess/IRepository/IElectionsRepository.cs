@@ -42,5 +42,11 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<bool> _UpdateResultAnnouncementElectionBasedOnElectionDate(DateTime ngayBD, MySqlConnection connection);
         //Lấy danh sách chi tiết các kỳ bầu cử
         Task<List<CadreJoinedForElectionDTO>> _getDetailsListOfElectionBassedOnYear(string year);
+        //Lấy danh sách các cử tri chưa tham dự bầu cử
+        Task<List<UserNotYetJoinedDTO>> _listOfVotersWhoHaveNotYetParticipatedElection(string ngayBD);
+        //Lấy danh sách các ứng cử viên chưa tham dự bầu cử
+        Task<List<UserNotYetJoinedDTO>> _listOfCandidatesWhoHaveNotYetParticipatedElection(string ngayBD);
+        //Lấy danh sách các cán bộ chưa tham dự bầu cử
+        Task<List<UserNotYetJoinedDTO>> _listOfCadresWhoHaveNotYetParticipatedElection(string ngayBD);
     }
 }

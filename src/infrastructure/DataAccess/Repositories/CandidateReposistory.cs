@@ -75,6 +75,17 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //1.Thêm (Kèm thêm chức vụ cho ứng cử viên)
         public async Task<int> _AddCandidate(CandidateDto Candidate, IFormFile fileAnh){
             Console.WriteLine("Đang thực hiện thêm thông tin ứng cử viên..");
+            Console.WriteLine($"Họ tên: {Candidate.HoTen}");
+            Console.WriteLine($"Ngày sinh: {Candidate.NgaySinh}");
+            Console.WriteLine($"Email: {Candidate.Email}");
+            Console.WriteLine($"Số điện thoại: {Candidate.SDT}");
+            Console.WriteLine($"Địa chỉ liên lạc: {Candidate.DiaChiLienLac}");
+            Console.WriteLine($"Giới thiệu: {Candidate.GioiThieu}");
+            Console.WriteLine($"Ngày bắt đầu: {Candidate.ngayBD}");
+            Console.WriteLine($"ID cấp: {Candidate.ID_Cap}");
+            Console.WriteLine($"ID chức vụ: {Candidate.ID_ChucVu}");
+            Console.WriteLine($"ID trình độ: {Candidate.ID_TrinhDo}");
+
             using var connect = await _context.Get_MySqlConnection();
 
             //Kiểm tra kết nối 
@@ -329,8 +340,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 await connection.OpenAsync();
 
             const string sql = @"
-            SELECT * FROM nguoidung nd 
+            SELECT nd.ID_user, nd.HoTen, nd.GioiTinh, nd.NgaySinh, nd.DiaChiLienLac, 
+            	nd.Email, nd.Email, nd.SDT, nd.HinhAnh, nd.PublicID, nd.ID_DanToc, nd.RoleID,	
+                ct.ID_ucv, ct.TrangThai, ct.GioiThieu
+            FROM nguoidung nd 
             INNER JOIN UngCuVien ct ON ct.ID_user = nd.ID_user";
+            
             using var command = new MySqlCommand(sql, connection);
             using var reader = await command.ExecuteReaderAsync();
             
@@ -349,7 +364,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     ID_DanToc = reader.GetInt32(reader.GetOrdinal("ID_DanToc")),
                     RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
                     PublicID = reader.GetString(reader.GetOrdinal("PublicID")),
-                    GioiThieu = reader.GetString(reader.GetOrdinal("GioiThieu")),
+                    GioiThieu = reader.GetString(reader.GetOrdinal("GioiThieu"))
                 });
             }
             return list;
@@ -442,20 +457,15 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 if(string.IsNullOrEmpty(ID_user)) return false;
 
                 //Xóa tài khoản ứng cử viên trước rồi xóa tài khoản người dùng sau
-                const string sqlDeleteCandidate = @"DELETE FROM UngCuVien WHERE ID_ucv = @ID_ucv;";
+                const string sqlDeleteCandidate = @"DELETE FROM nguoidung WHERE ID_user = @ID_user;";
                 using(var command1 = new MySqlCommand(sqlDeleteCandidate, connect)){
-                    command1.Parameters.AddWithValue("@ID_ucv", IDCandidate);
+                    command1.Parameters.AddWithValue("@ID_user", ID_user);
                     
                     int rowAffect = await command1.ExecuteNonQueryAsync();
                     if(rowAffect < 0){
                         await transaction.RollbackAsync();
                         return false;
                     }
-                }
-
-                if(await _DeleteUserBy_ID_withConnection(ID_user, connect) == false){
-                    await transaction.RollbackAsync();
-                    return false;
                 }
                 
                 await transaction.CommitAsync();
