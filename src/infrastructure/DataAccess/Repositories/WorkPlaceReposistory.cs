@@ -64,18 +64,30 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         }
 
         //1. Liệt kê các ID
-        public async Task<List<WorkPlace>> _GetWorkplaces(){
-            var list = new List<WorkPlace>();
+        public async Task<List<WorkPlaceDto>> _GetWorkplaces(){
+            var list = new List<WorkPlaceDto>();
 
             using var connection = await _context.Get_MySqlConnection();
-            using var command = new MySqlCommand("SELECT * FROM HoatDong", connection);
+            string sql = @"
+            SELECT hd.ID_canbo, nd.HoTen, b.ID_Ban, b.TenBan, cv.ID_ChucVu, cv.TenChucVu, hd.ngayBD
+            FROM hoatdong hd
+            INNER JOIN canbo cb ON cb.ID_canbo = hd.ID_canbo
+            INNER JOIN chucvu cv ON cv.ID_ChucVu = hd.ID_ChucVu
+            INNER JOIN ban b ON b.ID_Ban = hd.ID_Ban
+            INNER JOIN nguoidung nd ON nd.ID_user = cb.ID_user;";
+
+            using var command = new MySqlCommand(sql, connection);
             using var reader = await command.ExecuteReaderAsync();
             
             while(await reader.ReadAsync()){
-                list.Add(new WorkPlace{
+                list.Add(new WorkPlaceDto{
                     ID_Ban = reader.GetInt32(reader.GetOrdinal("ID_Ban")),
                     ID_canbo = reader.GetString(reader.GetOrdinal("ID_canbo")),
-                    ID_ChucVu = reader.GetInt32(reader.GetOrdinal("ID_ChucVu"))
+                    ID_ChucVu = reader.GetInt32(reader.GetOrdinal("ID_ChucVu")),
+                    TenBan = reader.GetString(reader.GetOrdinal("TenBan")),
+                    TenChucVu = reader.GetString(reader.GetOrdinal("TenChucVu")),
+                    HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
+                    ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD"))
                 });
             }
             return list;

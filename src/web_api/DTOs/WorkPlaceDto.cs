@@ -8,5 +8,6 @@ namespace BackEnd.src.web_api.DTOs
         public string? TenBan{set; get;}
         public string? HoTen{set; get;}
         public string? TenChucVu{set; get;}
+        public DateTime ngayBD { get; set; }
     }
 }

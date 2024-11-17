@@ -29,7 +29,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         //Xóa dữ liệu nơi công tác theo mã ban
         Task<bool> _DeleteWorkplaceBy_IDboard(int ID_ban);
         //Liệt kê các ID nơi công tác
-        Task<List<WorkPlace>> _GetWorkplaces();
+        Task<List<WorkPlaceDto>> _GetWorkplaces();
         //Liệt kê thông tin công tác, nhuwg chi tiết hơn
         Task<List<WorkPlaceDto>> _GetWorkplacesDetail();
         //Đặt lại chức vụ cho cán bộ - ID cán bộ
