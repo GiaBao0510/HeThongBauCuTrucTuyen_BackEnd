@@ -4323,7 +4323,7 @@
           }
         }
       },
-      "StackExchange.Redis/2.8.14": {
+      "StackExchange.Redis/2.8.16": {
         "type": "package",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
@@ -11955,10 +11955,10 @@
         "sprache.nuspec"
       ]
     },
-    "StackExchange.Redis/2.8.14": {
-      "sha512": "JcOSW+R2I5zeHOqnjqa2zpDjTA50/ZySO9vwK7nvdr+4vz6CKrJM8Z9amK5OyyW1OfKj1i4x+zrAohbuEol0sQ==",
+    "StackExchange.Redis/2.8.16": {
+      "sha512": "WaoulkOqOC9jHepca3JZKFTqndCWab5uYS7qCzmiQDlrTkFaDN7eLSlEfHycBxipRnQY9ppZM7QSsWAwUEGblw==",
       "type": "package",
-      "path": "stackexchange.redis/2.8.14",
+      "path": "stackexchange.redis/2.8.16",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -11972,7 +11972,7 @@
         "lib/netcoreapp3.1/StackExchange.Redis.xml",
         "lib/netstandard2.0/StackExchange.Redis.dll",
         "lib/netstandard2.0/StackExchange.Redis.xml",
-        "stackexchange.redis.2.8.14.nupkg.sha512",
+        "stackexchange.redis.2.8.16.nupkg.sha512",
         "stackexchange.redis.nuspec"
       ]
     },
@@ -16359,7 +16359,7 @@
       "MySql.Data >= 9.0.0",
       "MySql.EntityFrameworkCore >= 8.0.5",
       "Pomelo.EntityFrameworkCore.MySql >= 8.0.2",
-      "StackExchange.Redis >= 2.8.14",
+      "StackExchange.Redis >= 2.8.16",
       "Swashbuckle.AspNetCore >= 6.7.3",
       "log4net >= 2.0.17",
       "xunit >= 2.9.2"
@@ -16603,7 +16603,7 @@
           },
           "StackExchange.Redis": {
             "target": "Package",
-            "version": "[2.8.14, )"
+            "version": "[2.8.16, )"
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",

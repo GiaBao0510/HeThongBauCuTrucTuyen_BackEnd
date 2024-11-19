@@ -53,7 +53,7 @@
           "MySql.Data": "9.0.0",
           "MySql.EntityFrameworkCore": "8.0.5",
           "Pomelo.EntityFrameworkCore.MySql": "8.0.2",
-          "StackExchange.Redis": "2.8.14",
+          "StackExchange.Redis": "2.8.16",
           "Swashbuckle.AspNetCore": "6.7.3",
           "log4net": "2.0.17",
           "xunit": "2.9.2"
@@ -1885,7 +1885,7 @@
           "Microsoft.Extensions.Caching.Abstractions": "8.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "8.0.2",
           "Microsoft.Extensions.Options": "8.0.2",
-          "StackExchange.Redis": "2.8.14"
+          "StackExchange.Redis": "2.8.16"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Caching.StackExchangeRedis.dll": {
@@ -2706,7 +2706,7 @@
           }
         }
       },
-      "StackExchange.Redis/2.8.14": {
+      "StackExchange.Redis/2.8.16": {
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "8.0.2",
           "Pipelines.Sockets.Unofficial": "2.2.8"
@@ -2714,7 +2714,7 @@
         "runtime": {
           "lib/net6.0/StackExchange.Redis.dll": {
             "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.8.14.19860"
+            "fileVersion": "2.8.16.12844"
           }
         }
       },
@@ -5345,12 +5345,12 @@
       "path": "sprache/2.3.1",
       "hashPath": "sprache.2.3.1.nupkg.sha512"
     },
-    "StackExchange.Redis/2.8.14": {
+    "StackExchange.Redis/2.8.16": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-JcOSW+R2I5zeHOqnjqa2zpDjTA50/ZySO9vwK7nvdr+4vz6CKrJM8Z9amK5OyyW1OfKj1i4x+zrAohbuEol0sQ==",
-      "path": "stackexchange.redis/2.8.14",
-      "hashPath": "stackexchange.redis.2.8.14.nupkg.sha512"
+      "sha512": "sha512-WaoulkOqOC9jHepca3JZKFTqndCWab5uYS7qCzmiQDlrTkFaDN7eLSlEfHycBxipRnQY9ppZM7QSsWAwUEGblw==",
+      "path": "stackexchange.redis/2.8.16",
+      "hashPath": "stackexchange.redis.2.8.16.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore/6.7.3": {
       "type": "package",

@@ -1,7 +1,6 @@
 
 using BackEnd.src.core.Models;
 using BackEnd.src.web_api.DTOs;
-using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 
 namespace BackEnd.src.infrastructure.DataAccess.IRepository

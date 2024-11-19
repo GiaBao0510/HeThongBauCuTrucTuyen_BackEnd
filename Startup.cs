@@ -241,7 +241,7 @@ namespace BackEnd
             });
 
                 //13. Thêm dịch vụ signal
-            services.AddSignalR();
+            services.AddSignalR(); 
             
             services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
             services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
@@ -290,6 +290,14 @@ namespace BackEnd
             ));
             services.AddScoped<IFeedbackRepository,FeedbackReposistory>();
             services.AddScoped<IStatisticsRepository,StatisticsRepository>();
+            services.AddScoped<IRedisServices, RedisServices>();
+            //Cấu hình với redis
+            services.AddStackExchangeRedisCache(options =>{
+                options.Configuration = @$"
+                    {Configuration["RedisCloudConnection:Host"]}:{Configuration["RedisCloudConnection:Port"]},
+                    password={Configuration["RedisCloudConnection:Password"]},user={Configuration["RedisCloudConnection:Username"]},
+                    ssl=true,abortConnect=false";
+            });
         } 
 
         //Riêng các service muốn call thì sẽ goi trong đây

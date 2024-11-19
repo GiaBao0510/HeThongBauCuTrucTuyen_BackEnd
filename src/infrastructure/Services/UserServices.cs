@@ -5,7 +5,6 @@ using BackEnd.src.web_api.DTOs;
 using Isopoh.Cryptography.Argon2;
 using MySql.Data.MySqlClient;
 using log4net;
-using log4net.Config;
 using log4net.Util;
 using BackEnd.src.core.Common;
 using BackEnd.src.core.Interfaces;
@@ -19,8 +18,8 @@ namespace BackEnd.src.infrastructure.Services
         private readonly DatabaseContext _context;
         private static readonly ILog _log = LogManager.GetLogger(typeof(UserServices));
         private readonly IEmailSender _emailSender;
-        private readonly IMemoryCache _cache;
         private readonly IToken _token;
+        private readonly IRedisServices _redisServices;
 
 
         //Khởi tạo
@@ -28,12 +27,13 @@ namespace BackEnd.src.infrastructure.Services
             DatabaseContext context,
             IEmailSender emailSender,
             IMemoryCache cache,
-            IToken token
+            IToken token,
+            IRedisServices redisServices
         ){
             _context = context;
             _emailSender = emailSender;
-            _cache = cache;
             _token = token;
+            _redisServices = redisServices;
         }
 
         //Hủy
@@ -168,7 +168,7 @@ namespace BackEnd.src.infrastructure.Services
             EmailOTP emailopt = new EmailOTP();
             var emailBody = emailopt.GenerateOtpEmail(opt);     //Nội dung email
             var cacheKey = $"OTP_{emailDTO.Email}";                      //Đặt Key lưu vào bộ nhớ đệm
-            _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
+            await _redisServices.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
             await _emailSender.SendEmailAsync(emailDTO.Email, title, emailBody); //Gửi
 
             return true;
@@ -183,7 +183,7 @@ namespace BackEnd.src.infrastructure.Services
             
             //Thiết lập lưu mã otp vào bộ nhớ đệm
             var cacheKey = $"OTP_{email}";                      //Đặt Key lưu vào bộ nhớ đệm
-            _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
+            await _redisServices.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
             
             //Gửi
             await _emailSender.SendEmailAsync(
@@ -196,38 +196,37 @@ namespace BackEnd.src.infrastructure.Services
         //3. Xác thực mã otp sau khi đăng nhập
         public async Task<TokenModel> _VerifyOtpCodeAfterLogin(VerifyOtpDto verifyOtpDto){
             var cacheKey = $"OTP_{verifyOtpDto.Email}";
+            var value = await _redisServices.Get<string>(cacheKey);
 
             //Kiểm tra trong bộ nhớ cache có chứa OTP không
-            if(_cache.TryGetValue(cacheKey, out string cacheOTP)){
+            if(value != null && value.Equals(verifyOtpDto.Otp) && value == verifyOtpDto.Otp){ 
                 //Nếu mã otp hợp lệ thì xóa khỏi bộ nhớ đệm
-                if(cacheOTP == verifyOtpDto.Otp){
-                    _cache.Remove(cacheKey);
+                await _redisServices.Delete(cacheKey);
 
-                    //Tạo token rồi trả về cho người dùng
-                    LoginModel loginModel = new LoginModel();
+                //Tạo token rồi trả về cho người dùng
+                LoginModel loginModel = new LoginModel();
 
-                    const string sql = @"
-                    SELECT tk.TaiKhoan,tk.MatKhau,tk.RoleID,tk.BiKhoa,tk.SuDung, nd.Email 
-                    FROM taikhoan tk INNER JOIN nguoidung nd ON nd.SDT = tk.TaiKhoan
-                    WHERE nd.Email = @EMAIL";
-                    using var connection = await _context.Get_MySqlConnection();
-                    using(var command = new MySqlCommand(sql, connection)){
-                        command.Parameters.AddWithValue("@EMAIL", verifyOtpDto.Email);
-                        using var reader = await command.ExecuteReaderAsync();
+                const string sql = @"
+                SELECT tk.TaiKhoan,tk.MatKhau,tk.RoleID,tk.BiKhoa,tk.SuDung, nd.Email 
+                FROM taikhoan tk INNER JOIN nguoidung nd ON nd.SDT = tk.TaiKhoan
+                WHERE nd.Email = @EMAIL";
+                using var connection = await _context.Get_MySqlConnection();
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@EMAIL", verifyOtpDto.Email);
+                    using var reader = await command.ExecuteReaderAsync();
 
-                        if(await reader.ReadAsync()){       //Lưu thông tin này lại. Vì thông tin này để tạo ra token
-                            loginModel.account = reader.GetString(reader.GetOrdinal("TaiKhoan"));
-                            loginModel.Email = reader.GetString(reader.GetOrdinal("Email"));
-                            loginModel.password = reader.GetString(reader.GetOrdinal("MatKhau"));
-                            loginModel.Role = reader.GetInt32(reader.GetOrdinal("RoleID")).ToString();
-                            loginModel.BiKhoa = reader.GetString(reader.GetOrdinal("BiKhoa"));
-                            loginModel.SuDung = reader.GetInt32(reader.GetOrdinal("SuDung"));
-                        }
+                    if(await reader.ReadAsync()){       //Lưu thông tin này lại. Vì thông tin này để tạo ra token
+                        loginModel.account = reader.GetString(reader.GetOrdinal("TaiKhoan"));
+                        loginModel.Email = reader.GetString(reader.GetOrdinal("Email"));
+                        loginModel.password = reader.GetString(reader.GetOrdinal("MatKhau"));
+                        loginModel.Role = reader.GetInt32(reader.GetOrdinal("RoleID")).ToString();
+                        loginModel.BiKhoa = reader.GetString(reader.GetOrdinal("BiKhoa"));
+                        loginModel.SuDung = reader.GetInt32(reader.GetOrdinal("SuDung"));
                     }
-                    var token = await _token.GenerateToken(loginModel);
-
-                    return token;
                 }
+                var token = await _token.GenerateToken(loginModel);
+
+                return token;
             }
             return null; //xác nhận mã otp này không hợp lệ
         }
@@ -244,7 +243,7 @@ namespace BackEnd.src.infrastructure.Services
             EmailOTP_Verify emailopt = new EmailOTP_Verify();
             var emailBody = emailopt.GenerateOtpEmailVerify(opt);     //Nội dung email
             var cacheKey = $"OTP_{email}";                      //Đặt Key lưu vào bộ nhớ đệm
-            _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
+            await _redisServices.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
             await _emailSender.SendEmailAsync(email, title+":"+opt, emailBody); //Gửi
             return true;
         }
@@ -259,13 +258,13 @@ namespace BackEnd.src.infrastructure.Services
                 return -1; 
 
             var cacheKey = $"OTP_{verifyOtpDto.Email}";
+            var value = await _redisServices.Get<string>(cacheKey);
+            bool exitOtp = await _redisServices.KeyExists(cacheKey);
             
             //Lấy giá trị từ CacheKey
-            if(_cache.TryGetValue(cacheKey, out string cacheOTP)){
-                if(cacheOTP == verifyOtpDto.Otp){
-                    _cache.Remove(cacheKey);
-                    return 1;
-                }
+            if(value.Equals(verifyOtpDto.Otp) && exitOtp){
+                await _redisServices.Delete(cacheKey);
+                return 1;
             }
             return 0;   //Mã xác minh không hợp lệ
         }
@@ -285,7 +284,7 @@ namespace BackEnd.src.infrastructure.Services
             EmailOTP_password emailopt = new EmailOTP_password();
             var emailBody = emailopt.GenerateOtpEmail(opt);     //Nội dung email
             var cacheKey = $"OTP_{emailDTO.Email}";                      //Đặt Key lưu vào bộ nhớ đệm
-            _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
+            await _redisServices.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
             await _emailSender.SendEmailAsync(emailDTO.Email, title+":"+opt, emailBody); //Gửi
             return true;
         }
@@ -340,7 +339,7 @@ namespace BackEnd.src.infrastructure.Services
             EmailOTP_Verify emailopt = new EmailOTP_Verify();
             var emailBody = emailopt.GenerateOtpEmailVerify(opt);     //Nội dung email
             var cacheKey = $"OTP_{email}";                      //Đặt Key lưu vào bộ nhớ đệm
-            _cache.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
+            await _redisServices.Set(cacheKey, opt,TimeSpan.FromMinutes(5));  //Key, value và thời gian hết hạn
             await _emailSender.SendEmailAsync(email, title+":"+opt, emailBody); //Gửi
 
             return true;
