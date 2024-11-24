@@ -618,6 +618,9 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 
                 //Thông báo kết quả bầu cử
                 await _notificationHubs._announceElectionResult(ngayBD, connection);
+
+                //Gửi thông báo kết quả liên quan đến người dùng qua email
+                
                 
                 await transaction.CommitAsync();
                 Console.WriteLine("\t\t ====> công bố thành công");

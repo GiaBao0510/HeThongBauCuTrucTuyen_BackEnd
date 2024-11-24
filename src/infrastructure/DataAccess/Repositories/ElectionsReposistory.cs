@@ -687,7 +687,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 //Kiểm tra trạng thái kết nối trước khi mở
                 if(connection.State != System.Data.ConnectionState.Open)
                     await connection.OpenAsync();
-
+ 
                 const string sql = @"
                 UPDATE kybaucu
                 SET CongBo = '1'

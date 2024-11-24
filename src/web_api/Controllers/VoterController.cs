@@ -580,5 +580,33 @@ namespace BackEnd.src.web_api.Controllers
             }
         }
 
+        //18. Danh sách lich sử bỏ phiếu
+        [HttpGet("get-list-of-voting-history")]
+        [Authorize(Roles= "1,5")]
+        public async Task<IActionResult> GetListOfVotingHistory([FromQuery]string ID_cutri){
+            try{
+                if(string.IsNullOrEmpty(ID_cutri))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền mã cử tri."});
+
+                var result = await _voterReposistory._getListOfVotingHistory(ID_cutri);
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Danh sách lịch sử bỏ phiếu",
+                    Data = result,
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy danh sách lịch sử bỏ phiếu: {ex.Message}"
+                });
+            }
+        }
+
     }
 }

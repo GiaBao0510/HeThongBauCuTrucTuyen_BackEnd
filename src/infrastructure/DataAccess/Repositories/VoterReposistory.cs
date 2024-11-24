@@ -972,5 +972,44 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 throw;
             }
         }
+
+        //Lấy danh sách lịch sử bỏ phiếu
+        public async Task<List<VotingHistoryDTO>> _getListOfVotingHistory(string ID_CuTri){
+            try{
+                using var connection = await _context.Get_MySqlConnection();
+                var list = new List<VotingHistoryDTO>();
+                const string sql = @"
+                SELECT ct.ThoiDiem, p.ID_Phieu, p.ngayBD, dm.TenCapUngCu, ct.XacThuc
+                FROM chitietbaucu ct 
+                INNER JOIN phieubau p ON p.ID_Phieu = ct.ID_Phieu
+                INNER JOIN danhmucungcu dm ON dm.ID_Cap = p.ID_cap
+                WHERE ct.ID_CuTri =@ID_CuTri;";
+                
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ID_CuTri", ID_CuTri);
+                    
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new VotingHistoryDTO{
+                            ThoiDiemBoPhieu = reader.GetDateTime(reader.GetOrdinal("ThoiDiem")),
+                            ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
+                            ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")),
+                            TenCapUngCu = reader.GetString(reader.GetOrdinal("TenCapUngCu")),
+                            XacThuc = reader.GetInt32(reader.GetOrdinal("XacThuc"))
+                        });
+                    }
+                    return list;
+                }
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
     }
 }

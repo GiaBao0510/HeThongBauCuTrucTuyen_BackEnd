@@ -26,10 +26,11 @@ CREATE TABLE IF NOT EXISTS `ban` (
   `ID_DonViBauCu` smallint DEFAULT NULL,
   PRIMARY KEY (`ID_Ban`),
   KEY `ID_DonViBauCu` (`ID_DonViBauCu`),
+  KEY `idx_ban_ID_Ban` (`ID_Ban`),
   CONSTRAINT `ban_ibfk_1` FOREIGN KEY (`ID_DonViBauCu`) REFERENCES `donvibaucu` (`ID_DonViBauCu`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.ban: ~4 rows (approximately)
+-- Dumping data for table baucutructuyen.ban: ~5 rows (approximately)
 INSERT INTO `ban` (`ID_Ban`, `TenBan`, `ID_DonViBauCu`) VALUES
 	(1, 'Ban bầu cử', 1),
 	(2, 'Ban Kiểm phiếu', 1),
@@ -44,10 +45,11 @@ CREATE TABLE IF NOT EXISTS `canbo` (
   `ID_user` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`ID_CanBo`),
   KEY `ID_user` (`ID_user`),
-  CONSTRAINT `canbo_ibfk_1` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`)
+  KEY `idx_canbo_ID_user` (`ID_user`),
+  CONSTRAINT `canbo_ibfk_ID_user` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.canbo: ~4 rows (approximately)
+-- Dumping data for table baucutructuyen.canbo: ~5 rows (approximately)
 INSERT INTO `canbo` (`ID_CanBo`, `NgayCongTac`, `GhiChu`, `ID_user`) VALUES
 	('20241025151435', '1999-01-01 00:00:00', 'canbo8', 'Pv20241025151431'),
 	('20241025152418', '1999-01-01 00:00:00', 'canbo7', '7L20241025152412'),
@@ -60,20 +62,21 @@ CREATE TABLE IF NOT EXISTS `chitietbaucu` (
   `ThoiDiem` datetime DEFAULT NULL,
   `ID_Phieu` varchar(18) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `ID_CuTri` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `XacThuc` tinyint DEFAULT '-1',
   KEY `ID_CuTri` (`ID_CuTri`),
   KEY `ID_Phieu` (`ID_Phieu`),
-  CONSTRAINT `chitietbaucu_ibfk_1` FOREIGN KEY (`ID_CuTri`) REFERENCES `cutri` (`ID_CuTri`),
-  CONSTRAINT `chitietbaucu_ibfk_2` FOREIGN KEY (`ID_Phieu`) REFERENCES `phieubau` (`ID_Phieu`)
+  CONSTRAINT `chitietbaucu_ibfk_2` FOREIGN KEY (`ID_Phieu`) REFERENCES `phieubau` (`ID_Phieu`),
+  CONSTRAINT `chitietbaucu_ibfk_ID_CuTri` FOREIGN KEY (`ID_CuTri`) REFERENCES `cutri` (`ID_CuTri`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.chitietbaucu: ~6 rows (approximately)
-INSERT INTO `chitietbaucu` (`ThoiDiem`, `ID_Phieu`, `ID_CuTri`) VALUES
-	('2024-10-27 20:32:29', 'HL2024102720322871', '20240919194845'),
-	('2024-10-27 20:35:55', 'gg2024102720355539', '20240930165802'),
-	('2024-10-27 20:37:53', 'ok2024102720375308', '20240919200022'),
-	('2024-10-27 20:39:43', 'C42024102720394280', '20240916232132'),
-	('2024-10-27 20:41:23', 'gD2024102720412253', '20240916221039'),
-	('2024-10-27 20:42:47', 'a52024102720424695', '20240930165456');
+INSERT INTO `chitietbaucu` (`ThoiDiem`, `ID_Phieu`, `ID_CuTri`, `XacThuc`) VALUES
+	('2024-10-27 20:32:29', 'HL2024102720322871', '20240919194845', -1),
+	('2024-10-27 20:35:55', 'gg2024102720355539', '20240930165802', -1),
+	('2024-10-27 20:37:53', 'ok2024102720375308', '20240919200022', -1),
+	('2024-10-27 20:39:43', 'C42024102720394280', '20240916232132', -1),
+	('2024-10-27 20:41:23', 'gD2024102720412253', '20240916221039', -1),
+	('2024-11-11 10:16:53', 'w62024111110165247', '20240930165456', -1);
 
 -- Dumping structure for table baucutructuyen.chitietcongboketqua
 CREATE TABLE IF NOT EXISTS `chitietcongboketqua` (
@@ -81,27 +84,32 @@ CREATE TABLE IF NOT EXISTS `chitietcongboketqua` (
   `ID_CanBo` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `ID_ucv` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `ngayBD` datetime DEFAULT NULL,
-  KEY `ID_CanBo` (`ID_CanBo`),
-  KEY `ID_ucv` (`ID_ucv`),
-  KEY `ngayBD` (`ngayBD`),
-  CONSTRAINT `chitietcongboketqua_ibfk_1` FOREIGN KEY (`ID_CanBo`) REFERENCES `canbo` (`ID_CanBo`),
-  CONSTRAINT `chitietcongboketqua_ibfk_2` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`),
-  CONSTRAINT `chitietcongboketqua_ibfk_3` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
+  KEY `chitietcongboketqua_ibfk_ID_CanBo` (`ID_CanBo`),
+  KEY `chitietcongboketqua_ibfk_ID_ucv` (`ID_ucv`),
+  KEY `chitietcongboketqua_ibfk_ngayBD` (`ngayBD`),
+  CONSTRAINT `chitietcongboketqua_ibfk_ID_CanBo` FOREIGN KEY (`ID_CanBo`) REFERENCES `canbo` (`ID_CanBo`) ON DELETE CASCADE,
+  CONSTRAINT `chitietcongboketqua_ibfk_ID_ucv` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`) ON DELETE CASCADE,
+  CONSTRAINT `chitietcongboketqua_ibfk_ngayBD` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table baucutructuyen.chitietcongboketqua: ~1 rows (approximately)
 INSERT INTO `chitietcongboketqua` (`ThoiDiemCongBo`, `ID_CanBo`, `ID_ucv`, `ngayBD`) VALUES
-	('2024-10-28 15:21:28', '20241025151435', '20241017143409', '2024-10-22 12:12:12');
+	('2024-11-11 19:39:19', '20241025151435', '20241017143445', '2024-10-22 12:12:12');
 
 -- Dumping structure for table baucutructuyen.chitietcutri
 CREATE TABLE IF NOT EXISTS `chitietcutri` (
   `ID_ChucVu` tinyint DEFAULT NULL,
   `ID_CuTri` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   KEY `ID_CuTri` (`ID_CuTri`),
-  CONSTRAINT `chitietcutri_ibfk_1` FOREIGN KEY (`ID_CuTri`) REFERENCES `cutri` (`ID_CuTri`)
+  CONSTRAINT `chitietcutri_ibfk_ID_CuTri` FOREIGN KEY (`ID_CuTri`) REFERENCES `cutri` (`ID_CuTri`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.chitietcutri: ~0 rows (approximately)
+-- Dumping data for table baucutructuyen.chitietcutri: ~4 rows (approximately)
+INSERT INTO `chitietcutri` (`ID_ChucVu`, `ID_CuTri`) VALUES
+	(13, '20241109134558'),
+	(13, '20241109142305'),
+	(13, '20241109221936'),
+	(13, '20241109234117');
 
 -- Dumping structure for table baucutructuyen.chitietthongbaocanbo
 CREATE TABLE IF NOT EXISTS `chitietthongbaocanbo` (
@@ -109,11 +117,11 @@ CREATE TABLE IF NOT EXISTS `chitietthongbaocanbo` (
   `ID_CanBo` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   KEY `ID_ThongBao` (`ID_ThongBao`),
   KEY `ID_CanBo` (`ID_CanBo`),
-  CONSTRAINT `chitietthongbaocanbo_ibfk_1` FOREIGN KEY (`ID_ThongBao`) REFERENCES `thongbao` (`ID_ThongBao`),
-  CONSTRAINT `chitietthongbaocanbo_ibfk_2` FOREIGN KEY (`ID_CanBo`) REFERENCES `canbo` (`ID_CanBo`)
+  CONSTRAINT `chitietthongbaocanbo_ibfk_ID_CanBo` FOREIGN KEY (`ID_CanBo`) REFERENCES `canbo` (`ID_CanBo`) ON DELETE CASCADE,
+  CONSTRAINT `chitietthongbaocanbo_ibfk_ID_ThongBao` FOREIGN KEY (`ID_ThongBao`) REFERENCES `thongbao` (`ID_ThongBao`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.chitietthongbaocanbo: ~35 rows (approximately)
+-- Dumping data for table baucutructuyen.chitietthongbaocanbo: ~41 rows (approximately)
 INSERT INTO `chitietthongbaocanbo` (`ID_ThongBao`, `ID_CanBo`) VALUES
 	(59, '20241025151435'),
 	(59, '20241025152418'),
@@ -149,7 +157,17 @@ INSERT INTO `chitietthongbaocanbo` (`ID_ThongBao`, `ID_CanBo`) VALUES
 	(206, '20241025152418'),
 	(207, '20241025153453'),
 	(208, '20241025153720'),
-	(209, '20241025153942');
+	(209, '20241025153942'),
+	(210, '20241025151435'),
+	(210, '20241025152418'),
+	(210, '20241025153453'),
+	(210, '20241025153720'),
+	(210, '20241025153942'),
+	(211, '20241025151435'),
+	(211, '20241025152418'),
+	(211, '20241025153453'),
+	(211, '20241025153720'),
+	(211, '20241025153942');
 
 -- Dumping structure for table baucutructuyen.chitietthongbaocutri
 CREATE TABLE IF NOT EXISTS `chitietthongbaocutri` (
@@ -157,11 +175,11 @@ CREATE TABLE IF NOT EXISTS `chitietthongbaocutri` (
   `ID_CuTri` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   KEY `ID_CuTri` (`ID_CuTri`),
   KEY `ID_ThongBao` (`ID_ThongBao`),
-  CONSTRAINT `chitietthongbaocutri_ibfk_1` FOREIGN KEY (`ID_CuTri`) REFERENCES `cutri` (`ID_CuTri`),
-  CONSTRAINT `chitietthongbaocutri_ibfk_2` FOREIGN KEY (`ID_ThongBao`) REFERENCES `thongbao` (`ID_ThongBao`)
+  CONSTRAINT `chitietthongbaocutri_ibfk_ID_CuTri` FOREIGN KEY (`ID_CuTri`) REFERENCES `cutri` (`ID_CuTri`) ON DELETE CASCADE,
+  CONSTRAINT `chitietthongbaocutri_ibfk_ID_ThongBao` FOREIGN KEY (`ID_ThongBao`) REFERENCES `thongbao` (`ID_ThongBao`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.chitietthongbaocutri: ~85 rows (approximately)
+-- Dumping data for table baucutructuyen.chitietthongbaocutri: ~97 rows (approximately)
 INSERT INTO `chitietthongbaocutri` (`ID_ThongBao`, `ID_CuTri`) VALUES
 	(59, '20240930165802'),
 	(59, '20240919200022'),
@@ -247,7 +265,21 @@ INSERT INTO `chitietthongbaocutri` (`ID_ThongBao`, `ID_CuTri`) VALUES
 	(194, '20240919200022'),
 	(195, '20240919194845'),
 	(196, '20240916221039'),
-	(197, '20240930165802');
+	(197, '20240930165802'),
+	(210, '20240930165802'),
+	(210, '20240919200022'),
+	(210, '20240916232132'),
+	(210, '20240916220819'),
+	(210, '20240916221039'),
+	(210, '20240930165456'),
+	(210, '20240919194845'),
+	(211, '20240930165802'),
+	(211, '20240919200022'),
+	(211, '20240916232132'),
+	(211, '20240916220819'),
+	(211, '20240916221039'),
+	(211, '20240930165456'),
+	(211, '20240919194845');
 
 -- Dumping structure for table baucutructuyen.chitietthongbaoungcuvien
 CREATE TABLE IF NOT EXISTS `chitietthongbaoungcuvien` (
@@ -255,11 +287,11 @@ CREATE TABLE IF NOT EXISTS `chitietthongbaoungcuvien` (
   `ID_ucv` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   KEY `ID_ucv` (`ID_ucv`),
   KEY `ID_ThongBao` (`ID_ThongBao`),
-  CONSTRAINT `chitietthongbaoungcuvien_ibfk_1` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`),
-  CONSTRAINT `chitietthongbaoungcuvien_ibfk_2` FOREIGN KEY (`ID_ThongBao`) REFERENCES `thongbao` (`ID_ThongBao`)
+  CONSTRAINT `chitietthongbaoungcuvien_ibfk_ID_ThongBao` FOREIGN KEY (`ID_ThongBao`) REFERENCES `thongbao` (`ID_ThongBao`) ON DELETE CASCADE,
+  CONSTRAINT `chitietthongbaoungcuvien_ibfk_ID_ucv` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.chitietthongbaoungcuvien: ~47 rows (approximately)
+-- Dumping data for table baucutructuyen.chitietthongbaoungcuvien: ~55 rows (approximately)
 INSERT INTO `chitietthongbaoungcuvien` (`ID_ThongBao`, `ID_ucv`) VALUES
 	(59, '20241017143132'),
 	(59, '20241017143237'),
@@ -307,7 +339,17 @@ INSERT INTO `chitietthongbaoungcuvien` (`ID_ThongBao`, `ID_ucv`) VALUES
 	(201, '20241003003050'),
 	(202, '20241003003142'),
 	(203, '20241012212410'),
-	(204, '20241012212527');
+	(204, '20241012212527'),
+	(210, '20241017143132'),
+	(210, '20241017143237'),
+	(210, '20241017143328'),
+	(210, '20241017143409'),
+	(210, '20241017143445'),
+	(211, '20241017143132'),
+	(211, '20241017143237'),
+	(211, '20241017143328'),
+	(211, '20241017143409'),
+	(211, '20241017143445');
 
 -- Dumping structure for table baucutructuyen.chitiettrinhdohocvancanbo
 CREATE TABLE IF NOT EXISTS `chitiettrinhdohocvancanbo` (
@@ -316,7 +358,7 @@ CREATE TABLE IF NOT EXISTS `chitiettrinhdohocvancanbo` (
   KEY `ID_TrinhDo` (`ID_TrinhDo`),
   KEY `ID_CanBo` (`ID_CanBo`),
   CONSTRAINT `chitiettrinhdohocvancanbo_ibfk_1` FOREIGN KEY (`ID_TrinhDo`) REFERENCES `trinhdohocvan` (`ID_TrinhDo`),
-  CONSTRAINT `chitiettrinhdohocvancanbo_ibfk_2` FOREIGN KEY (`ID_CanBo`) REFERENCES `canbo` (`ID_CanBo`)
+  CONSTRAINT `chitiettrinhdohocvancanbo_ibfk_ID_CanBo` FOREIGN KEY (`ID_CanBo`) REFERENCES `canbo` (`ID_CanBo`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.chitiettrinhdohocvancanbo: ~0 rows (approximately)
@@ -327,11 +369,11 @@ CREATE TABLE IF NOT EXISTS `chitiettrinhdohocvanungcuvien` (
   `ID_ucv` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   KEY `ID_ucv` (`ID_ucv`),
   KEY `ID_TrinhDo` (`ID_TrinhDo`),
-  CONSTRAINT `chitiettrinhdohocvanungcuvien_ibfk_1` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`),
-  CONSTRAINT `chitiettrinhdohocvanungcuvien_ibfk_2` FOREIGN KEY (`ID_TrinhDo`) REFERENCES `trinhdohocvan` (`ID_TrinhDo`)
+  CONSTRAINT `chitiettrinhdohocvanungcuvien_ibfk_2` FOREIGN KEY (`ID_TrinhDo`) REFERENCES `trinhdohocvan` (`ID_TrinhDo`),
+  CONSTRAINT `chitiettrinhdohocvanungcuvien_ibfk_ID_ucv` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.chitiettrinhdohocvanungcuvien: ~12 rows (approximately)
+-- Dumping data for table baucutructuyen.chitiettrinhdohocvanungcuvien: ~13 rows (approximately)
 INSERT INTO `chitiettrinhdohocvanungcuvien` (`ID_TrinhDo`, `ID_ucv`) VALUES
 	(11, '20241003000921'),
 	(11, '20241003002121'),
@@ -344,24 +386,28 @@ INSERT INTO `chitiettrinhdohocvanungcuvien` (`ID_TrinhDo`, `ID_ucv`) VALUES
 	(8, '20241017143237'),
 	(8, '20241017143328'),
 	(8, '20241017143409'),
-	(8, '20241017143445');
+	(8, '20241017143445'),
+	(12, '20241114150058');
 
 -- Dumping structure for table baucutructuyen.chitietungcuvien
 CREATE TABLE IF NOT EXISTS `chitietungcuvien` (
   `ID_ChucVu` tinyint DEFAULT NULL,
   `ID_ucv` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   KEY `ID_ucv` (`ID_ucv`),
-  CONSTRAINT `chitietungcuvien_ibfk_1` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`)
+  CONSTRAINT `chitietungcuvien_ibfk_ID_ucv` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.chitietungcuvien: ~0 rows (approximately)
+INSERT INTO `chitietungcuvien` (`ID_ChucVu`, `ID_ucv`) VALUES
+	(0, '20241114150058');
 
 -- Dumping structure for table baucutructuyen.chucvu
 CREATE TABLE IF NOT EXISTS `chucvu` (
   `ID_ChucVu` tinyint NOT NULL AUTO_INCREMENT,
   `TenChucVu` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  PRIMARY KEY (`ID_ChucVu`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  PRIMARY KEY (`ID_ChucVu`),
+  KEY `idx_chucvu_ID_ChucVu` (`ID_ChucVu`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.chucvu: ~13 rows (approximately)
 INSERT INTO `chucvu` (`ID_ChucVu`, `TenChucVu`) VALUES
@@ -378,7 +424,8 @@ INSERT INTO `chucvu` (`ID_ChucVu`, `TenChucVu`) VALUES
 	(12, 'Không có chức vụ'),
 	(13, 'Sinh viên'),
 	(14, 'Giảng viên'),
-	(15, 'Kiểm soát viên');
+	(15, 'Kiểm soát viên'),
+	(16, 'test');
 
 -- Dumping structure for table baucutructuyen.cutri
 CREATE TABLE IF NOT EXISTS `cutri` (
@@ -386,15 +433,19 @@ CREATE TABLE IF NOT EXISTS `cutri` (
   `ID_user` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`ID_CuTri`),
   KEY `FK_userCuTri` (`ID_user`),
-  CONSTRAINT `FK_userCuTri` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`)
+  CONSTRAINT `FK_userCuTri_ID_user` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.cutri: ~7 rows (approximately)
+-- Dumping data for table baucutructuyen.cutri: ~11 rows (approximately)
 INSERT INTO `cutri` (`ID_CuTri`, `ID_user`) VALUES
+	('20241109134558', 'bp20241109134555'),
 	('20240919200022', 'i420240919200017'),
 	('20240919194845', 'iZ20240919194839'),
+	('20241109142305', 'J820241109142300'),
 	('20240930165456', 'jp20240930165451'),
 	('20240916221039', 'Pe20240916221033'),
+	('20241109234117', 'pf20241109234113'),
+	('20241109221936', 'ps20241109221931'),
 	('20240916220819', 'sT20240916220819'),
 	('20240930165802', 'uB20240930165759'),
 	('20240916232132', 'Zh20240916232125');
@@ -407,9 +458,9 @@ CREATE TABLE IF NOT EXISTS `danhmucungcu` (
   PRIMARY KEY (`ID_Cap`),
   KEY `ID_DonViBauCu` (`ID_DonViBauCu`),
   CONSTRAINT `danhmucungcu_ibfk_1` FOREIGN KEY (`ID_DonViBauCu`) REFERENCES `donvibaucu` (`ID_DonViBauCu`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.danhmucungcu: ~9 rows (approximately)
+-- Dumping data for table baucutructuyen.danhmucungcu: ~11 rows (approximately)
 INSERT INTO `danhmucungcu` (`ID_Cap`, `TenCapUngCu`, `ID_DonViBauCu`) VALUES
 	(1, 'Trưởng khoa', 3),
 	(2, 'Phó trưởng khoa', 3),
@@ -420,7 +471,8 @@ INSERT INTO `danhmucungcu` (`ID_Cap`, `TenCapUngCu`, `ID_DonViBauCu`) VALUES
 	(8, 'Trưởng Lớp A3 Khoa Khoa Học Máy Tính', 9),
 	(9, 'Trưởng Lớp A1 Khoa Khoa Học Máy Tính', 3),
 	(10, 'Phó bảo vệ', 9),
-	(11, 'Thủ quỹ', 3);
+	(11, 'Thủ Quỹ', 9),
+	(12, 'Cấp temp', 3);
 
 -- Dumping structure for table baucutructuyen.dantoc
 CREATE TABLE IF NOT EXISTS `dantoc` (
@@ -494,7 +546,7 @@ CREATE TABLE IF NOT EXISTS `diachitamtru` (
   KEY `ID_QH` (`ID_QH`),
   KEY `fk_nguoidungtamtru` (`ID_user`),
   CONSTRAINT `diachitamtru_ibfk_3` FOREIGN KEY (`ID_QH`) REFERENCES `quanhuyen` (`ID_QH`),
-  CONSTRAINT `fk_nguoidungtamtru` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`)
+  CONSTRAINT `fk_nguoidungtamtru_ID_user` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.diachitamtru: ~0 rows (approximately)
@@ -506,7 +558,7 @@ CREATE TABLE IF NOT EXISTS `diachithuongtru` (
   KEY `ID_QH` (`ID_QH`),
   KEY `fk_nguoidung` (`ID_user`),
   CONSTRAINT `diachithuongtru_ibfk_3` FOREIGN KEY (`ID_QH`) REFERENCES `quanhuyen` (`ID_QH`),
-  CONSTRAINT `fk_nguoidung` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`)
+  CONSTRAINT `fk_nguoidung_ID_user` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.diachithuongtru: ~0 rows (approximately)
@@ -520,43 +572,51 @@ CREATE TABLE IF NOT EXISTS `donvibaucu` (
   PRIMARY KEY (`ID_DonViBauCu`),
   KEY `ID_QH` (`ID_QH`),
   CONSTRAINT `donvibaucu_ibfk_1` FOREIGN KEY (`ID_QH`) REFERENCES `quanhuyen` (`ID_QH`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.donvibaucu: ~4 rows (approximately)
+-- Dumping data for table baucutructuyen.donvibaucu: ~6 rows (approximately)
 INSERT INTO `donvibaucu` (`ID_DonViBauCu`, `TenDonViBauCu`, `DiaChi`, `ID_QH`) VALUES
 	(1, 'Khoa công nghệ thông tin', 'Phường An Khánh, Q.Ninh Kiều, tp.Cần Thơ', 1),
 	(3, 'Khoa khoa học máy tính', 'Phường An Khánh, Q.Ninh Kiều, tp.Cần Thơ', 1),
 	(6, 'Khoa Hệ thống thông tin', 'Phường An Khánh, Q.Ninh Kiều, tp.Cần Thơ', 1),
-	(9, 'Trường CNTT&TT', 'Phường An Khánh, Q.Ninh Kiều, tp.Cần Thơ', 1);
+	(9, 'Trường CNTT&TT', 'Phường An Khánh, Q.Ninh Kiều, tp.Cần Thơ', 1),
+	(10, 'Trường ĐH Cần Thơ', 'Phường An Khánh, Q.Ninh Kiều, tp.Cần Thơ', 1);
 
 -- Dumping structure for table baucutructuyen.hoatdong
 CREATE TABLE IF NOT EXISTS `hoatdong` (
   `ID_canbo` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `ID_ChucVu` tinyint DEFAULT NULL,
-  `ID_Ban` smallint DEFAULT NULL,
+  `ID_ChucVu` tinyint DEFAULT '16',
+  `ID_Ban` smallint DEFAULT '6',
   `ngayBD` datetime DEFAULT NULL,
   KEY `ID_canbo` (`ID_canbo`),
   KEY `ID_ChucVu` (`ID_ChucVu`),
   KEY `ID_Ban` (`ID_Ban`),
   KEY `ngayBD` (`ngayBD`),
-  CONSTRAINT `hoatdong_ibfk_1` FOREIGN KEY (`ID_canbo`) REFERENCES `canbo` (`ID_CanBo`),
+  KEY `idx_hoatdong_ngayBD` (`ngayBD`),
+  KEY `idx_hoatdong_ID_canbo` (`ID_canbo`),
+  KEY `idx_hoatdong_ID_ChucVu` (`ID_ChucVu`),
+  KEY `idx_hoatdong_ID_Ban` (`ID_Ban`),
   CONSTRAINT `hoatdong_ibfk_2` FOREIGN KEY (`ID_ChucVu`) REFERENCES `chucvu` (`ID_ChucVu`),
   CONSTRAINT `hoatdong_ibfk_3` FOREIGN KEY (`ID_Ban`) REFERENCES `ban` (`ID_Ban`),
-  CONSTRAINT `hoatdong_ibfk_4` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
+  CONSTRAINT `hoatdong_ibfk_ID_CanBo` FOREIGN KEY (`ID_canbo`) REFERENCES `canbo` (`ID_CanBo`) ON DELETE CASCADE,
+  CONSTRAINT `hoatdong_ibfk_ngayBD` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.hoatdong: ~10 rows (approximately)
+-- Dumping data for table baucutructuyen.hoatdong: ~13 rows (approximately)
 INSERT INTO `hoatdong` (`ID_canbo`, `ID_ChucVu`, `ID_Ban`, `ngayBD`) VALUES
 	('20241025151435', 14, 2, '2024-10-22 12:12:12'),
 	('20241025152418', 14, 2, '2024-10-22 12:12:12'),
-	('20241025153453', 14, 2, '2024-10-22 12:12:12'),
+	('20241025153453', 14, 6, '2024-10-22 12:12:12'),
 	('20241025153720', 14, 2, '2024-10-22 12:12:12'),
 	('20241025153942', 14, 2, '2024-10-22 12:12:12'),
 	('20241025151435', 14, 2, '2024-11-03 10:25:11'),
 	('20241025152418', 14, 2, '2024-11-03 10:25:11'),
-	('20241025153453', 14, 2, '2024-11-03 10:25:11'),
+	('20241025153453', 14, 6, '2024-11-03 10:25:11'),
 	('20241025153720', 14, 2, '2024-11-03 10:25:11'),
-	('20241025153942', 14, 2, '2024-11-03 10:25:11');
+	('20241025153942', 14, 2, '2024-11-03 10:25:11'),
+	('20241025153453', 16, 6, '2024-11-28 11:11:11'),
+	('20241025151435', 16, 6, '2024-11-28 11:11:11'),
+	('20241025153942', 16, 6, '2024-11-28 11:11:11');
 
 -- Dumping structure for table baucutructuyen.hosonguoidung
 CREATE TABLE IF NOT EXISTS `hosonguoidung` (
@@ -565,10 +625,10 @@ CREATE TABLE IF NOT EXISTS `hosonguoidung` (
   `ID_user` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`MaSo`),
   KEY `ID_user` (`ID_user`),
-  CONSTRAINT `hosonguoidung_ibfk_1` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `hosonguoidung_ibfk_ID_user` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.hosonguoidung: ~24 rows (approximately)
+-- Dumping data for table baucutructuyen.hosonguoidung: ~31 rows (approximately)
 INSERT INTO `hosonguoidung` (`MaSo`, `TrangThaiDangKy`, `ID_user`) VALUES
 	(1, '1', 'sT20240916220819'),
 	(2, '1', 'Pe20240916221033'),
@@ -594,7 +654,12 @@ INSERT INTO `hosonguoidung` (`MaSo`, `TrangThaiDangKy`, `ID_user`) VALUES
 	(24, '1', '7L20241025152412'),
 	(25, '1', 'in20241025153445'),
 	(26, '1', 'Dp20241025153713'),
-	(27, '1', 'rw20241025153937');
+	(27, '1', 'rw20241025153937'),
+	(28, '0', 'bp20241109134555'),
+	(29, '0', 'J820241109142300'),
+	(30, '0', 'ps20241109221931'),
+	(31, '0', 'pf20241109234113'),
+	(39, '1', '2K20241114150052');
 
 -- Dumping structure for table baucutructuyen.ketquabaucu
 CREATE TABLE IF NOT EXISTS `ketquabaucu` (
@@ -607,12 +672,13 @@ CREATE TABLE IF NOT EXISTS `ketquabaucu` (
   KEY `ID_Cap` (`ID_Cap`),
   KEY `ID_ucv` (`ID_ucv`),
   KEY `ngayBD` (`ngayBD`),
+  KEY `idx_ketquabaucu_ngayBD` (`ngayBD`),
   CONSTRAINT `ketquabaucu_ibfk_1` FOREIGN KEY (`ID_Cap`) REFERENCES `danhmucungcu` (`ID_Cap`),
-  CONSTRAINT `ketquabaucu_ibfk_2` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`),
-  CONSTRAINT `ketquabaucu_ibfk_3` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
+  CONSTRAINT `ketquabaucu_ibfk_ID_ucv` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`) ON DELETE CASCADE,
+  CONSTRAINT `ketquabaucu_ibfk_ngayBD` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.ketquabaucu: ~12 rows (approximately)
+-- Dumping data for table baucutructuyen.ketquabaucu: ~16 rows (approximately)
 INSERT INTO `ketquabaucu` (`SoLuotBinhChon`, `ThoiDiemDangKy`, `TyLeBinhChon`, `ngayBD`, `ID_ucv`, `ID_Cap`) VALUES
 	(0, '2024-10-03 00:09:22', 0, '2024-11-03 10:15:00', '20241003000921', 9),
 	(0, '2024-10-03 00:21:22', 0, '2024-11-03 10:15:00', '20241003002121', 9),
@@ -621,11 +687,15 @@ INSERT INTO `ketquabaucu` (`SoLuotBinhChon`, `ThoiDiemDangKy`, `TyLeBinhChon`, `
 	(0, '2024-10-03 00:31:43', 0, '2024-11-03 10:15:00', '20241003003142', 9),
 	(0, '2024-10-12 21:24:10', 0, '2024-11-03 10:25:10', '20241012212410', 1),
 	(0, '2024-10-12 21:25:28', 0, '2024-11-03 10:25:10', '20241012212527', 1),
-	(4, '2024-10-17 14:31:32', 20, '2024-10-22 12:12:12', '20241017143132', 3),
-	(3, '2024-10-17 14:32:37', 15, '2024-10-22 12:12:12', '20241017143237', 3),
-	(4, '2024-10-17 14:33:28', 20, '2024-10-22 12:12:12', '20241017143328', 3),
-	(5, '2024-10-17 14:34:10', 25, '2024-10-22 12:12:12', '20241017143409', 3),
-	(4, '2024-10-17 14:34:45', 20, '2024-10-22 12:12:12', '20241017143445', 3);
+	(4, '2024-10-17 14:31:32', 17.3913, '2024-10-22 12:12:12', '20241017143132', 3),
+	(4, '2024-10-17 14:32:37', 17.3913, '2024-10-22 12:12:12', '20241017143237', 3),
+	(5, '2024-10-17 14:33:28', 21.7391, '2024-10-22 12:12:12', '20241017143328', 3),
+	(5, '2024-10-17 14:34:10', 21.7391, '2024-10-22 12:12:12', '20241017143409', 3),
+	(5, '2024-10-17 14:34:45', 21.7391, '2024-10-22 12:12:12', '20241017143445', 3),
+	(0, '2024-11-14 15:00:59', 0, '2024-11-28 11:11:11', '20241114150058', 12),
+	(0, '2024-11-15 16:52:27', 0, '2024-11-28 11:11:11', '20241003003142', 11),
+	(0, '2024-11-15 16:52:28', 0, '2024-11-28 11:11:11', '20241003000921', 11),
+	(0, '2024-11-15 16:52:28', 0, '2024-11-28 11:11:11', '20241017143409', 11);
 
 -- Dumping structure for table baucutructuyen.khoa
 CREATE TABLE IF NOT EXISTS `khoa` (
@@ -637,8 +707,8 @@ CREATE TABLE IF NOT EXISTS `khoa` (
   `ngayBD` datetime DEFAULT NULL,
   PRIMARY KEY (`ID_Khoa`),
   KEY `ngayBD` (`ngayBD`),
-  CONSTRAINT `khoa_ibfk_1` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `khoa_ibfk_ngayBD` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.khoa: ~15 rows (approximately)
 INSERT INTO `khoa` (`ID_Khoa`, `NgayTao`, `N`, `G`, `path_PK`, `ngayBD`) VALUES
@@ -656,7 +726,8 @@ INSERT INTO `khoa` (`ID_Khoa`, `NgayTao`, `N`, `G`, `path_PK`, `ngayBD`) VALUES
 	(16, '2024-10-31 19:26:00', 547693, 297973395241, 'F:\\PrivateKey\\2024-26-31_19-26-00.txt', '2024-10-31 12:50:00'),
 	(17, '2024-10-31 21:45:04', 319369, 68851783052, 'F:\\PrivateKey\\2024-45-31_21-45-04.txt', '2024-10-31 21:43:59'),
 	(18, '2024-10-31 21:48:15', 367063, 133865138971, 'F:\\PrivateKey\\2024-48-31_21-48-14.txt', '2024-10-31 21:46:50'),
-	(19, '2024-11-01 18:06:40', 217801, 21443713795, 'F:\\PrivateKey\\2024-06-01_18-06-39.txt', '2024-10-31 12:51:00');
+	(19, '2024-11-01 18:06:40', 217801, 21443713795, 'F:\\PrivateKey\\2024-06-01_18-06-39.txt', '2024-10-31 12:51:00'),
+	(22, '2024-11-13 21:05:53', 373831, 59174556355, 'F:\\PrivateKey\\2024-05-13_21-05-53.txt', '2024-11-28 11:11:11');
 
 -- Dumping structure for table baucutructuyen.kybaucu
 CREATE TABLE IF NOT EXISTS `kybaucu` (
@@ -680,28 +751,29 @@ CREATE TABLE IF NOT EXISTS `kybaucu` (
 
 -- Dumping data for table baucutructuyen.kybaucu: ~22 rows (approximately)
 INSERT INTO `kybaucu` (`ngayBD`, `ngayKT`, `NgayKT_UngCu`, `TenKyBauCu`, `MoTa`, `SoLuongToiDaCuTri`, `SoLuongToiDaUngCuVien`, `SoLuotBinhChonToiDa`, `CongBo`, `ID_Cap`) VALUES
-	('2024-08-13 07:00:19', '2024-12-18 07:00:19', '2024-07-03 20:02:34', 'Bảo vệ luận văn', '', 30, 12, 5, '0', 5),
-	('2024-09-19 23:54:51', '2024-11-30 12:14:00', '2024-07-03 20:02:33', 'Bao', '', 50, 10, 5, '0', 2),
-	('2024-10-15 19:05:00', '2024-12-16 12:15:00', '2024-10-18 00:00:00', 'Deadline', 'bảo vệ luận văn', 20, 5, 3, '0', 2),
-	('2024-10-15 19:11:03', '2024-12-16 12:15:00', '2024-10-18 00:00:00', 'Deadline', 'bảo vệ luận văn', 20, 5, 3, '0', 9),
-	('2024-10-15 19:14:42', '2024-12-15 12:15:55', '2024-10-18 00:00:00', 'Bầu cử trưởng xóm', 'Dealine2', 20, 6, 3, '0', 7),
-	('2024-10-19 12:15:55', '2024-11-15 12:15:55', '2024-10-18 00:00:00', 'Bầu cử phó trưởng xóm', 'Dealine3', 20, 5, 3, '0', 9),
-	('2024-10-21 12:15:55', '2024-11-16 12:15:55', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng', 'Dealine4', 20, 5, 3, '0', 3),
-	('2024-10-22 12:10:10', '2024-11-09 10:10:10', '2024-11-05 11:34:23', 'Bầu cử phó trưởng phòng', 'Diễn ra tại phòng bảo vệ', 10, 5, 4, '0', 10),
-	('2024-10-22 12:12:12', '2024-12-12 12:12:12', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng 12', 'Dealine12', 12, 5, 4, '1', 3),
-	('2024-10-22 12:50:10', '2024-11-11 11:11:11', '2024-11-05 11:35:32', 'Bầu cử phó trưởng phòng2', 'Diễn ra tại phòng bảo vệ', 10, 5, 4, '0', 10),
-	('2024-10-23 11:12:35', '2024-11-17 12:15:55', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng5', 'Dealine5', 20, 5, 3, '0', 7),
-	('2024-10-23 12:15:45', '2024-11-17 12:15:55', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng3', 'Dealine5', 20, 5, 3, '0', 5),
-	('2024-10-23 12:17:35', '2024-11-17 12:15:55', '0001-01-01 00:00:00', 'Bầu cử phó trưởng làng4', 'Dealine5', 20, 5, 3, '0', 2),
-	('2024-10-30 12:50:10', '2024-11-13 11:13:13', '2024-11-05 19:18:01', 'Bầu cử phó trưởng phòng3', 'Diễn ra tại phòng bảo vệ', 10, 5, 4, '0', 10),
-	('2024-10-31 12:50:00', '2024-11-09 09:09:09', '2024-11-05 19:26:00', 'Bầu cử trưởng lớp KHMT', 'Diễn ra tại phòng 204', 10, 5, 4, '0', 9),
-	('2024-10-31 12:51:00', '2024-11-09 09:09:09', '2024-11-06 18:06:39', 'Bầu cử trưởng lớp KHMT ', 'Test có thể xóa (Xóa)', 10, 5, 4, '0', 9),
+	('2024-08-13 07:00:19', '2024-12-18 07:00:19', '2024-07-03 20:02:34', 'Bầu cử trưởng lớp KHMT A1', '', 30, 12, 5, '0', 5),
+	('2024-09-19 23:54:51', '2024-11-30 12:14:00', '2024-07-03 20:02:33', 'Bầu cử trưởng lớp KHMT A2', '', 50, 10, 5, '0', 2),
+	('2024-10-15 19:05:00', '2024-12-16 12:15:00', '2024-10-18 00:00:00', 'Bầu cử trưởng lớp KHMT A3', 'bảo vệ luận văn', 20, 5, 3, '0', 2),
+	('2024-10-15 19:11:03', '2024-12-16 12:15:00', '2024-10-18 00:00:00', 'Bầu cử trưởng lớp HTTT A1', 'bảo vệ luận văn', 20, 5, 3, '0', 9),
+	('2024-10-15 19:14:42', '2024-12-15 12:15:55', '2024-10-18 00:00:00', 'Bầu cử trưởng lớp HTTT A2', 'Dealine2', 20, 6, 3, '0', 7),
+	('2024-10-19 12:15:55', '2024-11-15 12:15:55', '2024-10-18 00:00:00', 'Bầu cử trưởng lớp HTTT A3', 'Dealine3', 20, 5, 3, '0', 9),
+	('2024-10-21 12:15:55', '2024-11-16 12:15:55', '0001-01-01 00:00:00', 'Bầu cử trưởng lớp MMT A1', 'Dealine4', 20, 5, 3, '0', 3),
+	('2024-10-22 12:10:10', '2024-11-09 10:10:10', '2024-11-05 11:34:23', 'Bầu cử trưởng lớp MMT A2', 'Diễn ra tại phòng bảo vệ', 10, 5, 4, '0', 10),
+	('2024-10-22 12:12:12', '2024-12-12 12:12:12', '0001-01-01 00:00:00', 'Bầu cử trưởng lớp MMT A3', 'Dealine12', 12, 5, 4, '1', 3),
+	('2024-10-22 12:50:10', '2024-11-11 11:11:11', '2024-11-05 11:35:32', 'Bầu cử trưởng lớp CNTT&TT A1', 'Diễn ra tại phòng bảo vệ', 10, 5, 4, '0', 10),
+	('2024-10-23 11:12:35', '2024-11-17 12:15:55', '0001-01-01 00:00:00', 'Bầu cử trưởng lớp CNTT&TT A2', 'Dealine5', 20, 5, 3, '0', 7),
+	('2024-10-23 12:15:45', '2024-11-17 12:15:55', '0001-01-01 00:00:00', 'Bầu cử trưởng lớp CNTT&TT A3', 'Dealine5', 20, 5, 3, '0', 5),
+	('2024-10-23 12:17:35', '2024-11-17 12:15:55', '0001-01-01 00:00:00', 'Bầu cử trưởng lớp TTDPT A1', 'Dealine5', 20, 5, 3, '0', 2),
+	('2024-10-30 12:50:10', '2024-11-13 11:13:13', '2024-11-05 19:18:01', 'Bầu cử trưởng lớp TTDPT A2', 'Diễn ra tại phòng bảo vệ', 10, 5, 4, '0', 10),
+	('2024-10-31 12:50:00', '2024-11-09 09:09:09', '2024-11-05 19:26:00', 'Bầu cử trưởng lớp TTDPT A3', 'Diễn ra tại phòng 204', 10, 5, 4, '0', 9),
+	('2024-10-31 12:51:00', '2024-11-09 09:09:09', '2024-11-06 18:06:39', 'Bầu cử trưởng lớp KTPM A1', 'Test có thể xóa (Xóa)', 10, 5, 4, '0', 9),
 	('2024-10-31 21:43:59', '2024-11-09 21:44:08', '2024-11-05 21:45:04', 'Bầu cử phó trưởng lớp KHMT A1', 'Diễn ra tại phòng 217', 15, 4, 3, '0', 8),
-	('2024-10-31 21:46:50', '2024-11-10 21:47:03', '2024-11-05 21:48:15', 'Bầu cử thủ quỹ', 'Diễn ra tại phòng 101', 10, 3, 2, '0', 11),
-	('2024-11-03 10:15:00', '2024-11-15 12:10:00', '2024-07-03 20:02:35', 'Bầu cử trưởng thôn', 'okok', 20, 5, 3, '0', 9),
-	('2024-11-03 10:25:10', '2024-11-15 12:10:00', '2024-10-25 20:02:36', 'Bầu cử trưởng làng', '', 10, 7, 3, '0', 1),
-	('2024-11-03 10:25:11', '2024-11-30 12:14:00', '2024-07-03 20:02:37', 'Bầu cử thị trưởng', '', 15, 4, 2, '0', 9),
-	('2024-11-05 00:00:00', '2024-12-31 00:00:00', '2024-07-03 20:02:38', 'Bầu cử', '', 100, 8, 3, '0', 5);
+	('2024-10-31 21:46:50', '2024-11-10 21:47:03', '2024-11-05 21:48:15', 'Bầu cử thủ quỹ', 'Diễn ra tại phòng 101', 10, 3, 2, '0', 10),
+	('2024-11-03 10:15:00', '2024-11-15 12:10:00', '2024-07-03 20:02:35', 'Bầu cử trưởng lớp KTPM A2', 'okok', 20, 5, 3, '0', 9),
+	('2024-11-03 10:25:10', '2024-11-15 12:10:00', '2024-10-25 20:02:36', 'Bầu cử trưởng lớp KTPM A3', '', 10, 7, 3, '0', 1),
+	('2024-11-03 10:25:11', '2024-11-30 12:14:00', '2024-07-03 20:02:37', 'Bầu cử trưởng lớp KTPM A4', '', 15, 4, 2, '0', 9),
+	('2024-11-05 00:00:00', '2024-12-31 00:00:00', '2024-07-03 20:02:38', 'Bầu cử', '', 100, 8, 3, '0', 5),
+	('2024-11-28 11:11:11', '2024-12-05 09:09:09', '2024-11-18 21:05:53', 'Bầu cử thủ quỹ lớp CNTT a3 ', 'Diễn ra tại 207/DI', 10, 5, 4, '0', 11);
 
 -- Dumping structure for table baucutructuyen.lichsudangnhap
 CREATE TABLE IF NOT EXISTS `lichsudangnhap` (
@@ -710,22 +782,22 @@ CREATE TABLE IF NOT EXISTS `lichsudangnhap` (
   `TaiKhoan` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   UNIQUE KEY `UNK_IDTaiKhoan` (`TaiKhoan`),
   KEY `TaiKhoan` (`TaiKhoan`),
-  CONSTRAINT `lichsudangnhap_ibfk_1` FOREIGN KEY (`TaiKhoan`) REFERENCES `taikhoan` (`TaiKhoan`)
+  CONSTRAINT `lichsudangnhap_ibfk_TaiKhoan` FOREIGN KEY (`TaiKhoan`) REFERENCES `taikhoan` (`TaiKhoan`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.lichsudangnhap: ~12 rows (approximately)
+-- Dumping data for table baucutructuyen.lichsudangnhap: ~13 rows (approximately)
 INSERT INTO `lichsudangnhap` (`ThoiDiem`, `DiaChiIP`, `TaiKhoan`) VALUES
-	('2024-11-02 22:31:02', '127.0.0.1', 'admin2'),
+	('2024-11-21 21:42:27', '127.0.0.1', 'admin2'),
 	('2024-10-25 22:04:56', '192.168.2.113', '098910005'),
-	('2024-10-29 19:20:16', '192.168.2.113', '098950005'),
+	('2024-11-11 20:28:48', '192.168.1.205', '098950005'),
 	('2024-10-27 20:39:26', '192.168.2.113', '0974000252'),
 	('2024-10-26 21:50:20', '192.168.2.113', '0974000452'),
-	('2024-10-29 18:44:32', '192.168.2.113', '0974000652'),
+	('2024-11-11 12:09:45', '192.168.1.107', '0974000652'),
 	('2024-10-29 18:24:47', '192.168.2.113', '0974000352'),
-	('2024-10-27 19:57:27', '192.168.2.113', '0974000162'),
+	('2024-11-11 11:35:13', '192.168.1.107', '0974000162'),
 	('2024-10-27 20:35:02', '192.168.2.113', '0974000752'),
-	('2024-10-30 14:38:01', '192.168.10.118', '0974000552'),
-	('2024-10-28 23:16:23', '192.168.1.228', '040714015'),
+	('2024-11-10 15:06:29', '192.168.1.92', '0974000552'),
+	('2024-11-17 21:04:11', '192.168.112.1', '040714015'),
 	('2024-10-29 18:33:44', '192.168.2.113', '040714016'),
 	('2024-10-29 19:16:02', '192.168.2.113', '040714018');
 
@@ -739,8 +811,8 @@ CREATE TABLE IF NOT EXISTS `nguoidung` (
   `CCCD` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `Email` varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `SDT` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `HinhAnh` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `PublicID` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `HinhAnh` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'null',
+  `PublicID` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'null',
   `ID_DanToc` tinyint DEFAULT NULL,
   `RoleID` tinyint DEFAULT NULL,
   PRIMARY KEY (`ID_user`),
@@ -749,27 +821,33 @@ CREATE TABLE IF NOT EXISTS `nguoidung` (
   UNIQUE KEY `SDT` (`SDT`),
   KEY `ID_DanToc` (`ID_DanToc`),
   KEY `fk_vaitronguoidung` (`RoleID`),
+  KEY `idx_nguoidung_ID_user` (`ID_user`),
   CONSTRAINT `fk_vaitronguoidung` FOREIGN KEY (`RoleID`) REFERENCES `vaitro` (`RoleID`),
   CONSTRAINT `nguoidung_ibfk_1` FOREIGN KEY (`ID_DanToc`) REFERENCES `dantoc` (`ID_DanToc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.nguoidung: ~25 rows (approximately)
+-- Dumping data for table baucutructuyen.nguoidung: ~30 rows (approximately)
 INSERT INTO `nguoidung` (`ID_user`, `HoTen`, `GioiTinh`, `NgaySinh`, `DiaChiLienLac`, `CCCD`, `Email`, `SDT`, `HinhAnh`, `PublicID`, `ID_DanToc`, `RoleID`) VALUES
+	('2K20241114150052', 'Phạm Huy Hoàng 5555', '1', '2024-10-21', 'Quận ninh kiều ,Thành phố cần thơ', NULL, 'phamhuyh0ang115@gmail.com', '0947888952', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1731571258/NguoiDung/idb21pn0ufbhrylxderm.jpg', 'NguoiDung/idb21pn0ufbhrylxderm', 1, 2),
 	('5520241012212400', 'NguyenVanF', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001053', 'nguyenvanf@gmail.com', '040714013', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1728743049/NguoiDung/pdcpemhuohcom13ph71z.jpg', 'NguoiDung/pdcpemhuohcom13ph71z', 1, 2),
 	('7H20241003002115', 'NguyenVanB', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170000652', 'nguyenvanb@gmail.com', '040714008', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727889680/NguoiDung/mecgdcdk13queaimrygw.jpg', 'NguoiDung/mecgdcdk13queaimrygw', 1, 2),
 	('7L20241025152412', 'PhamVanG', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'phamvang@ctu.edu.vn', '098940005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729844658/NguoiDung/jjqxglfizr2ou0cs0kru.jpg', 'NguoiDung/jjqxglfizr2ou0cs0kru', 1, 8),
+	('bp20241109134555', 'Trần Vĩnh Tiến', '0', '2003-06-12', 'tp Bạc Liêu', NULL, 'tranvinhtien@gmail.com', '0974008888', 'null', 'null', 14, 8),
 	('Do20241003003139', 'NguyenVanE', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170000952', 'nguyenvane@gmail.com', '040714011', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727890302/NguoiDung/svxuiuxvdgjcm9wm49v7.jpg', 'NguoiDung/svxuiuxvdgjcm9wm49v7', 1, 2),
 	('Dp20241025153713', 'PhamVanE', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'phamvane@ctu.edu.vn', '098920005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729845440/NguoiDung/axuxnvasmnaurocimz2j.jpg', 'NguoiDung/axuxnvasmnaurocimz2j', 1, 8),
 	('Ds20241003000915', 'NguyenVanA', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170000552', 'nguyenvana@gmail.com', '040714007', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727888960/NguoiDung/zztvpcs0hopvem3gsnel.jpg', 'NguoiDung/zztvpcs0hopvem3gsnel', 1, 2),
 	('Dz20241017143406', 'TranVanD', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001058', 'liyor6okey@aleitar.com', '040714018', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150449/NguoiDung/g95k0de68o0nizgdhntn.jpg', 'NguoiDung/g95k0de68o0nizgdhntn', 1, 2),
 	('Gu20241003002922', 'NguyenVanC', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170000752', 'nguyenvanc@gmail.com', '040714009', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727890169/NguoiDung/cu16bwbu1tbr3jhq47yp.jpg', 'NguoiDung/cu16bwbu1tbr3jhq47yp', 1, 2),
-	('i420240919200017', 'Tiểu Xuân Tử', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '123456789', 'liyor63942@aleitar.com', '0974000552', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726750819/NguoiDung/giajvu1tmzpixlqhxmyb.jpg', 'NguoiDung/giajvu1tmzpixlqhxmyb', 1, 5),
+	('i420240919200017', 'Tiểu Xuân Tử', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '123456789', 'pgiabao2002@gmail.com', '0974000552', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726750819/NguoiDung/giajvu1tmzpixlqhxmyb.jpg', 'NguoiDung/giajvu1tmzpixlqhxmyb', 1, 5),
 	('in20241025153445', 'PhamVanF', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'phamvanf@ctu.edu.vn', '098930005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729845293/NguoiDung/a6wiydsmwefoojijtp05.jpg', 'NguoiDung/a6wiydsmwefoojijtp05', 1, 8),
-	('iZ20240919194839', 'Võ Hoàng Tuấn Đạt', '1', '2002-10-29', ' tp.Cà Mau', NULL, 'riwopaplah@regishub.com', '0974000162', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726750121/NguoiDung/b0pyecdhyid0q37zlpy2.jpg', 'NguoiDung/b0pyecdhyid0q37zlpy2', 1, 5),
-	('jp20240930165451', 'Hồ Minh Trường', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', NULL, 'liyorhala@aleitar.com', '0974000652', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727690096/NguoiDung/cpvj0gxxgzyevrbw7hgl.jpg', 'NguoiDung/cpvj0gxxgzyevrbw7hgl', 1, 5),
-	('ME20241017143125', 'TranVanA', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001055', 'wobaxa1@acroins.com', '040714015', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150291/NguoiDung/mzo3aew6ixn1asas3bno.jpg', 'NguoiDung/mzo3aew6ixn1asas3bno', 1, 2),
+	('iZ20240919194839', 'Võ Hoàng Tuấn Đạt G', '1', '2002-10-29', ' tp.Cà Mau', NULL, 'halaopis479@cironex.com', '0974000162', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726750121/NguoiDung/b0pyecdhyid0q37zlpy2.jpg', 'NguoiDung/b0pyecdhyid0q37zlpy2', 1, 5),
+	('J820241109142300', 'Trần Vĩnh2', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', NULL, 'hanagaming5@gmail.com', '0974000754', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1731136983/NguoiDung/pg2btxfazvhkkih12oqj.jpg', 'NguoiDung/pg2btxfazvhkkih12oqj', 1, 5),
+	('jp20240930165451', 'Hồ Minh Trường', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', NULL, 'kepon8893@gianes.com', '0974000652', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727690096/NguoiDung/cpvj0gxxgzyevrbw7hgl.jpg', 'NguoiDung/cpvj0gxxgzyevrbw7hgl', 1, 5),
+	('ME20241017143125', 'TranVanA', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170001055', 'pudrenurdu@gufum.com', '040714015', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729150291/NguoiDung/mzo3aew6ixn1asas3bno.jpg', 'NguoiDung/mzo3aew6ixn1asas3bno', 1, 2),
 	('Pe20240916221033', 'Lê Hữu Đức', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', '000322327445', 'wobaxa3469@acroins.com', '0974000352', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726499436/NguoiDung/nhdc4uzjfwwpwmbcmcpr.jpg', 'NguoiDung/nhdc4uzjfwwpwmbcmcpr', 1, 5),
-	('Pv20241025151431', 'PhamVanH', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'liyor63412@aleitar.com', '098950005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729844076/NguoiDung/qfyf9uwti3adcqptxg6d.jpg', 'NguoiDung/qfyf9uwti3adcqptxg6d', 1, 8),
+	('pf20241109234113', 'Châu Phi Hùng', '1', '2024-11-01', 'Quận ninh kiều ,Thành phố cần thơ', NULL, 'chauphihung@gmail.com', '0947517952', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1731170474/NguoiDung/zx2we5wi8ybw7bgseecg.jpg', 'NguoiDung/zx2we5wi8ybw7bgseecg', 1, 5),
+	('ps20241109221931', 'Châu Tiểu Long', '1', '2024-10-29', '3/2, q.Ninh Kiều, tp.Cần Thơ', NULL, 'chauTieuLong@gmail.com', '0974000755', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1731165573/NguoiDung/pxsbq5qerrjhuh40v4a3.jpg', 'NguoiDung/pxsbq5qerrjhuh40v4a3', 1, 5),
+	('Pv20241025151431', 'PhamVanH', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'yinikil924@edectus.com', '098950005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729844076/NguoiDung/qfyf9uwti3adcqptxg6d.jpg', 'NguoiDung/qfyf9uwti3adcqptxg6d', 1, 8),
 	('RM20241003003046', 'NguyenVanD', '1', '2002-01-01', 'hẻm 69,3/2, q.Ninh Kiều, tp.Cần Thơ', '0170000852', 'nguyenvand@gmail.com', '040714010', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1727890250/NguoiDung/bun34h6wktbzda5o5tug.jpg', 'NguoiDung/bun34h6wktbzda5o5tug', 1, 2),
 	('rw20241025153937', 'PhamVanD', '1', '1999-01-01', 'q.Ninh Kiều, tp.Cần Thơ', NULL, 'rad12162@inohm.com', '098910005', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1729845582/NguoiDung/hvqbyz73wrultd40uy9c.jpg', 'NguoiDung/hvqbyz73wrultd40uy9c', 1, 8),
 	('rY20240918210506', 'Đỗ Thánh', '1', '2002-10-19', 'Q.Ninh Kiều, tp.Càn Thơ', '10000000008', 'pgbaop4@gmail.com', 'admin2', 'http://res.cloudinary.com/dkajnklq6/image/upload/v1726668312/NguoiDung/whyuizgynfpg63zrogdp.jpg', 'NguoiDung/whyuizgynfpg63zrogdp', 1, 1),
@@ -787,7 +865,7 @@ CREATE TABLE IF NOT EXISTS `phanhoicanbo` (
   `ThoiDiem` datetime DEFAULT NULL,
   `ID_CanBo` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   KEY `ID_CanBo` (`ID_CanBo`),
-  CONSTRAINT `phanhoicanbo_ibfk_1` FOREIGN KEY (`ID_CanBo`) REFERENCES `canbo` (`ID_CanBo`)
+  CONSTRAINT `phanhoicanbo_ibfk_ID_CanBo` FOREIGN KEY (`ID_CanBo`) REFERENCES `canbo` (`ID_CanBo`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.phanhoicanbo: ~0 rows (approximately)
@@ -795,24 +873,24 @@ CREATE TABLE IF NOT EXISTS `phanhoicanbo` (
 -- Dumping structure for table baucutructuyen.phanhoicutri
 CREATE TABLE IF NOT EXISTS `phanhoicutri` (
   `Ykien` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `ThoiDiem` date DEFAULT NULL,
+  `ThoiDiem` datetime DEFAULT NULL,
   `ID_CuTri` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   KEY `ID_CuTri` (`ID_CuTri`),
-  CONSTRAINT `phanhoicutri_ibfk_1` FOREIGN KEY (`ID_CuTri`) REFERENCES `cutri` (`ID_CuTri`)
+  CONSTRAINT `phanhoicutri_ibfk_ID_CuTri` FOREIGN KEY (`ID_CuTri`) REFERENCES `cutri` (`ID_CuTri`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.phanhoicutri: ~2 rows (approximately)
 INSERT INTO `phanhoicutri` (`Ykien`, `ThoiDiem`, `ID_CuTri`) VALUES
-	('test12345678', '2024-10-11', '20240930165802'),
-	('cần cải thiện giao diện', '2024-10-12', '20240930165802');
+	('test12345678', '2024-10-11 00:00:00', '20240930165802'),
+	('cần cải thiện giao diện', '2024-10-12 00:00:00', '20240930165802');
 
 -- Dumping structure for table baucutructuyen.phanhoiungcuvien
 CREATE TABLE IF NOT EXISTS `phanhoiungcuvien` (
   `Ykien` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `ThoiDiem` date DEFAULT NULL,
+  `ThoiDiem` datetime DEFAULT NULL,
   `ID_ucv` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   KEY `ID_ucv` (`ID_ucv`),
-  CONSTRAINT `phanhoiungcuvien_ibfk_1` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`)
+  CONSTRAINT `phanhoiungcuvien_ibfk_ID_ucv` FOREIGN KEY (`ID_ucv`) REFERENCES `ungcuvien` (`ID_ucv`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.phanhoiungcuvien: ~0 rows (approximately)
@@ -827,7 +905,7 @@ CREATE TABLE IF NOT EXISTS `phieubau` (
   KEY `ngayBD` (`ngayBD`),
   KEY `FK_DMUC_Phieu` (`ID_cap`),
   CONSTRAINT `FK_DMUC_Phieu` FOREIGN KEY (`ID_cap`) REFERENCES `danhmucungcu` (`ID_Cap`),
-  CONSTRAINT `phieubau_ibfk_1` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
+  CONSTRAINT `phieubau_ibfk_ngayBD` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.phieubau: ~6 rows (approximately)
@@ -837,7 +915,8 @@ INSERT INTO `phieubau` (`ID_Phieu`, `GiaTriPhieuBau`, `ngayBD`, `ID_cap`) VALUES
 	('gD2024102720412253', 75715792743, '2024-10-22 12:12:12', 3),
 	('gg2024102720355539', 40278313698, '2024-10-22 12:12:12', 3),
 	('HL2024102720322871', 79519378900, '2024-10-22 12:12:12', 3),
-	('ok2024102720375308', 85427687397, '2024-10-22 12:12:12', 3);
+	('ok2024102720375308', 85427687397, '2024-10-22 12:12:12', 3),
+	('w62024111110165247', 84791985507, '2024-10-22 12:12:12', 3);
 
 -- Dumping structure for table baucutructuyen.quanhuyen
 CREATE TABLE IF NOT EXISTS `quanhuyen` (
@@ -847,7 +926,7 @@ CREATE TABLE IF NOT EXISTS `quanhuyen` (
   PRIMARY KEY (`ID_QH`),
   KEY `STT` (`STT`),
   CONSTRAINT `quanhuyen_ibfk_1` FOREIGN KEY (`STT`) REFERENCES `tinhthanh` (`STT`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.quanhuyen: ~26 rows (approximately)
 INSERT INTO `quanhuyen` (`ID_QH`, `TenQH`, `STT`) VALUES
@@ -889,10 +968,11 @@ CREATE TABLE IF NOT EXISTS `taikhoan` (
   `RoleID` tinyint NOT NULL,
   PRIMARY KEY (`TaiKhoan`),
   KEY `RoleID` (`RoleID`),
+  CONSTRAINT `fk_taikhoan_SDT` FOREIGN KEY (`TaiKhoan`) REFERENCES `nguoidung` (`SDT`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `taikhoan_ibfk_1` FOREIGN KEY (`RoleID`) REFERENCES `vaitro` (`RoleID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.taikhoan: ~25 rows (approximately)
+-- Dumping data for table baucutructuyen.taikhoan: ~31 rows (approximately)
 INSERT INTO `taikhoan` (`TaiKhoan`, `MatKhau`, `BiKhoa`, `LyDoKhoa`, `NgayTao`, `SuDung`, `RoleID`) VALUES
 	('040714007', '$argon2id$v=19$m=65536,t=3,p=1$LnAOv4nQnHKrtc/QfRGRRg$lCBt51MfGEerZKFngJRzvAIaWP/aYAWF6KEtd6fG100', '0', 'null', '2024-10-03 00:09:21', 1, 2),
 	('040714008', '$argon2id$v=19$m=65536,t=3,p=1$uoUAWWz7IR7LR221OAcj1A$RR0TqvUb2i3upCD3b10Pz6cJIMnUbbIkvuhbwTwoHEA', '0', 'null', '2024-10-03 00:21:21', 1, 2),
@@ -906,6 +986,8 @@ INSERT INTO `taikhoan` (`TaiKhoan`, `MatKhau`, `BiKhoa`, `LyDoKhoa`, `NgayTao`, 
 	('040714017', '$argon2id$v=19$m=65536,t=3,p=1$gVsCxtsLCcqNrPVJNqXqzw$ru/M4N5yAD5UL2yLCiTWKTBVg5aoAV8LpO5ZpVVnOSQ', '0', 'null', '2024-10-17 14:33:28', 1, 2),
 	('040714018', '$argon2id$v=19$m=65536,t=3,p=1$8Aq2oMjGD1QJeMat3afktg$TAbXzX3OsfOPfv1sdjOVm7uXwITpwZVGBt3FxcRBmP0', '0', 'null', '2024-10-17 14:34:09', 1, 2),
 	('040714019', '$argon2id$v=19$m=65536,t=3,p=1$PKWiBfsRm46qi0pGYyN8TQ$Z/SV8+vUKjijFzlTEXu3rfBYOE2zsCZw/4R+Zr9xgfM', '0', 'null', '2024-10-17 14:34:45', 1, 2),
+	('0947517952', '$argon2id$v=19$m=65536,t=3,p=1$aLTFHuHEDZg5xnRGtue+Ww$5nJmA42xKVNa04zO8tgNzi6wYMQrF+HPZmt6FRvux+c', '0', 'null', '2024-11-09 23:41:17', 1, 5),
+	('0947888952', '$argon2id$v=19$m=65536,t=3,p=1$5ArWgnDSiuTZaanSb1lJ0Q$1AoC6J/+rgtbC3HMkiZqMHasVUY3L+Y0wNttv1E8ZKQ', '0', 'null', '2024-11-14 15:00:58', 1, 2),
 	('0974000162', '$argon2id$v=19$m=65536,t=3,p=1$9X213jZA5D3IQ3fTHUD/Kg$jkdrrtKPM0kQN9t5ssvcwDDRHIzwJL8Qb02BM9HRwR8', '0', 'null', '2024-09-19 19:48:45', 1, 5),
 	('0974000252', '$argon2id$v=19$m=65536,t=3,p=1$XRd1Nk4gP6vLTZoGP5fIaQ$MMZV6UTKcjvX/DqrZWID66KfWux81bCFjMo2VrH9Ffc', '0', 'null', '2024-09-16 23:21:32', 1, 5),
 	('0974000352', '$argon2id$v=19$m=65536,t=3,p=1$EyaIakq2nLN3FumoP9cPTQ$xLF09ge+h6hTd8YXqBGlVDlyKCTYmg80QY6Xz5ppzVM', '0', 'null', '2024-09-16 22:10:39', 1, 5),
@@ -913,12 +995,14 @@ INSERT INTO `taikhoan` (`TaiKhoan`, `MatKhau`, `BiKhoa`, `LyDoKhoa`, `NgayTao`, 
 	('0974000552', '$argon2id$v=19$m=65536,t=3,p=1$5dnHAQUKnugZ7P/RXY10sg$aIhTrCG440ign1ZtoRQJU5pHvMkFRlGmgOf3cIkToBA', '0', 'null', '2024-09-19 20:00:22', 1, 5),
 	('0974000652', '$argon2id$v=19$m=65536,t=3,p=1$GJltnBx0XqLkHK7YhKWNzg$7TqoG31MwUe694TBhZytH6kyG7OkQw54wd+TLvskDy0', '0', 'null', '2024-09-30 16:54:56', 1, 5),
 	('0974000752', '$argon2id$v=19$m=65536,t=3,p=1$ZBZQmzk6awvKlkjRMA+WSA$mBoieyV1+gSj6A3oc5HSTZCv8PNaa0yI0iY4oxa9qzY', '0', 'null', '2024-09-30 16:58:02', 1, 5),
+	('0974000754', '$argon2id$v=19$m=65536,t=3,p=1$d7FT6U0tLnBcrb/jph2mQQ$Eew7oU70LZMXWseAH5PSxd9jTRLTO9bEzFStz8/pD2U', '0', 'null', '2024-11-09 14:23:04', 1, 5),
+	('0974000755', '$argon2id$v=19$m=65536,t=3,p=1$GubhtuQZvj+v1Z3HFNunYQ$tYxK6vuhkqrkKlh5aWUvLQ1lky6a4RccfvcCcza8dqw', '0', 'null', '2024-11-09 22:19:35', 1, 5),
+	('0974008888', '$argon2id$v=19$m=65536,t=3,p=1$4OC/RiPyafhivUcKqxIifA$GPqn2J9Gx+ujZW/nGjmYKLIXcNDOWngwaOob8D68qgw', '0', 'null', '2024-11-09 13:45:58', 1, 5),
 	('098910005', '$argon2id$v=19$m=65536,t=3,p=1$DNJr/NGXxMiBukWReNhogQ$2n5vOuC1AfcJfdecTlMJocUXkhudiRjgde7QxPqkce8', '0', 'null', '2024-10-25 15:39:42', 1, 8),
 	('098920005', '$argon2id$v=19$m=65536,t=3,p=1$7HSj4A9ow4uGmISgjOKW7A$d3VLg1qXO1+5Q124e5NPvnfLb8SxjfIH0BpOd26ZRCg', '0', 'null', '2024-10-25 15:37:20', 1, 8),
 	('098930005', '$argon2id$v=19$m=65536,t=3,p=1$C8nUcEt1BDjal7+J7PByYQ$TvjFt5FysArjRi7YoSEVvxEaHtLRw5mrS347CkOzt64', '0', 'null', '2024-10-25 15:34:53', 1, 8),
 	('098940005', '$argon2id$v=19$m=65536,t=3,p=1$5lxnCi5mBeNLwC9xA9tRMQ$aPm7ItUGkPn0Vp94hNOnMAjE3S5yLPzlW83ZxUYV2m0', '0', 'null', '2024-10-25 15:24:18', 1, 8),
 	('098950005', '$argon2id$v=19$m=65536,t=3,p=1$bOwWIzPq+mbIWrNSsXcqmA$2MLSj/9zB0xeeugJIkfBYGs2FOf4MaA/bLkTeswqJK8', '0', 'null', '2024-10-25 15:14:35', 1, 8),
-	('admin', '$argon2i$v=19$m=12,t=3,p=1$bDcxdzRoaGRubWowMDAwMA$96w9DOJfMGBtu8GfeWvyfw', '0', NULL, NULL, 1, 1),
 	('admin2', '$argon2id$v=19$m=65536,t=3,p=1$0tfopQz8TcG6GvpAl28d0g$jOrPw+GGqpVOv0OmOt53AnK7HbGD4sbuUFScCjR8wMA', '0', 'null', '2024-09-18 21:05:13', 1, 1);
 
 -- Dumping structure for table baucutructuyen.thongbao
@@ -927,7 +1011,7 @@ CREATE TABLE IF NOT EXISTS `thongbao` (
   `NoiDungThongBao` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `ThoiDiem` datetime DEFAULT NULL,
   PRIMARY KEY (`ID_ThongBao`)
-) ENGINE=InnoDB AUTO_INCREMENT=210 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=212 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table baucutructuyen.thongbao: ~154 rows (approximately)
 INSERT INTO `thongbao` (`ID_ThongBao`, `NoiDungThongBao`, `ThoiDiem`) VALUES
@@ -1084,7 +1168,9 @@ INSERT INTO `thongbao` (`ID_ThongBao`, `NoiDungThongBao`, `ThoiDiem`) VALUES
 	(206, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:36'),
 	(207, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:36'),
 	(208, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:36'),
-	(209, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:36');
+	(209, 'Ngày bầu cử sắp tới của bạn là 03/11/2024 10:25:11 SA.', '2024-11-01 23:34:36'),
+	(210, 'Thông báo kết quả bầu cử tại kỳ: 2024-10-22 12:12:12', '2024-11-11 12:07:21'),
+	(211, 'Thông báo kết quả bầu cử tại kỳ: 2024-10-22 12:12:12', '2024-11-11 19:39:20');
 
 -- Dumping structure for table baucutructuyen.tinhthanh
 CREATE TABLE IF NOT EXISTS `tinhthanh` (
@@ -1095,9 +1181,6 @@ CREATE TABLE IF NOT EXISTS `tinhthanh` (
 
 -- Dumping data for table baucutructuyen.tinhthanh: ~83 rows (approximately)
 INSERT INTO `tinhthanh` (`STT`, `TenTinhThanh`) VALUES
-	(0, 'Test'),
-	(1, 'Test2'),
-	(2, 'Test2'),
 	(11, 'Cao Bằng'),
 	(12, 'Lạng Sơn'),
 	(14, 'Quảng Ninh'),
@@ -1186,14 +1269,17 @@ CREATE TABLE IF NOT EXISTS `trangthaibaucu` (
   `ID_DonViBauCu` smallint DEFAULT NULL,
   `ngayBD` datetime DEFAULT NULL,
   KEY `ID_DonViBauCu` (`ID_DonViBauCu`),
-  KEY `ID_CuTri` (`ID_CuTri`),
-  KEY `ngayBD` (`ngayBD`),
-  CONSTRAINT `trangthaibaucu_ibfk_1` FOREIGN KEY (`ID_DonViBauCu`) REFERENCES `donvibaucu` (`ID_DonViBauCu`),
-  CONSTRAINT `trangthaibaucu_ibfk_2` FOREIGN KEY (`ID_CuTri`) REFERENCES `cutri` (`ID_CuTri`),
+  KEY `index_TrangThaiBauCu_ngayBD` (`ngayBD`),
+  KEY `index_TrangThaiBauCu_ID_CuTri` (`ID_CuTri`),
+  KEY `idx_ttbaucu_CuTri_ngayBD` (`ID_CuTri`,`ngayBD`),
+  KEY `idx_trangthaibaucu_ngayBD` (`ngayBD`),
+  CONSTRAINT `fk_trangThaiBauCu_ID_CuTri` FOREIGN KEY (`ID_CuTri`) REFERENCES `cutri` (`ID_CuTri`) ON DELETE CASCADE,
+  CONSTRAINT `fk_trangThaiBauCu_ID_DonViBauCu` FOREIGN KEY (`ID_DonViBauCu`) REFERENCES `donvibaucu` (`ID_DonViBauCu`) ON DELETE CASCADE,
+  CONSTRAINT `fk_trangThaiBauCu_ngayBD` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`) ON DELETE CASCADE,
   CONSTRAINT `trangthaibaucu_ibfk_3` FOREIGN KEY (`ngayBD`) REFERENCES `kybaucu` (`ngayBD`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.trangthaibaucu: ~29 rows (approximately)
+-- Dumping data for table baucutructuyen.trangthaibaucu: ~39 rows (approximately)
 INSERT INTO `trangthaibaucu` (`GhiNhan`, `ID_CuTri`, `ID_DonViBauCu`, `ngayBD`) VALUES
 	('0', '20240919200022', 3, '2024-09-19 23:54:51'),
 	('0', '20240919194845', 3, '2024-09-19 23:54:51'),
@@ -1223,7 +1309,17 @@ INSERT INTO `trangthaibaucu` (`GhiNhan`, `ID_CuTri`, `ID_DonViBauCu`, `ngayBD`) 
 	('0', '20240916220819', 1, '2024-10-22 12:12:12'),
 	('1', '20240916221039', 1, '2024-10-22 12:12:12'),
 	('1', '20240930165456', 1, '2024-10-22 12:12:12'),
-	('1', '20240919194845', 1, '2024-10-22 12:12:12');
+	('1', '20240919194845', 1, '2024-10-22 12:12:12'),
+	('0', '20241109134558', 9, '2024-08-13 07:00:19'),
+	('0', '20240919200022', 9, '2024-08-13 07:00:19'),
+	('0', '20240919194845', 9, '2024-08-13 07:00:19'),
+	('0', '20240916232132', 9, '2024-08-13 07:00:19'),
+	('0', '20240930165802', 9, '2024-08-13 07:00:19'),
+	('0', '20241109142305', 9, '2024-08-13 07:00:19'),
+	('0', '20240930165456', 9, '2024-08-13 07:00:19'),
+	('0', '20241109234117', 3, '2024-09-19 23:54:51'),
+	('0', '20240930165456', 3, '2024-09-19 23:54:51'),
+	('0', '20241109142305', 3, '2024-09-19 23:54:51');
 
 -- Dumping structure for table baucutructuyen.trinhdohocvan
 CREATE TABLE IF NOT EXISTS `trinhdohocvan` (
@@ -1248,28 +1344,29 @@ INSERT INTO `trinhdohocvan` (`ID_TrinhDo`, `TenTrinhDoHocVan`) VALUES
 -- Dumping structure for table baucutructuyen.ungcuvien
 CREATE TABLE IF NOT EXISTS `ungcuvien` (
   `ID_ucv` varchar(14) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `TrangThai` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `TrangThai` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'active',
   `ID_user` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `GioiThieu` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`ID_ucv`),
   KEY `FK_userUngCuVien` (`ID_user`),
-  CONSTRAINT `FK_userUngCuVien` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`)
+  CONSTRAINT `FK_userUngCuVien_ID_user` FOREIGN KEY (`ID_user`) REFERENCES `nguoidung` (`ID_user`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table baucutructuyen.ungcuvien: ~12 rows (approximately)
+-- Dumping data for table baucutructuyen.ungcuvien: ~13 rows (approximately)
 INSERT INTO `ungcuvien` (`ID_ucv`, `TrangThai`, `ID_user`, `GioiThieu`) VALUES
-	('20241003000921', 'acctive', 'Ds20241003000915', 'KOKOKOKOKOKOK'),
-	('20241003002121', 'acctive', '7H20241003002115', 'OKOKOKOK'),
-	('20241003002930', 'acctive', 'Gu20241003002922', 'OKOKOKOK'),
-	('20241003003050', 'acctive', 'RM20241003003046', 'OKOKOK'),
-	('20241003003142', 'acctive', 'Do20241003003139', 'OKOK'),
-	('20241012212410', 'acctive', '5520241012212400', 'rất ok.'),
-	('20241012212527', 'acctive', 'uO20241012212509', 'rất ok.'),
-	('20241017143132', 'acctive', 'ME20241017143125', 'rất ok.'),
-	('20241017143237', 'acctive', 'ui20241017143233', 'rất ok.'),
-	('20241017143328', 'acctive', 'sX20241017143325', 'rất ok.'),
-	('20241017143409', 'acctive', 'Dz20241017143406', 'rất ok.'),
-	('20241017143445', 'acctive', 'TC20241017143443', 'rất ok.');
+	('20241003000921', 'active', 'Ds20241003000915', 'KOKOKOKOKOKOK'),
+	('20241003002121', 'active', '7H20241003002115', 'OKOKOKOK'),
+	('20241003002930', 'active', 'Gu20241003002922', 'OKOKOKOK'),
+	('20241003003050', 'active', 'RM20241003003046', 'OKOKOK'),
+	('20241003003142', 'active', 'Do20241003003139', 'OKOK'),
+	('20241012212410', 'active', '5520241012212400', 'rất ok.'),
+	('20241012212527', 'active', 'uO20241012212509', 'rất ok.'),
+	('20241017143132', 'active', 'ME20241017143125', 'rất ok.'),
+	('20241017143237', 'active', 'ui20241017143233', 'rất ok.'),
+	('20241017143328', 'active', 'sX20241017143325', 'rất ok.'),
+	('20241017143409', 'active', 'Dz20241017143406', 'rất ok.'),
+	('20241017143445', 'active', 'TC20241017143443', 'rất ok.'),
+	('20241114150058', 'acctive', '2K20241114150052', 'OKOKOKOK');
 
 -- Dumping structure for table baucutructuyen.vaitro
 CREATE TABLE IF NOT EXISTS `vaitro` (

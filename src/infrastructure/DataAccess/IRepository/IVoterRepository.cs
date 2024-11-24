@@ -53,5 +53,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<int> _countTheNumberOfElections_VotersParticipated(string ID_CuTri);
         //Lấy số lượng các kỳ bầu cử mà cử tri sắp bỏ phiếu trong tương lai
         Task<int> _countTheNumberOfElections_VoterWillVote_Future(string ID_CuTri);
+        //Lấy danh sách lịch sử bỏ phiếu
+        Task<List<VotingHistoryDTO>> _getListOfVotingHistory(string ID_CuTri);
     }
 }

@@ -278,3 +278,4 @@ D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_Ba
 D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\Google.Apis.Drive.v3.dll
 D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\System.Management.dll
 D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Management.dll
+D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\bin\Debug\net8.0\LoggerConfig.xml

@@ -21,36 +21,50 @@ namespace BackEnd.src.infrastructure.Services
 
         //Xóa hình ảnh dựa trên publicID của hình ảnh trên cloudinary
         public async Task<DeletionResult> DeleteImage(string publicId){
-            var deleteParams = new DeletionParams(publicId);
-            var result = await _cloudinary.DestroyAsync(deleteParams);
-            return result;
+            try{
+                var deleteParams = new DeletionParams(publicId);
+                return await _cloudinary.DestroyAsync(deleteParams);
+            }catch(Exception ex){
+                throw new Exception(ex.Message);
+            }
         }
 
         //Đưa ảnh lên
         public async Task<ImageUploadResult> UploadImage(IFormFile file){
-            var uploadResult = new ImageUploadResult();
+            if (file.Length == 0){
+                throw new ArgumentException("File is empty", nameof(file));
+            }
 
-            if(file.Length>0){
+            try{
+                var uploadResult = new ImageUploadResult();
+
                 using(var stream = file.OpenReadStream()){
                     var uploadParams = new ImageUploadParams(){
                         File = new FileDescription(file.FileName, stream),
-                        Folder="NguoiDung"             //Thư mục lưu trữ
+                        Folder="NguoiDung",             //Thư mục lưu trữ
+                        Transformation = new Transformation()
+                                            .Quality("auto")    //Chất lượng ảnh
+                                            .FetchFormat("auto") //Định dạng ảnh
+                                            .Flags("preserve_transparency") //Đảm bảo ảnh không mất màu
                     };
-                    uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                    return await _cloudinary.UploadAsync(uploadParams);
                 }
+            }catch(Exception ex){
+                throw new Exception(ex.Message);
             }
-            
-            return uploadResult;  
         }
 
         //Thay đổi ảnh đựa trên PublicId
         public async Task<ImageUploadResult> UpdateImage(string publicId, IFormFile file){
-            //Xóa ảnh cũ
-            await DeleteImage(publicId);
+            try{
+                //Xóa ảnh cũ
+                await DeleteImage(publicId);
 
-            //Cập nhật ảnh mới
-            var result = await UploadImage(file);
-            return result;
+                //Cập nhật ảnh mới
+                return await UploadImage(file);
+            }catch(Exception ex){
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

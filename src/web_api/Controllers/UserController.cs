@@ -322,16 +322,16 @@ namespace BackEnd.src.web_api.Controllers
         [Authorize(Roles= "1")]
         public async Task<IActionResult> EditUserImageByID(string id,[FromForm] IFormFile fileAnh){
             try{
+                if (fileAnh == null || fileAnh.Length == 0)
+                {
+                    return BadRequest(new { Status = false, Message = "File ảnh không hợp lệ" });
+                }
+
                 var result = await _userRepository._EditUserImageByID(id, fileAnh);
-                if( result == false)
-                    return StatusCode(404, new{
-                        Status = false,
-                        Message ="Không tìm thấy ID người dùng"
-                    });
-                return Ok(new{
-                    Status = true,
-                    Message ="Thay đổi ảnh thành công."
-                });
+                return result switch{
+                    true => Ok(new { Status = true, Message = "Thay đổi ảnh thành công." }),
+                    false => StatusCode(404, new { Status = false, Message = "Không tìm thấy ID người dùng" }),
+                };
             }catch(Exception ex){
                 Console.WriteLine($"Exception Message: {ex.Message}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");

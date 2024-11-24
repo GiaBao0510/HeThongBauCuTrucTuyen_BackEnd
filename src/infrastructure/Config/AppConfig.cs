@@ -36,7 +36,7 @@ namespace BackEnd.infrastructure.config
         }
         
         // --- Phương thức lấy thông tin
-        public string GetServerIP(){
+        public string GetServerIP(){ 
             return Server_Host;
         }
         public string GetServerPort(){

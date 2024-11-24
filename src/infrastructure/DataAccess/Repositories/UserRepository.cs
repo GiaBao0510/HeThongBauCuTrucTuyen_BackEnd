@@ -538,43 +538,60 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //13. Cập nhập ảnh người dùng thông qua ID người dùng
         public async Task<bool> _EditUserImageByID(string ID, IFormFile file){
-            using var connection = await _context.Get_MySqlConnection();
+            await using var connection = await _context.Get_MySqlConnection();
+            await using var transaction = await connection.BeginTransactionAsync();
+            try{
+                //Kiểm tra xem ID người dùng có tồn tại không. Nếu tồn tại thì lấy PublicID
+                const string sql_GetPublicID = @"
+                SELECT PublicID 
+                FROM nguoidung 
+                WHERE ID_user = @ID_user;";
+                string publicID = null;
 
-            //Kiểm tra xem ID người dùng có tồn tại không
-            bool check = await _CheckUserExists(ID,connection);
-            if(!check) return false;
+                using(var command0 = new MySqlCommand(sql_GetPublicID, connection)){
+                    command0.Parameters.AddWithValue("@ID_user",ID);
 
-            string publicID = null;
-
-            //Lấy PublicID để cập nhật trên nó
-            const string sql_GetPublicID = "SELECT PublicID FROM nguoidung WHERE ID_user = @ID_user;";
-            using(var command0 = new MySqlCommand(sql_GetPublicID, connection)){
-                command0.Parameters.AddWithValue("@ID_user",ID);
-
-                using var reader = await command0.ExecuteReaderAsync();
-                if(await reader.ReadAsync()){
-                    publicID = reader.GetString(reader.GetOrdinal("PublicID"));
+                    using var reader = await command0.ExecuteReaderAsync();
+                    if(await reader.ReadAsync()){
+                        publicID = reader.GetString(reader.GetOrdinal("PublicID"));
+                    }
+                    await reader.CloseAsync();
                 }
+                
+                //Cập nhật lại ảnh trên cloudinary
+                var EditImage = await _cloudinaryService.UpdateImage(publicID, file);
+                string hinhAnh = EditImage.Url.ToString();
+                    publicID = EditImage.PublicId;
+
+                //Cập nhật lại ảnh trong sql
+                const string sqlUpdate = @"UPDATE nguoidung 
+                SET HinhAnh = @HinhAnh, PublicID = @PublicID
+                WHERE ID_user = @ID_user";
+                using (var command2 = new MySqlCommand(sqlUpdate, connection)){
+                    command2.Parameters.AddWithValue("@ID_user",ID);
+                    command2.Parameters.AddWithValue("@HinhAnh",hinhAnh);
+                    command2.Parameters.AddWithValue("@PublicID",publicID);
+
+                    await command2.ExecuteNonQueryAsync();
+                    await transaction.CommitAsync();
+                     return true;
+                }
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
             }
-            
-            //Cập nhật lại ảnh trên cloudinary
-            var EditImage = await _cloudinaryService.UpdateImage(publicID, file);
-            string hinhAnh = EditImage.Url.ToString();
-                publicID = EditImage.PublicId;
-
-            //Cập nhật lại ảnh trong sql
-            const string sqlUpdate = @"UPDATE nguoidung 
-            SET HinhAnh = @HinhAnh, PublicID = @PublicID
-            WHERE ID_user = @ID_user";
-            using (var command2 = new MySqlCommand(sqlUpdate, connection)){
-                command2.Parameters.AddWithValue("@ID_user",ID);
-                command2.Parameters.AddWithValue("@HinhAnh",hinhAnh);
-                command2.Parameters.AddWithValue("@PublicID",publicID);
-
-                await command2.ExecuteNonQueryAsync();
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
             }
-
-            return true;
         }
 
         //14. Sửa pwd theo ID người dùng - admin
