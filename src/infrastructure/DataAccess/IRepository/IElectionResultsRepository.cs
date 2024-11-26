@@ -14,5 +14,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<List<ElectionResultDetailsDTO>> _getDetailedListOfElectionResultForCandidate(string ID_ucv);
         //4. Lấy bảng chi tiết kết quả bầu cử đã công bố cho cán bộ
         Task<List<ElectionResultDetailsDTO>> _getDetailedListOfElectionResultForCandre(string ID_canbo);
+        //Lấy danh sách thông tin kết quả bầu cử dựa trên ngày bầu cử
+        Task<List<ElectionsResultAnnouncedDTO>> _ListOfElectionsResultAnnounced(string ngayBD);
     }
 }

@@ -6,13 +6,13 @@ using BackEnd.src.infrastructure.Services;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.core.Common;
 using Isopoh.Cryptography.Argon2;
-using Microsoft.CodeAnalysis;
-using System.Data;
+using log4net;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
     public class CandidateRepository : UserRepository, IDisposable, ICandidateRepository
     {
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
         private readonly DatabaseContext _context;
         private readonly CloudinaryService _cloudinaryService;
         private readonly IListOfPositionRepository _listOfPositionRepository;
@@ -600,7 +600,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //11.Thêm danh sách ứng cử viên vào cuộc bầu cử
         public async Task<int> _AddListCandidatesToTheElection(CandidateListInElectionDto CandidateListInElectionDto){
             using var connect = await _context.Get_MySqlConnection();
-            
+            _log.Info("Thêm danh sách wungs cử viên vào kỳ bầu cử");
+
             try{
                 int dem = 0; //Đếm số lượng ững cử viên đã góp mặt
                 //Kiểm tra xem ngày bầu cử có tồn tại không
@@ -613,22 +614,30 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 //Nếu danh sách ứng cử viên vượt quá số lượng tối đã ứng cử viên đã quy định trước đo thì báo lỗi
                 int sl_cuTriToiDa = await  _ElectionsRepository._MaximumNumberOfCandidates(CandidateListInElectionDto.ngayBD, connect);
+                _log.Info($"Số lượng ứng cử viên tối đa: {sl_cuTriToiDa}");
                 if(sl_cuTriToiDa < 0) return -2;
 
                 //Lấy số lượng ứng cử viên trong kỳ bầu cử này ở hiện tại
                 int sl_cuTriHienTai = await  _ElectionsRepository._GetCurrentCandidateCountByElection(CandidateListInElectionDto.ngayBD, connect);
+                _log.Info($"Số lượng ứng cử viên hiện tại: {sl_cuTriHienTai}");
                 if(sl_cuTriHienTai < 0) return -4;
 
                 DateTime? TimeOfCanDiDate = await _ElectionsRepository._GetRegistrationClosingDate(CandidateListInElectionDto.ngayBD,connect);
                 if(TimeOfCanDiDate != null && DateTime.Now > TimeOfCanDiDate)
                     return -5;
 
+                //Kiểm tra xem số lượng ứng cử viên vượt quá mức quy định thì không được thêm vào
+                _log.Info($"Số lượng ứng cử viên hiện tại với số lượng ứng cử viên từ danh sách đầu vào : {sl_cuTriHienTai + CandidateListInElectionDto.listIDCandidate.Count}");
                 if((sl_cuTriHienTai + CandidateListInElectionDto.listIDCandidate.Count) > sl_cuTriToiDa) return -3;
 
                 //thêm từng ứng cử viên trong danh sách vào cuộc bầu cử
                 const string sql = @"
                 INSERT INTO ketquabaucu(SoLuotBinhChon,ThoiDiemDangKy,TyLeBinhChon,ngayBD,ID_ucv,ID_Cap) 
                 VALUES(@SoLuotBinhChon,@ThoiDiemDangKy,@TyLeBinhChon,@ngayBD,@ID_ucv,@ID_Cap);";
+
+                const string sqlTrangThaiBauCu = @"
+                INSERT INTO trangthaibaucu(ID_ucv,ID_DonViBauCu,ngayBD,GhiNhan)
+                VALUES(@ID_ucv,@ID_DonViBauCu,@ngayBD,@GhiNhan);";
 
                 foreach(string Candidate in CandidateListInElectionDto.listIDCandidate){
                     
@@ -639,14 +648,16 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     bool checkCandidateExist = await _CheckCandidateExists(Candidate, connect);
 
                     if(!checkInput && checkCandidateExist){
-                        using(var command = new MySqlCommand(sql, connect)){
+                        using(var command = new MySqlCommand(sql + sqlTrangThaiBauCu, connect)){
                             command.Parameters.AddWithValue("@SoLuotBinhChon", 0);
                             command.Parameters.AddWithValue("@ThoiDiemDangKy", DateTime.Now);
                             command.Parameters.AddWithValue("@TyLeBinhChon",0f);
                             command.Parameters.AddWithValue("@ngayBD", CandidateListInElectionDto.ngayBD);
                             command.Parameters.AddWithValue("@ID_ucv", Candidate);
                             command.Parameters.AddWithValue("@ID_Cap", CandidateListInElectionDto.ID_Cap);
-                            
+                            command.Parameters.AddWithValue("@ID_DonViBauCu", CandidateListInElectionDto.ID_DonViBauCu);
+                            command.Parameters.AddWithValue("@GhiNhan", "0");
+
                             await command.ExecuteNonQueryAsync();
                             dem++;
                         }
@@ -837,6 +848,49 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     }
                     return list;
                 }
+
+            }catch(MySqlException ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Code: {ex.Code}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //19. Kiểm tra xem ứng cử viên đã bỏ phiếu trong kỳ bầu cử chưa
+        public async Task<bool> _CheckCandidateHasVoted(string ID_ucv, DateTime ngayBD, MySqlConnection connect){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connect.State != System.Data.ConnectionState.Open)
+                await connect.OpenAsync();
+            try{
+                const string sql = @"
+                SELECT GhiNhan
+                FROM trangthaibaucu
+                WHERE ngayBD = @ngayBD AND ID_ucv =@ID_ucv;";
+
+                using (var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                    command.Parameters.AddWithValue("@ID_ucv", ID_ucv);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    if(await reader.ReadAsync()){
+                        string ghinhan = reader.GetString(reader.GetOrdinal("GhiNhan"));
+                        Console.WriteLine($">>Ghi nhận bỏ phiếu: {ghinhan}");
+                        if(ghinhan.Equals("1")) return true; //Đã bỏ phiếu rồi
+                    }
+                    return  false;  //Chưa bỏ phiếu
+                }
+                
 
             }catch(MySqlException ex){
                 Console.WriteLine($"Error message: {ex.Message}");

@@ -174,5 +174,49 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             }
         }
 
+        //Kiểm tra ID của đơn vị bầu, mã ững củ viên và ngày bắt đầu có cùng tồn tại không
+        public async Task<bool> _CheckCandidateID_ConsituencyID_andPollingDateTogether(string ID_DonViBauCu, string ID_ucv, DateTime ngayBD, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+                
+            const string sql = @"
+            SELECT COUNT(ngayBD)
+            FROM trangthaibaucu 
+            WHERE ID_ucv =@ID_ucv AND ngayBD =@ngayBD AND ID_DonViBauCu =@ID_DonViBauCu; 
+            ";
+            
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_DonViBauCu",ID_DonViBauCu);
+                command.Parameters.AddWithValue("@ID_ucv", ID_ucv);
+                command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            }
+        }
+
+        //Kiểm tra ID của đơn vị bầu, mã cán bộ và ngày bắt đầu có cùng tồn tại không
+        public async Task<bool> _CheckCadreID_ConsituencyID_andPollingDateTogether(string ID_DonViBauCu, string ID_CanBo, DateTime ngayBD, MySqlConnection connection){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+                
+            const string sql = @"
+            SELECT COUNT(ngayBD)
+            FROM trangthaibaucu 
+            WHERE ID_CanBo =@ID_CanBo AND ngayBD =@ngayBD AND ID_DonViBauCu =@ID_DonViBauCu; 
+            ";
+            
+            using(var command = new MySqlCommand(sql, connection)){
+                command.Parameters.AddWithValue("@ID_DonViBauCu",ID_DonViBauCu);
+                command.Parameters.AddWithValue("@ID_CanBo", ID_CanBo);
+                command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                
+                int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+                return count > 0;
+            }
+        }
+
     }
 }

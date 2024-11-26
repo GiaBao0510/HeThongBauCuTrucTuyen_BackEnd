@@ -1,11 +1,13 @@
-using System;
+using log4net;
 using System.Numerics;
-using System.Security.Cryptography;
 using BackEnd.src.core.Interfaces;
+
 namespace BackEnd.src.infrastructure.Services
 {
     public class PaillierServices : IPaillierServices
     {
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
+
         //1.Tính gcd()
         public BigInteger gcd( BigInteger a, BigInteger b){
             while (b != 0)
@@ -47,7 +49,9 @@ namespace BackEnd.src.infrastructure.Services
 
         //7. Tính Modulo N
         public (BigInteger, BigInteger) TinhModulo_N( int n, int b, int s){
+            _log.Info("Chuẩn bị tạo số nguyên tố Q và P");
             BigInteger Tmax = KetQuaKiemPhieuLonNhat_Tmax( n, b, s);
+            _log.Info($"\tKiểm tra giá kết quả kiểm phiếu lớn nhất = {Tmax}");
 
             //Đường dẫn 
             string filePath = "src/infrastructure/Config/SoNguyenTo.txt";
@@ -61,33 +65,43 @@ namespace BackEnd.src.infrastructure.Services
             //Random Q,P
             var random = new Random();
             BigInteger q = primeNumber[random.Next(0, primeNumber.Length -1)];
+            _log.Info($"\t>> Q = {q}");
             BigInteger p = 0;
             while(true){
                 p = primeNumber[random.Next(0, primeNumber.Length -1)];
                 if(p != q && (p*q) > Tmax)
                     break;
             }
+            _log.Info($"\t>> P = {p}");
             return (q,p);
         }
 
         //8. tạo khóa công khai - và khóa cá nhân
         public (BigInteger, BigInteger, BigInteger, BigInteger) GenerateKey_public_private( int n, int b, int s){
+            _log.Info("Chuẩn bị tạo khóa công khai và khóa cá nhân");
             //1.Tính N
             var random = new Random();
             (BigInteger q, BigInteger p) = TinhModulo_N( n, b, s);
+            _log.Info($"\t>> Q = {q}");
+            _log.Info($"\t>> P = {p}");
             BigInteger N = p*q;
+            _log.Info($"\t>> N = {N}");
 
             //2.Tính số camichael - lamda
             BigInteger lamda = lcm(q-1,p-1);
+            _log.Info($"\t>> lamda = {lamda}");
             BigInteger Nx2 = N*N;
+            _log.Info($"\t>> Nx2 = {Nx2}");
             BigInteger G = 0;
 
             //3. Chọn bãn ngẫu nhiên Semi-random - Chọn g 
             while(true){
                 BigInteger g = GetRanDomBigInteger_bytes(0,Nx2) ;
+                _log.Info($"\t>> Chọn đại g = {g}");
                 
                 //Nếu g là nguyên tố cùng nhau với n^2 thì làm bước sau đây
                 if(TinhNguyenToCungNhau( g, Nx2) == true){
+                    _log.Info($"\t>> Nguyên tố cùng nhau với N ...");
                     //3.1 tính u
                     BigInteger u = ModuloPower(g, lamda, Nx2);
 
@@ -97,6 +111,7 @@ namespace BackEnd.src.infrastructure.Services
                     //3.3 Kiểm tra nguyên tố cùng nhau
                     if(gcd( Lu, N) == 1){
                         G = g;
+                        _log.Info($"\t>> G = {G}");
                         break;      //Dừng
                     } 
                 }
@@ -105,18 +120,21 @@ namespace BackEnd.src.infrastructure.Services
             //4.Tính muy            
                 // -- 4.1 Tìm u = g^lamda % N^2
             BigInteger U = ModuloPower(G, lamda, Nx2);
+            _log.Info($"\t>> U = {U}");
                 
                 // -- 4.2  TÍnh L(U) = (u-1)//n
             BigInteger LU = BigInteger.Divide(U-1,N);
+            _log.Info($"\t>> LU = {LU}");
 
                 // -- 4.2 Tính Muy = L(u)^-1 % N
             BigInteger muy = Euclide_MoRong( N, LU);
+            _log.Info($"\t>> muy = {muy}");
 
-            // Console.WriteLine($"\t>> N = {N}");
-            // Console.WriteLine($"\t>> G = {G}");
-            // Console.WriteLine($"\t>> lamda = {lamda}");
-            // Console.WriteLine($"\t>> muy = {muy}");
-
+            // _log.Info($"\t>> N = {N}");
+            // _log.Info($"\t>> G = {G}");
+            // _log.Info($"\t>> lamda = {lamda}");
+            // _log.Info($"\t>> muy = {muy}");
+            _log.Info("Tạo khóa công khai và khóa cá nhân thành công");
             return (N,G,lamda,muy);
         }
 

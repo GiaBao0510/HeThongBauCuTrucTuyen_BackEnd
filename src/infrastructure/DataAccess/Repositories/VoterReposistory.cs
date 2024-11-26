@@ -623,7 +623,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             return true;
         }
 
-        //15.Thêm danh sách cử tri vào cuộc bầu cử
+        //15.Thêm danh sách cử tri vào cuộc bầu cử 
         public async Task<int> _AddListVotersToTheElection(VoterListInElectionDto voterListInElectionDto){
             using var connect = await _context.Get_MySqlConnection();
             
@@ -646,7 +646,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             if((sl_cuTriHienTai + voterListInElectionDto.listIDVoter.Count) > sl_cuTriToiDa) return -3;
 
             //thêm từng cử tri trong danh sách vào cuộc bầu cử
-            const string sql = @"
+            const string sqlTrangThaiBauCu = @"
                 INSERT INTO trangthaibaucu(ID_CuTri,ID_DonViBauCu,ngayBD,GhiNhan)
                 VALUES(@ID_CuTri,@ID_DonViBauCu,@ngayBD,@GhiNhan);";
 
@@ -656,7 +656,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 bool checkVoterJoined = await _VoterCheckInElection(voter,voterListInElectionDto.ngayBD,connect);
                 bool checVoterExists = await _CheckVoterExists(voter, connect);
                 if(!checkVoterJoined && checVoterExists){
-                    using(var command = new MySqlCommand(sql, connect)){
+                    using(var command = new MySqlCommand(sqlTrangThaiBauCu, connect)){
                         command.Parameters.AddWithValue("@ID_CuTri", voter);
                         command.Parameters.AddWithValue("@ID_DonViBauCu", voterListInElectionDto.ID_DonViBauCu);
                         command.Parameters.AddWithValue("@ngayBD", voterListInElectionDto.ngayBD);
@@ -983,7 +983,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 FROM chitietbaucu ct 
                 INNER JOIN phieubau p ON p.ID_Phieu = ct.ID_Phieu
                 INNER JOIN danhmucungcu dm ON dm.ID_Cap = p.ID_cap
-                WHERE ct.ID_CuTri =@ID_CuTri;";
+                WHERE ct.ID_CuTri =@ID_CuTri AND ID_CuTri IS NOT NULL;";
                 
                 using(var command = new MySqlCommand(sql, connection)){
                     command.Parameters.AddWithValue("@ID_CuTri", ID_CuTri);

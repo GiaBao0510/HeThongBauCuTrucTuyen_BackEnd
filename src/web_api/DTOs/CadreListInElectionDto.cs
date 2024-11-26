@@ -4,5 +4,6 @@ namespace BackEnd.src.web_api.DTOs
     {
         public List<string> ListID_canbo{set; get;}
         public DateTime ngayBD{set; get;}
+        public string? ID_DonViBauCu{set; get;}
     }
 }

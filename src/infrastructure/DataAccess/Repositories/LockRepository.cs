@@ -1,14 +1,13 @@
 using BackEnd.src.infrastructure.Hubs;
 using System.Globalization;
 using System.Numerics;
-using Microsoft.AspNetCore.SignalR;
 using BackEnd.src.core.Interfaces;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using Microsoft.Extensions.Hosting;
+using log4net;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -20,6 +19,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         private readonly NotificationHubs _notificationHubs;
         private readonly IResultsAnnouncementDetailsRepository _resultsAnnouncementDetails;
         public IConfiguration Configuration{get;}
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
 
         //khởi tạo
         public LockRepository(
@@ -73,19 +73,19 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 return null;
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -112,15 +112,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command.Parameters.AddWithValue("@ngayBD",ngayBD);
                     using var reader = await command.ExecuteReaderAsync();
                     if(await reader.ReadAsync()){
-                        //Kiểm tra N và G phải khác null
-                        if(reader.IsDBNull(reader.GetOrdinal("N")) || reader.IsDBNull(reader.GetOrdinal("G")))
-                            throw new Exception("N và G phải khác null");
                         
                         return new LockDTO{
                             ID_Khoa = reader.GetInt32(reader.GetOrdinal("ID_Khoa")),
                             NgayTao = reader.GetDateTime(reader.GetOrdinal("NgayTao")),
-                            N = (BigInteger)reader.GetDecimal(reader.GetOrdinal("N")),
-                            G = (BigInteger)reader.GetDecimal(reader.GetOrdinal("G")),
+                            N = BigInteger.Parse(reader.GetString(reader.GetOrdinal("N"))),
+                            G = BigInteger.Parse(reader.GetString(reader.GetOrdinal("G"))),
                             path_PK = reader.GetString(reader.GetOrdinal("path_PK")),
                         };
                     }
@@ -128,19 +125,19 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 return null;
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -150,7 +147,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             using var connection = await _context.Get_MySqlConnection();
             var list = new List<LockDTO>();
             try{
-                Console.WriteLine($"Đường dẫn khóa mật: {Configuration["AppSettings:PrivateKeyPath"]}");
+                _log.Info($"Đường dẫn khóa mật: {Configuration["AppSettings:PrivateKeyPath"]}");
                 //Lấy thông tin trả về kết quả
                 const string sql = @"
                 SELECT *
@@ -162,8 +159,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                             list.Add(new LockDTO{
                                 ID_Khoa = reader.GetInt32(reader.GetOrdinal("ID_Khoa")),
                                 NgayTao = reader.GetDateTime(reader.GetOrdinal("NgayTao")),
-                                N = (BigInteger)reader.GetInt64(reader.GetOrdinal("N")),
-                                G = (BigInteger)reader.GetDecimal(reader.GetOrdinal("G")),
+                                N = BigInteger.Parse(reader.GetString(reader.GetOrdinal("N"))),
+                                G = BigInteger.Parse(reader.GetString(reader.GetOrdinal("G"))),
                                 path_PK = reader.GetString(reader.GetOrdinal("path_PK")),
                             });
                         }
@@ -171,19 +168,19 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     return list;
                 }
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -212,19 +209,19 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 return true;
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -269,25 +266,25 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         };
                     }
                 }else{
-                    Console.WriteLine("File khong tồn tại");
+                    _log.Info("File khong tồn tại");
                 }
                 
 
                 return null;
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -315,19 +312,19 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     return null;
                 }
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -340,7 +337,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 var list = new List<DecodingTheBallotsDTO>();
                 var pbKey = await _getLockBasedOnElectionDate(ngayBD, connection);
                 if(pbKey == null){
-                    Console.WriteLine("ngày bắt đầu không tồn tại");
+                    _log.Info("ngày bắt đầu không tồn tại");
                     return 0;
                 }
 
@@ -354,7 +351,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 //Kiểm tra đường dẫn tồn tại không 
                 if(!File.Exists(pbKey.path_PK)){
-                    Console.WriteLine($"File khóa mật phiếu bầu không tồn tại:{pbKey.path_PK}");
+                    _log.Info($"File khóa mật phiếu bầu không tồn tại:{pbKey.path_PK}");
                     return -1;
                 }
 
@@ -368,7 +365,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         //Đọc giá trị từng phiếu bầu
                         var vote = new DecodingTheBallotsDTO{
                             ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
-                            GiaTriPhieuBau = (BigInteger)reader.GetDecimal(reader.GetOrdinal("GiaTriPhieuBau")),
+                            GiaTriPhieuBau = BigInteger.Parse(reader.GetString(reader.GetOrdinal("GiaTriPhieuBau"))),
                             ThoiDiem = reader.GetDateTime(reader.GetOrdinal("ThoiDiem")),
                             ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
                             HoTen = reader.GetString(reader.GetOrdinal("HoTen"))
@@ -396,19 +393,19 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     return list;
                 }
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -420,7 +417,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 var list = new List<VoteDto>();
                 var pbKey = await _getLockBasedOnElectionDate(ngayBD, connection);
                 if(pbKey == null){
-                    Console.WriteLine("ngày bắt đầu không tồn tại");
+                    _log.Info("ngày bắt đầu không tồn tại");
                     return 0;
                 }
 
@@ -432,7 +429,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 //Kiểm tra đường dẫn tồn tại không 
                 if(!File.Exists(pbKey.path_PK)){
-                    Console.WriteLine($"File khóa mật phiếu bầu không tồn tại:{pbKey.path_PK}");
+                    _log.Info($"File khóa mật phiếu bầu không tồn tại:{pbKey.path_PK}");
                     return -1;
                 }
 
@@ -446,7 +443,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         //Đọc giá trị từng phiếu bầu
                         var vote = new VoteDto{
                             ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
-                            GiaTriPhieuBau = (BigInteger)reader.GetDecimal(reader.GetOrdinal("GiaTriPhieuBau")),
+                            GiaTriPhieuBau = BigInteger.Parse(reader.GetString(reader.GetOrdinal("GiaTriPhieuBau"))),
                             ID_cap = reader.GetInt32(reader.GetOrdinal("ID_cap")),
                             ngayBD = ngayBD
                         };
@@ -473,19 +470,19 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     return list;
                 }
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -494,7 +491,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         public async Task<int> _CaculateAndAnnounceElectionResult(string ngayBD, string ID_CanBo){
             using var connection = await _context.Get_MySqlConnection();
             using var transaction = await connection.BeginTransactionAsync();
-            Console.WriteLine("\t\t == Chuẩn bị cập nhật công bố kết quả bầu cử ==");
+            _log.Info("\t\t == Chuẩn bị cập nhật công bố kết quả bầu cử ==");
 
             try{
                 //Đưa ngày bắt đầu về dạng DateTime
@@ -537,7 +534,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 //Tính toán từng phiếu bầu để tìm số lượt bình chọn cho từng ứng củ viên
                 foreach(var vote in listOfDecodedVotesBasedOnElection){
-                    //Console.WriteLine($"Giá trị phiếu bầu: {vote.GiaTriPhieuBau}");
+                    //_log.Error($"Giá trị phiếu bầu: {vote.GiaTriPhieuBau}");
                     BigInteger vote_mi = (BigInteger)vote.GiaTriPhieuBau;
                     int s_temp = s;
 
@@ -623,23 +620,23 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 
                 
                 await transaction.CommitAsync();
-                Console.WriteLine("\t\t ====> công bố thành công");
+                _log.Info("\t\t ====> công bố thành công");
                 return 1;
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 await transaction.RollbackAsync();
                 return -98;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 await transaction.RollbackAsync();
                 return -99;
             }

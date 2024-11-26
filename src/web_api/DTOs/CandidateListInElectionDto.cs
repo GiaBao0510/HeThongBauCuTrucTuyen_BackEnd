@@ -9,5 +9,6 @@ namespace BackEnd.src.web_api.DTOs
         public DateTime ngayBD{set; get;}
         public int ID_Cap {set; get;}
         public List<string> listIDCandidate{set; get;}
+        public string? ID_DonViBauCu{set; get;}
     }
 }

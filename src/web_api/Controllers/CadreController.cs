@@ -1,4 +1,5 @@
 
+using BackEnd.src.core.Interfaces;
 using BackEnd.src.core.Models;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
@@ -15,9 +16,17 @@ namespace BackEnd.src.web_api.Controllers
     public class CadreController : ControllerBase
     {
         private readonly ICadreRepository _CadreRepository;
+                private readonly IVotingServices _votingServices;
 
         //Khởi tạo
-        public CadreController(ICadreRepository CadreRepository) => _CadreRepository = CadreRepository;
+        public CadreController(
+            ICadreRepository CadreRepository,
+            IVotingServices VotingServices
+        ){
+            _CadreRepository = CadreRepository;
+            _votingServices = VotingServices;
+        }
+
 
         //1. Thêm
         [HttpPost]
@@ -357,6 +366,59 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500,new{
                     Status = "false",
                     Message=$"Lỗi khi lấy danh sách kỳ bầu cử mã cán bộ đang trực thuộc: {ex.Message}"
+                });
+            }
+        }
+
+        //14. cán bộ bỏ phiếu
+        [HttpPost("cadre-vote")]
+        [Authorize(Roles= "1,8")]
+        public async Task<IActionResult> CadreVote([FromBody] CadreVoteDTO cadreVoteDTO){
+            try{
+                // Kiểm tra đầu vào
+                if(cadreVoteDTO == null || string.IsNullOrEmpty(cadreVoteDTO.ID_CanBo))
+                    return StatusCode(400,new{
+                        Status = "false",
+                        Message="Lỗi khi đầu vào không được rỗng"
+                    });
+        
+                // Lấy kết quả thêm vào được hay không
+                int result = await _votingServices._CadreVote(cadreVoteDTO);
+                if(result <= 0){
+                    string errorMessage = result switch{
+                        0 => "Lỗi ngày bỏ phiếu không hợp lệ",
+                        -1 =>"Lỗi cán bộ không tồn tại",
+                        -2 => "Lỗi không tìm thấy kỳ bầu cử",
+                        -3 =>"cán bộ đã bỏ phiếu rồi",
+                        -4 =>"Lỗi giá trị phiếu bầu không hợp lệ",
+                        -5 => "Lỗi vị trí ứng tuyển để bầu cử không tồn tại",
+                        -6 => "Lỗi không tìm thấy đơn vị bầu cử",
+                        -7 => "Lỗi khi khởi tại và thêm phiếu bầu",
+                        -8 => "Lỗi khi cập nhật trạng thái bầu cử của người dùng",
+                        -9 => "Lỗi khi thêm thông tin chi tiết của người dùng",
+                        -10 => "Lỗi ngày bắt đầu của kỳ bầu cử không tồn tại",
+                        _ => "Lỗi không xác định"
+                    };
+                    int status = result switch{
+                        0 => 400, -1 => 400, -2 => 400, -3 =>400, -4 => 400,
+                        -5=> 400, -6 => 400, -7=>500, -8=>500 , -9=> 500, -10 => 400,
+                        _ => 500
+                    };
+                    return StatusCode(status,new {Status = "False", Message = errorMessage});
+                }
+                
+                return Ok(new{
+                    Status = "OK", 
+                    Message = "Bỏ phiếu bình chọn thành công"
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện bỏ phiếu: {ex.Message}"
                 });
             }
         }

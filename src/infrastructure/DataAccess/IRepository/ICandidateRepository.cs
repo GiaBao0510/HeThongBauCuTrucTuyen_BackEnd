@@ -45,5 +45,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<List<CandidateRegistedForElectionsDTO>> _getListOfRegisteredCandidate(string ID_ucv);
         //Lấy danh sách ID ứng cử viên theo ngày bầu cử
         Task<List<CandidateID_DTO>> _getCandidateID_ListBasedOnElection(string ngayBD, MySqlConnection connect);
+        //Kiểm tra xem cán bộ đã bỏ phiếu hay chưa
+        Task<bool> _CheckCandidateHasVoted(string ID_ucv, DateTime ngayBD, MySqlConnection connect);
     }
 }

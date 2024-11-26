@@ -1,4 +1,4 @@
-using System.Data;
+using log4net;
 using BackEnd.src.core.Common;
 using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
@@ -13,6 +13,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
     public class CadreRepository: UserRepository, IDisposable, ICadreRepository
     {
         private readonly DatabaseContext _context;
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
         private readonly IElectionsRepository _ElectionsRepository; //kỳ bầu cử
         private readonly IProfileRepository _profileRepository;
         private readonly CloudinaryService _cloudinaryService;
@@ -558,11 +559,18 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     
                     //Kiểm tra xem cán bộ đã trực tại kỳ bầu cử này chưa
                     bool checkTheCadresWhoAttendedTheElection = await _workPlaceRepository._CheckTheCadresWhoAttendedTheElection(cadre, cadreListInElectionDto.ngayBD, connection);
-                                   
+
+                    const string sql = @"INSERT INTO hoatdong(ID_CanBo,ngayBD) VALUES(@ID_CanBo,@ngayBD);";
+                    const string sqlTrangThaiBauCu = @"
+                        INSERT INTO trangthaibaucu(ID_CanBo,ID_DonViBauCu,ngayBD,GhiNhan)
+                        VALUES(@ID_CanBo,@ID_DonViBauCu,@ngayBD,@GhiNhan);";
+
                     if(checkExistsCadre && !checkTheCadresWhoAttendedTheElection){
-                        using (var command = new MySqlCommand("INSERT INTO hoatdong(ID_CanBo,ngayBD) VALUES(@ID_CanBo,@NgayBD);", connection)){
+                        using (var command = new MySqlCommand(sql + sqlTrangThaiBauCu, connection)){
                             command.Parameters.AddWithValue("@ID_CanBo", cadre);
-                            command.Parameters.AddWithValue("@NgayBD", cadreListInElectionDto.ngayBD);
+                            command.Parameters.AddWithValue("@ngayBD", cadreListInElectionDto.ngayBD);
+                            command.Parameters.AddWithValue("@ID_DonViBauCu", cadreListInElectionDto.ID_DonViBauCu);
+                            command.Parameters.AddWithValue("@GhiNhan", "0");
 
                             await command.ExecuteNonQueryAsync();
                             dem++;
@@ -676,6 +684,50 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     }
                     return list;
                 }
+
+            }catch(MySqlException ex){
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //19. Kiểm tra xem cán bộ đã bỏ phiếu trong kỳ bầu cử chưa
+        public async Task<bool> _CheckCadreHasVoted(string ID_CanBo, DateTime ngayBD, MySqlConnection connect){
+            //Kiểm tra trạng thái kết nối trước khi mở
+            if(connect.State != System.Data.ConnectionState.Open)
+                await connect.OpenAsync();
+                
+            try{
+                const string sql = @"
+                SELECT GhiNhan
+                FROM trangthaibaucu
+                WHERE ngayBD = @ngayBD AND ID_CanBo =@ID_CanBo;";
+
+                using (var command = new MySqlCommand(sql, connect)){
+                    command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                    command.Parameters.AddWithValue("@ID_CanBo", ID_CanBo);
+
+                    using var reader = await command.ExecuteReaderAsync();
+                    if(await reader.ReadAsync()){
+                        string ghinhan = reader.GetString(reader.GetOrdinal("GhiNhan"));
+                        Console.WriteLine($">>Ghi nhận bỏ phiếu: {ghinhan}");
+                        if(ghinhan.Equals("1")) return true; //Đã bỏ phiếu rồi
+                    }
+                    return  false;  //Chưa bỏ phiếu
+                }
+                
 
             }catch(MySqlException ex){
                 Console.WriteLine($"Error message: {ex.Message}");

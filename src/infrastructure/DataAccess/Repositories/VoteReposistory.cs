@@ -290,7 +290,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     while(await reader.ReadAsync()){
                         list.Add( new VoteDetailsDTO{
                             ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
-                            GiaTriPhieuBau =(BigInteger)reader.GetDecimal(reader.GetOrdinal("GiaTriPhieuBau")),
+                            GiaTriPhieuBau = BigInteger.Parse(reader.GetString(reader.GetOrdinal("GiaTriPhieuBau"))),
                             ThoiDiem = reader.GetDateTime(reader.GetOrdinal("ThoiDiem")),
                             ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
                             HoTen = reader.GetString(reader.GetOrdinal("HoTen"))
@@ -337,7 +337,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     while(await reader.ReadAsync()){
                         list.Add( new VoteDetailsDTO{
                             ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
-                            GiaTriPhieuBau =(BigInteger)reader.GetDecimal(reader.GetOrdinal("GiaTriPhieuBau")),
+                            GiaTriPhieuBau = BigInteger.Parse(reader.GetString(reader.GetOrdinal("GiaTriPhieuBau"))),
                             ThoiDiem = reader.GetDateTime(reader.GetOrdinal("ThoiDiem")),
                             ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
                             HoTen = reader.GetString(reader.GetOrdinal("HoTen"))

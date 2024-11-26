@@ -6,12 +6,14 @@ using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.SignalR;
 using MySql.Data.MySqlClient;
+using log4net;
 
 namespace BackEnd.src.infrastructure.Hubs
 {
     public class NotificationHubs : Hub, IDisposable, INotificationHubs
     {
         private readonly DatabaseContext _context;
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program));
         private readonly IHubContext<NotificationHubs> _hubContext;
         private readonly IVoterRepository _voterRepository;
         private readonly ICandidateRepository _candidateRepository;
@@ -72,19 +74,19 @@ namespace BackEnd.src.infrastructure.Hubs
                     return rowsAffected > 0;
                 }
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -116,7 +118,7 @@ namespace BackEnd.src.infrastructure.Hubs
             
             var list = new List<VoterNoticeDetailsDTO>();
             try{
-                const string sql = @"SELECT ID_CuTri,ngayBD FROM trangthaibaucu;";
+                const string sql = @"SELECT ID_CuTri,ngayBD FROM trangthaibaucu WHERE ID_CuTri IS NOT NULL;";
                 using(var command = new MySqlCommand(sql, connect)){
                     using var reader = await command.ExecuteReaderAsync();
                     while(await reader.ReadAsync()){
@@ -128,19 +130,19 @@ namespace BackEnd.src.infrastructure.Hubs
                 }
                 return list;
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -165,19 +167,19 @@ namespace BackEnd.src.infrastructure.Hubs
                 }
                 return list;
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -202,19 +204,19 @@ namespace BackEnd.src.infrastructure.Hubs
                 }
                 return list;
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -233,7 +235,7 @@ namespace BackEnd.src.infrastructure.Hubs
                     TimeSpan difference = upcomingDay - currentDay;
 
                     if(difference.Days == 1){
-                        Console.WriteLine($">>>>>Thông báo ID cử tri: {e.ID_CuTri} Ngày bắt đầu bầu cử: {e.ngayBD}");
+                        _log.Info($">>>>>Thông báo ID cử tri: {e.ID_CuTri} Ngày bắt đầu bầu cử: {e.ngayBD}");
                         //Chuỗi thông báo
                         string message = $"Ngày bầu cử sắp tới của bạn tham dự là {e.ngayBD}.";
                         
@@ -252,22 +254,22 @@ namespace BackEnd.src.infrastructure.Hubs
                 }
             }catch (NullReferenceException nre)
             {
-                Console.WriteLine($"Null reference error: {nre.Message}");
+                _log.Error($"Null reference error: {nre.Message}");
                 // Xử lý cụ thể cho lỗi null
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -287,7 +289,7 @@ namespace BackEnd.src.infrastructure.Hubs
                     TimeSpan difference = upcomingDay - currentDay;
 
                     if(difference.Days == 1){
-                        Console.WriteLine($">>>>>Thông báo ID ứng cử viên: {e.ID_ucv} Ngày bắt đầu bầu cử: {e.ngayBD}");
+                        _log.Info($">>>>>Thông báo ID ứng cử viên: {e.ID_ucv} Ngày bắt đầu bầu cử: {e.ngayBD}");
                         //Chuỗi thông báo
                         string message = $"Ngày bầu cử sắp tới của bạn là {upcomingDay}.";
                         
@@ -306,22 +308,22 @@ namespace BackEnd.src.infrastructure.Hubs
                 }
             }catch (NullReferenceException nre)
             {
-                Console.WriteLine($"Null reference error: {nre.Message}");
+                _log.Error($"Null reference error: {nre.Message}");
                 // Xử lý cụ thể cho lỗi null
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -341,7 +343,7 @@ namespace BackEnd.src.infrastructure.Hubs
                     TimeSpan difference = upcomingDay - currentDay;
 
                     if(difference.Days == 1){
-                        Console.WriteLine($">>>>>Thông báo ID cử tri: {e.ID_CanBo} Ngày bắt đầu bầu cử: {e.ngayBD}");
+                        _log.Info($">>>>>Thông báo ID cử tri: {e.ID_CanBo} Ngày bắt đầu bầu cử: {e.ngayBD}");
                         //Chuỗi thông báo
                         string message = $"Ngày bầu cử sắp tới của bạn là {e.ngayBD}.";
                         
@@ -359,22 +361,22 @@ namespace BackEnd.src.infrastructure.Hubs
                 }
             }catch (NullReferenceException nre)
             {
-                Console.WriteLine($"Null reference error: {nre.Message}");
+                _log.Error($"Null reference error: {nre.Message}");
                 // Xử lý cụ thể cho lỗi null
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -414,22 +416,22 @@ namespace BackEnd.src.infrastructure.Hubs
                 await _hubContext.Clients.All.SendAsync("Kết quả bầu cử tại kỳ", message);
             }catch (NullReferenceException nre)
             {
-                Console.WriteLine($"Null reference error: {nre.Message}");// Xử lý cụ thể cho lỗi null
+                _log.Error($"Null reference error: {nre.Message}");// Xử lý cụ thể cho lỗi null
                 throw new Exception("Null reference error");
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -462,19 +464,19 @@ namespace BackEnd.src.infrastructure.Hubs
                 }
 
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }

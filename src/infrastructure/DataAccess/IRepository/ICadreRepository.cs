@@ -38,5 +38,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<List<CadreJoinedForElectionDTO>> _getListOfCadreJoinedForElection(string ID_CanBo);
         //Lấy danh sách ID cán bộ theo ngày bầu cử
         Task<List<CadreID_DTO>> _getCadreID_ListBasedOnElection(string ngayBD, MySqlConnection connect);
+        //Kiểm tra xem cán bộ bỏ phiếu chưa
+        Task<bool> _CheckCadreHasVoted(string ID_CanBo, DateTime ngayBD, MySqlConnection connect);
     }
 }

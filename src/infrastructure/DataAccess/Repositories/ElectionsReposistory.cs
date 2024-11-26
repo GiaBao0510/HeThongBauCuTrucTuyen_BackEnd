@@ -3,20 +3,19 @@ using BackEnd.src.infrastructure.DataAccess.Context;
 using MySql.Data.MySqlClient;
 using BackEnd.src.web_api.DTOs;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
-using System.Data;
 using System.Globalization;
 using BackEnd.src.core.Interfaces;
 using System.Numerics;
-using System;
-using System.IO;
 using Microsoft.Extensions.Configuration;
 using BackEnd.src.infrastructure.Services;
+using log4net;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
     public class ElectionsReposistory : IDisposable,IElectionsRepository
     {
         private readonly DatabaseContext _context;
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
         private readonly IPaillierServices _PaillierServices;
         private readonly IListOfPositionRepository _listOfPositionRepository;
         public IConfiguration Configuration{get;}
@@ -94,6 +93,16 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         public async Task<int> _AddElections(ElectionTempDTO kybaucu){
             using var connection = await _context.Get_MySqlConnection();
             using var transaction =await connection.BeginTransactionAsync();
+            _log.Info(" --------------- Start add election ---------------");
+            _log.Info($"NgayBD: {kybaucu.ngayBD}");
+            _log.Info($"NgayKT: {kybaucu.ngayKT}");
+            _log.Info($"NgayKT_UngCu: {kybaucu.NgayKT_UngCu}");
+            _log.Info($"TenKyBauCu: {kybaucu.TenKyBauCu}");
+            _log.Info($"MoTa: {kybaucu.MoTa}");
+            _log.Info($"SoLuongToiDaCuTri: {kybaucu.SoLuongToiDaCuTri}");
+            _log.Info($"SoLuongToiDaUngCuVien: {kybaucu.SoLuongToiDaUngCuVien}");
+            _log.Info($"SoLuotBinhChonToiDa: {kybaucu.SoLuotBinhChonToiDa}");
+            _log.Info($"ID_Cap: {kybaucu.ID_Cap}");
             try{
                 //Lấy thời điểm hiện tại Và kiểm tra nếu ngày bắt đầu để rỗng thì nó lấy thời điểm hiện tại
                 DateTime currentDay = DateTime.Now;
@@ -119,8 +128,9 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 ";
 
                 //Cấc biến hỗ trợ
-                string now = currentDay.ToString("yyyy-mm-dd_HH-mm-ss");
+                string now = currentDay.ToString("yyyy-MM-dd_HH-mm-ss");
                 string directoryPath  = Configuration["AppSettings:PrivateKeyPath"];   //Thư mục lưu khóa chính
+                _log.Info($"Now: {now}");
                 string filePk = $@"\{now}.txt";
                 string filePath = Path.Combine(directoryPath, filePk);
                 Console.WriteLine($"\nĐường dẫn: {filePath}");
@@ -247,44 +257,69 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //Xóa
         public async Task<bool> _DeleteElectionsBy_ID(string ID){
             using var connection = await _context.Get_MySqlConnection();
-
-            const string sqlupdate = @"
+            using var transaction = await connection.BeginTransactionAsync();
+            _log.Info($"ngayBD: {ID}");
+            try{
+                const string sqlupdate = @"
                 DELETE FROM kybaucu
                 WHERE ngayBD = @ngayBD;";
+
+                //Kiểm tra kỳ bầu cửu có tồn tại không
+                bool check_ngayBD = await _CheckIfElectionTimeExists(DateTime.ParseExact(ID, "yyyy-MM-dd HH:mm:ss", null),connection);
+                if(!check_ngayBD) return false;
+
+                //Lấy đường dẫn khóa riêng tư - và xóa tệp tin dựa trên đường dẫn
+                string pathPK = await _getPrivateKeyPathBasedOnElectionDate(ID,connection);
+                _log.Info($"Đường dẫn tệp tin privatekey:" + pathPK);
+                
+                //Xóa tệp tin privatekey trên google drive
+                int lastIndex = pathPK.LastIndexOf('\\');
+                string fileName = pathPK.Substring(lastIndex + 1);
+                 _log.Info($"Tên tệp tin cần xóa: {fileName}");
+                bool deleteFileOnDrive = await _googleDriveService.deleteFileAssync(fileName, "1lfcfq-fMMOMXQlXwSLYUGkpJDVDoMM7U");
+                if(!deleteFileOnDrive){
+                    _log.Info("Error: Xóa tệp tin trên google drive không thành công");
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                //Xóa tệp tin trên usb
+                if(File.Exists(pathPK)){
+                    File.Delete(pathPK);
+                }else{
+                    _log.Info("Error: Không tìm thấy tệp tin privatekey");
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                using var command = new MySqlCommand(sqlupdate, connection);
+                command.Parameters.AddWithValue("@ngayBD",ID);
             
-            //Xóa khóa dự trên ngày BD
-            const string sqlupdate2 = @"
-                DELETE FROM khoa
-                WHERE ngayBD = @ngayBD;";
-
-            //Lấy đường dẫn khóa riêng tư - và xóa tệp tin dựa trên đường dẫn
-            string pathPK = await _getPrivateKeyPathBasedOnElectionDate(ID,connection);
-            
-            //Xóa tệp tin privatekey trên google drive
-            int lastIndex = pathPK.LastIndexOf('\\');
-            string fileName = pathPK.Substring(lastIndex + 1);
-            Console.WriteLine($"Tên tệp tin cần xóa: {fileName}");
-            bool deleteFileOnDrive = await _googleDriveService.deleteFileAssync(fileName, "1lfcfq-fMMOMXQlXwSLYUGkpJDVDoMM7U");
-            if(!deleteFileOnDrive){
-                Console.WriteLine("Error: Xóa tệp tin trên google drive không thành công");
-                return false;
+                //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
+                int rowAffected = await command.ExecuteNonQueryAsync();
+                _log.Info($"Số hàng tác động khi xóa:{rowAffected}");
+                
+                await transaction.CommitAsync();
+                return rowAffected > 0;
+            }catch(MySqlException ex){
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                await transaction.RollbackAsync();
+                throw;
             }
-
-            //Xóa tệp tin trên usb
-            if(File.Exists(pathPK)){
-                File.Delete(pathPK);
-            }else{
-                Console.WriteLine("Error: Không tìm thấy tệp tin privatekey");
-                return false;
+            catch(Exception ex){
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
+                await transaction.RollbackAsync();
+                throw;
             }
-
-            using var command = new MySqlCommand(sqlupdate2 + sqlupdate, connection);
-            command.Parameters.AddWithValue("@ngayBD",ID);
-        
-            //Lấy số hàng bị tác động nếu > 0 thì true, ngược lại là false
-            int rowAffected = await command.ExecuteNonQueryAsync();
-            Console.WriteLine($"Số hàng tác động khi xóa:{rowAffected}");
-            return rowAffected > 0;
         }
 
         //Kiểm tra xem ngày bầu cử có tồn tại không

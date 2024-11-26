@@ -3,12 +3,14 @@ using BackEnd.src.infrastructure.DataAccess.Context;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
 using MySql.Data.MySqlClient;
+using log4net;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
     public class ListOfPositionReposistory : IDisposable,IListOfPositionRepository
     {
         private readonly DatabaseContext _context;
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
         private readonly IConstituencyRepository _constituencyRepository;
 
         //Khởi tạo
@@ -89,10 +91,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //Sửa
         public async Task<bool> _EditListOfPositionsBy_ID(string ID, ListOfPositionDTO listOfPositions){
             using var connection = await _context.Get_MySqlConnection();
-            Console.WriteLine($"Đầu vào");
-            Console.WriteLine($"ID: {ID}");
-            Console.WriteLine($"TenCapUngCu: {listOfPositions.TenCapUngCu}");
-            Console.WriteLine($"ID_DonViBauCu: {listOfPositions.ID_DonViBauCu}");
+            _log.Info($"Đầu vào");
+            _log.Info($"ID: {ID}");
+            _log.Info($"TenCapUngCu: {listOfPositions.TenCapUngCu}");
+            _log.Info($"ID_DonViBauCu: {listOfPositions.ID_DonViBauCu}");
             //Tìm kiếm mã đơn vị có tồn tại không
             try{
                 //Kiêmr tra mã số đơn vị bầu cử tại danhmucungcu có tồn tại không
@@ -113,20 +115,20 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 }
                 
             }catch(MySqlException ex){
-                Console.WriteLine($"Lỗi tại kiểm tra email trùng trong MYSQL");
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Info($"Lỗi tại kiểm tra email trùng trong MYSQL");
+                _log.Info($"Error message: {ex.Message}");
+                _log.Info($"Error Code: {ex.Code}");
+                _log.Info($"Error Source: {ex.Source}");
+                _log.Info($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Info($"Error message: {ex.Message}");
+                _log.Info($"Error Source: {ex.Source}");
+                _log.Info($"Error StackTrace: {ex.StackTrace}");
+                _log.Info($"Error TargetSite: {ex.TargetSite}");
+                _log.Info($"Error HResult: {ex.HResult}");
+                _log.Info($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -146,20 +148,20 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 int rowAffected = await command.ExecuteNonQueryAsync();
                 return rowAffected > 0;
             }catch(MySqlException ex){
-                Console.WriteLine($"Lỗi tại kiểm tra email trùng trong MYSQL");
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Info($"Lỗi tại kiểm tra email trùng trong MYSQL");
+                _log.Info($"Error message: {ex.Message}");
+                _log.Info($"Error Code: {ex.Code}");
+                _log.Info($"Error Source: {ex.Source}");
+                _log.Info($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Info($"Error message: {ex.Message}");
+                _log.Info($"Error Source: {ex.Source}");
+                _log.Info($"Error StackTrace: {ex.StackTrace}");
+                _log.Info($"Error TargetSite: {ex.TargetSite}");
+                _log.Info($"Error HResult: {ex.HResult}");
+                _log.Info($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }
@@ -194,9 +196,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 command.Parameters.AddWithValue("@ngayBD",ngayBD);
                 
                 int count = Convert.ToInt32(await command.ExecuteScalarAsync());
-                Console.WriteLine($"Đếm ngayBD trong danh muc dựa trên kq bầu cử: {count}");
+                _log.Info($"Đếm ngayBD trong danh muc dựa trên kq bầu cử: {count}");
                 return count > 0;
             }
         }
+        
     }
 }

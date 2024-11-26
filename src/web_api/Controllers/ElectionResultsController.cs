@@ -85,5 +85,28 @@ namespace BackEnd.src.web_api.Controllers
                 });
             }
         }
+
+        //Lấy danh sách kết quả kỳ bầu cử đã công bố dựa trên ngày bầu cử
+        [HttpGet("list-of-elections-result-announced")]
+        [Authorize(Roles= "1")]
+        public async Task<IActionResult> ListOfElectionsResultAnnounced([FromQuery] string ngayBD){
+            try{
+                if(string.IsNullOrEmpty(ngayBD))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền ngày bắt đầu."});
+                
+                var result = await electionResultsRepository._ListOfElectionsResultAnnounced(ngayBD);
+
+                return Ok(new{Status = true, Message = "", data = result});
+
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy danh sách các kỳ bầu củ đã công bố cho ứng cử viên: {ex.Message}"
+                });
+            }
+        }
     }
 }
