@@ -861,7 +861,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 const string sql = @"
                 SELECT ID_CuTri
                 FROM trangthaibaucu
-                WHERE ngayBD =@ngayBD;";
+                WHERE ngayBD =@ngayBD AND ID_CuTri IS NOT NULL;";
 
                 using(var command = new MySqlCommand(sql, connect)){
                     command.Parameters.AddWithValue("@ngayBD", ngayBD);

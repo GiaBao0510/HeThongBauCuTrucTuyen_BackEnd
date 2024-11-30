@@ -3,12 +3,14 @@ using BackEnd.src.infrastructure.DataAccess.Context;
 using MySql.Data.MySqlClient;
 using BackEnd.src.web_api.DTOs;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
+using log4net;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
     public class ConstituencyReposistory : IDisposable,IConstituencyRepository
     {
         private readonly DatabaseContext _context;
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
 
         //Khởi tạo
         public ConstituencyReposistory(DatabaseContext context) => _context = context;
@@ -154,6 +156,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //Kiểm tra ID của đơn vị bầu, mã cử tri và ngày bắt đầu có cùng tồn tại không
         public async Task<bool> _CheckVoterID_ConsituencyID_andPollingDateTogether(string ID_DonViBauCu, string IDcutri, DateTime ngayBD, MySqlConnection connection){
+            _log.Info($"Kiểm tra đơn vị bầu cử bên cử tri");
+
             //Kiểm tra trạng thái kết nối trước khi mở
             if(connection.State != System.Data.ConnectionState.Open)
                 await connection.OpenAsync();
@@ -176,6 +180,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //Kiểm tra ID của đơn vị bầu, mã ững củ viên và ngày bắt đầu có cùng tồn tại không
         public async Task<bool> _CheckCandidateID_ConsituencyID_andPollingDateTogether(string ID_DonViBauCu, string ID_ucv, DateTime ngayBD, MySqlConnection connection){
+            _log.Info($"Kiểm tra đơn vị bầu cử bên ứng cử viên");
+
             //Kiểm tra trạng thái kết nối trước khi mở
             if(connection.State != System.Data.ConnectionState.Open)
                 await connection.OpenAsync();
@@ -198,6 +204,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //Kiểm tra ID của đơn vị bầu, mã cán bộ và ngày bắt đầu có cùng tồn tại không
         public async Task<bool> _CheckCadreID_ConsituencyID_andPollingDateTogether(string ID_DonViBauCu, string ID_CanBo, DateTime ngayBD, MySqlConnection connection){
+            _log.Info($"Kiểm tra đơn vị bầu cử bên cán bộ");
+            
             //Kiểm tra trạng thái kết nối trước khi mở
             if(connection.State != System.Data.ConnectionState.Open)
                 await connection.OpenAsync();

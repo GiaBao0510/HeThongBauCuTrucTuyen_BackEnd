@@ -243,7 +243,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Lấy thông tin chi tiết phiếu bầu dựa trên ngày bầu cử
         [HttpGet("get-details-about-votes-based-on-election-date")]
-        [Authorize(Roles= "1,8")]
+        [Authorize(Roles= "1,8")] 
         [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> GetDetailsAboutVotesBasedOnElectionDate([FromQuery]DateTime ngayBD){
             try{

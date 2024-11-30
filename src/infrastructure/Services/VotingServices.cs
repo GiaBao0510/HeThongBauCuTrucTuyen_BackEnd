@@ -53,448 +53,251 @@ namespace BackEnd.src.infrastructure.Services
         //Hủy
         public new void Dispose() => _context.Dispose();
 
-        //17. Cử tri bỏ phiếu
-        public async Task<int> _VoterVote(VoterVoteDTO voterVoteDTO){
+        //17.0 Kiêm tra xem thời điểm bỏ phiếu hợp lệ không. Nếu không thì trả về
+        // if(DateTime.Now > timeOfTheElectionDTO.ngayKT || DateTime.Now < votingDay){
+        //    return 0;
+        // } 
+
+        // Loại người bỏ phiếu
+        private enum VoterType
+        {
+            Voter,
+            Candidate,
+            Cadre
+        }
+
+        // Phương thức bỏ phiếu chung
+        private async Task<int> ProcessVoteAsync(
+            string ngayBD,
+            string giaTriPhieuBauStr,
+            int idCap,
+            int idDonViBauCu,
+            string idNguoiBau,
+            VoterType voterType)
+        {
             using var connect = await _context.Get_MySqlConnection();
-            //Kiểm tra kết nối
-            if(connect.State != System.Data.ConnectionState.Open )
+            if (connect.State != System.Data.ConnectionState.Open)
                 await connect.OpenAsync();
-            
+
             using var transaction = await connect.BeginTransactionAsync();
 
-            try{
-                _log.Info(" --- Đến bên trong phần kiểm tra --- ");
-                //Chuyển đổi dữ liệu
-                CultureInfo provider = CultureInfo.InvariantCulture;
-                DateTime votingDay = DateTime.ParseExact(voterVoteDTO.ngayBD,"yyyy-MM-dd HH:mm:ss",provider);
-                var timeOfTheElectionDTO = await _electionsRepository._GetTimeOfElection(voterVoteDTO.ngayBD, connect);
-                //DateTime pollingStopTime = 
+            try
+            {
+                _log.Info(" --- Bắt đầu quá trình bỏ phiếu --- ");
 
-                _log.Info("\t\t --- Thông tin đầu vào --");
-                _log.Info($"timeOfTheElectionDTO: {timeOfTheElectionDTO}");
-                _log.Info($"Ngày BD: {votingDay}");
-                _log.Info($"Ngày HIện tại: {DateTime.Now}");
-                _log.Info($"ID_CuTri: {voterVoteDTO.ID_CuTri}");
-                _log.Info($"ID_DonViBauCu: {voterVoteDTO.ID_DonViBauCu}");
-                _log.Info($"ID_Cap: {voterVoteDTO.ID_Cap}");
-                _log.Info($"GiaTriPhieuBau: {voterVoteDTO.GiaTriPhieuBau}");
-                
-                //17.-1 Kiếm ngày bắt đầu không tồn tại thì báo lỗi
-                if(timeOfTheElectionDTO == null)
+                // Chuyển đổi dữ liệu
+                if (!DateTime.TryParseExact(ngayBD, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime votingDay))
+                {
+                    _log.Error("Định dạng ngày bắt đầu không hợp lệ.");
                     return -10;
+                }
 
-                _log.Info($"Ngày KT: {timeOfTheElectionDTO.ngayKT}");
-                _log.Info("\t\t --------------------------");
+                var electionInfo = await _electionsRepository._GetTimeOfElection(ngayBD, connect);
+                if (electionInfo == null)
+                {
+                    _log.Error("Không tìm thấy thông tin bầu cử.");
+                    return -10;
+                }
 
-                //Chuyển đổi giá trị phiếu
-                BigInteger GiaTriPhieuBauHienTai = BigInteger.Parse(voterVoteDTO.GiaTriPhieuBau);
+                _log.Info("Thông tin đầu vào:");
+                _log.Info($"Ngày bầu cử: {votingDay}");
+                _log.Info($"ID Người bầu: {idNguoiBau}");
+                _log.Info($"ID Đơn vị bầu cử: {idDonViBauCu}");
+                _log.Info($"ID Cấp: {idCap}");
+                _log.Info($"Giá trị phiếu bầu: {giaTriPhieuBauStr}");
 
-                //17.0 Kiêm tra xem thời điểm bỏ phiếu hợp lệ không. Nếu không thì trả về
-                // if(DateTime.Now > timeOfTheElectionDTO.ngayKT || DateTime.Now < votingDay){
-                //    return 0;
-                // } 
-
-                //17.1 Kiểm tra xem cử tri có tồn tại không
-                bool checkVoterExists = await _voterRepository._CheckVoterExists(voterVoteDTO.ID_CuTri, connect);
-                if(!checkVoterExists)
-                    return -1;
-
-                //17.2 Kiểm tra xem thời điểm bắt đầu bầu cử có tồn tại không
-                bool checkElectionExist = await _electionsRepository._CheckIfElectionTimeExists(votingDay, connect);
-                if(!checkElectionExist){
-                    _log.Info("Kiểm tra xem thời điểm bắt đầu bầu cử có tồn tại không");
-                    return -2;
-                } 
-                
-                //17.3 Kiểm tra xem cử tri đã bỏ phiếu chưa ,nếu rồi thì không cho bỏ hiếu
-                bool checkVoterHasVoted = await _voterRepository._CheckVoterHasVoted(voterVoteDTO.ID_CuTri, votingDay, connect);
-                if(checkVoterHasVoted)
-                    return -3;
-
-                //17.4 Kiểm tra giá trị phiếu bầu có hợp lệ không
-                int SoLuotBinhChonToiDa = await _electionsRepository._MaximumNumberOfVotes(votingDay, connect);
-                int SoLuongToiDaCuTri = await _electionsRepository._MaximumNumberOfVoters(votingDay, connect);
-                _log.Info($"SoLuotBinhChonToiDa(S): {SoLuotBinhChonToiDa}");
-                _log.Info($"SoLuongToiDaCuTri(N): {SoLuongToiDaCuTri}");
-                
-                BigInteger GiaTriPhieuLonNhat = _paillierServices.GiaTriToiDaCuaPhieuBau_M(SoLuongToiDaCuTri+1, SoLuotBinhChonToiDa);
-                _log.Info($"GiaTriPhieuLonNhat: {GiaTriPhieuLonNhat} - Check:{GiaTriPhieuLonNhat < GiaTriPhieuBauHienTai}");
-                
-                if(GiaTriPhieuLonNhat < GiaTriPhieuBauHienTai)
+                if (!BigInteger.TryParse(giaTriPhieuBauStr, out BigInteger giaTriPhieuBau))
+                {
+                    _log.Error("Giá trị phiếu bầu không hợp lệ.");
                     return -4;
+                }
 
-                //17.5 Kiểm tra ID của danh mục úng cử & ngày bầu cử có tồn tại trong kỳ bầu cử không không
-                bool CheckID_ListOfPosition = await _listOfPositionRepository._CheckTheListOgCandidatesWithTheVotingDateTogether(votingDay,voterVoteDTO.ID_Cap,connect);
-                if(!CheckID_ListOfPosition) return -5;
+                // Kiểm tra người bầu có tồn tại
+                bool isVoterExists = voterType switch
+                {
+                    VoterType.Voter => await _voterRepository._CheckVoterExists(idNguoiBau, connect),
+                    VoterType.Candidate => await _candidateRepository._CheckCandidateExists(idNguoiBau, connect),
+                    VoterType.Cadre => await _cadreRepository._CheckCadreExists(idNguoiBau, connect),
+                    _ => false
+                };
 
-                //17.6 Kiểm tra ID của đơn vị bầu, mã cử tri và ngày bắt đầu có cùng tồn tại không
-                bool CheckID_Constituency = await _constituencyRepository._CheckVoterID_ConsituencyID_andPollingDateTogether(voterVoteDTO.ID_DonViBauCu.ToString(),voterVoteDTO.ID_CuTri,votingDay ,connect);
-                if(!CheckID_Constituency) return -6;
-                
-                //17.7 Tự tạo phiếu phầu khi người dùng bỏ phiếu và thêm vào đó luôn
-                    //Lấy 2 ký tự ngẫu nhiên
-                string randomString = RandomString.ChuoiNgauNhien(2);
-                DateTime currentDay = DateTime.Now;
-                string ID_Phieu = randomString+$"{currentDay:yyyyMMddHHmmssff}";
+                if (!isVoterExists)
+                {
+                    _log.Error("Người bầu không tồn tại.");
+                    return -1;
+                }
 
-                    //Lấy N và G dựa trên ngày bầu cử
-                LockDTO Lock = await  _lockRepository._getLockBasedOnElectionDate(voterVoteDTO.ngayBD,connect);
-                _log.Info($"N: {Lock.N}"); 
-                _log.Info($"G: {Lock.G}");
-                _log.Info($"GiaTriPhieuBauHienTai: {GiaTriPhieuBauHienTai}");
-                    
-                    //Mã hóa phiếu trước khi lưu    
-                BigInteger GiaTriPhieuBauHienTai_MaHoa = _paillierServices.Encryption(Lock.G, Lock.N, GiaTriPhieuBauHienTai);
+                // Kiểm tra người bầu đã bỏ phiếu chưa
+                bool hasVoted = voterType switch
+                {
+                    VoterType.Voter => await _voterRepository._CheckVoterHasVoted(idNguoiBau, votingDay, connect),
+                    VoterType.Candidate => await _candidateRepository._CheckCandidateHasVoted(idNguoiBau, votingDay, connect),
+                    VoterType.Cadre => await _cadreRepository._CheckCadreHasVoted(idNguoiBau, votingDay, connect),
+                    _ => false
+                };
 
-                VoteDto phieubau = new VoteDto();
-                phieubau.ngayBD = voterVoteDTO.ngayBD.ToString();
-                phieubau.ID_cap = voterVoteDTO.ID_Cap;
-                phieubau.GiaTriPhieuBau = GiaTriPhieuBauHienTai_MaHoa;
+                if (hasVoted)
+                {
+                    _log.Error("Người bầu đã bỏ phiếu.");
+                    return -3;
+                }
 
-                bool addVote = await _voteRepository._AddVote(ID_Phieu, phieubau, connect);
-                if(!addVote){
+                // Kiểm tra giá trị phiếu bầu hợp lệ
+                int maxVotes = await _electionsRepository._MaximumNumberOfVotes(votingDay, connect);
+                int maxVoters = await _electionsRepository._MaximumNumberOfVoters(votingDay, connect);
+
+                BigInteger maxVoteValue = _paillierServices.GiaTriToiDaCuaPhieuBau_M(maxVoters + 1, maxVotes);
+
+                if (giaTriPhieuBau > maxVoteValue)
+                {
+                    _log.Error("Giá trị phiếu bầu vượt quá giới hạn.");
+                    return -4;
+                }
+
+                // Kiểm tra danh mục ứng cử
+                bool isValidListOfPosition = await _listOfPositionRepository._CheckTheListOgCandidatesWithTheVotingDateTogether(votingDay, idCap, connect);
+                if (!isValidListOfPosition)
+                {
+                    _log.Error("Danh mục ứng cử không hợp lệ.");
+                    return -5;
+                }
+
+                // Kiểm tra đơn vị bầu cử
+                bool isValidConstituency = voterType switch{
+                    VoterType.Voter => await _constituencyRepository._CheckVoterID_ConsituencyID_andPollingDateTogether(idDonViBauCu.ToString(), idNguoiBau, votingDay, connect),
+                    VoterType.Candidate => await _constituencyRepository._CheckCandidateID_ConsituencyID_andPollingDateTogether(idDonViBauCu.ToString(), idNguoiBau, votingDay, connect),
+                    VoterType.Cadre => await _constituencyRepository._CheckCadreID_ConsituencyID_andPollingDateTogether(idDonViBauCu.ToString(), idNguoiBau, votingDay, connect),
+                    _ => false
+                };
+                if (!isValidConstituency){
+                    _log.Error("Đơn vị bầu cử không hợp lệ.");
+                    return -6;
+                }
+
+                // Tạo phiếu bầu
+                string idPhieu = GenerateVoteId();
+                var lockInfo = await _lockRepository._getLockBasedOnElectionDate(ngayBD, connect);
+                BigInteger encryptedVoteValue = _paillierServices.Encryption(lockInfo.G, lockInfo.N, giaTriPhieuBau);
+
+                var voteDto = new VoteDto
+                {
+                    ngayBD = ngayBD,
+                    ID_cap = idCap,
+                    GiaTriPhieuBau = encryptedVoteValue
+                };
+
+                bool isVoteAdded = await _voteRepository._AddVote(idPhieu, voteDto, connect);
+                if (!isVoteAdded)
+                {
+                    _log.Error("Thêm phiếu bầu thất bại.");
                     await transaction.RollbackAsync();
                     return -7;
                 }
-                _log.Info($"Đã thêm phiếu bầu (Mã phiếu: {ID_Phieu})");
 
-                //17.7 Cập nhật trạng thái phiếu bầu là người dùng này đã bầu
-                bool updateStatusElectionsBy_IDcutri = await _UpdateStatusElectionsBy_IDcutri(voterVoteDTO.ID_CuTri, voterVoteDTO.ngayBD,connect);
-                if(!updateStatusElectionsBy_IDcutri){
+                // Cập nhật trạng thái bỏ phiếu
+                bool isStatusUpdated = voterType switch
+                {
+                    VoterType.Voter => await _UpdateStatusElectionsBy_IDcutri(idNguoiBau, ngayBD, connect),
+                    VoterType.Candidate => await _UpdateStatusElectionsBy_IDucv(idNguoiBau, ngayBD, connect),
+                    VoterType.Cadre => await _UpdateStatusElectionsBy_IDcanbo(idNguoiBau, ngayBD, connect),
+                    _ => false
+                };
+
+                if (!isStatusUpdated)
+                {
+                    _log.Error("Cập nhật trạng thái bầu cử thất bại.");
                     await transaction.RollbackAsync();
                     return -8;
                 }
 
-                //17.8 Cập nhật chi tiết phiếu bầu , là cho biết cử tri đã bầu bằng phiếu nào và thời điểm nào
-                ElectionDetailsDTO electionDetailsDTO = new ElectionDetailsDTO{
-                    ID_CuTri = voterVoteDTO.ID_CuTri,
-                    ID_Phieu = ID_Phieu,
+                // Thêm chi tiết phiếu bầu
+                var electionDetails = new ElectionDetailsDTO
+                {
+                    ID_CuTri = voterType == VoterType.Voter ? idNguoiBau : null,
+                    ID_ucv = voterType == VoterType.Candidate ? idNguoiBau : null,
+                    ID_CanBo = voterType == VoterType.Cadre ? idNguoiBau : null,
+                    ID_Phieu = idPhieu,
                     ThoiDiem = DateTime.Now
                 };
-                bool addElectionDetail = await _AddElectionDetailsBy_IDcutri(electionDetailsDTO,connect);
-                if(!addElectionDetail){
+
+                bool isElectionDetailAdded = voterType switch
+                {
+                    VoterType.Voter => await _AddElectionDetailsBy_IDcutri(electionDetails, connect),
+                    VoterType.Candidate => await _AddElectionDetailsBy_IDucv(electionDetails, connect),
+                    VoterType.Cadre => await _AddElectionDetailsBy_IDcanbo(electionDetails, connect),
+                    _ => false
+                };
+
+                if (!isElectionDetailAdded)
+                {
+                    _log.Error("Thêm chi tiết phiếu bầu thất bại.");
                     await transaction.RollbackAsync();
                     return -9;
                 }
 
                 await transaction.CommitAsync();
-                _log.Info($"Đã ghi nhận bỏ phiếu");
+                _log.Info("Bỏ phiếu thành công.");
                 return 1;
-
-            }catch(MySqlException ex){
-                _log.Info($"Error message: {ex.Message}");
-                _log.Info($"Error Code: {ex.Code}");
-                _log.Info($"Error Source: {ex.Source}");
-                _log.Info($"Error HResult: {ex.HResult}");
-                await transaction.RollbackAsync();
-                throw;
             }
-            catch(Exception ex){
-                _log.Info($"Error message: {ex.Message}");
-                _log.Info($"Error Source: {ex.Source}");
-                _log.Info($"Error StackTrace: {ex.StackTrace}");
-                _log.Info($"Error TargetSite: {ex.TargetSite}");
-                _log.Info($"Error HResult: {ex.HResult}");
-                _log.Info($"Error InnerException: {ex.InnerException}");
+            catch (MySqlException ex)
+            {
+                _log.Error($"Lỗi MySQL: {ex.Message}", ex);
                 await transaction.RollbackAsync();
-                throw;
+                return -100;
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"Lỗi hệ thống: {ex.Message}", ex);
+                await transaction.RollbackAsync();
+                return -100;
             }
         }
 
-        //18. uứng cử viên bỏ phiếu
-        public async Task<int> _CandidateVote(CandidateVoteDTO candidateVoteDTO){
-            using var connect = await _context.Get_MySqlConnection();
-            //Kiểm tra kết nối
-            if(connect.State != System.Data.ConnectionState.Open )
-                await connect.OpenAsync();
-            
-            using var transaction = await connect.BeginTransactionAsync();
-
-            try{
-                _log.Info(" --- Đến bên trong phần kiểm tra --- ");
-                //Chuyển đổi dữ liệu
-                CultureInfo provider = CultureInfo.InvariantCulture;
-                DateTime votingDay = DateTime.ParseExact(candidateVoteDTO.ngayBD,"yyyy-MM-dd HH:mm:ss",provider);
-                var timeOfTheElectionDTO = await _electionsRepository._GetTimeOfElection(candidateVoteDTO.ngayBD, connect);
-                //DateTime pollingStopTime = 
-
-                _log.Info("\t\t --- Thông tin đầu vào --");
-                _log.Info($"timeOfTheElectionDTO: {timeOfTheElectionDTO}");
-                _log.Info($"Ngày BD: {votingDay}");
-                _log.Info($"Ngày HIện tại: {DateTime.Now}");
-                _log.Info($"ID_ucv: {candidateVoteDTO.ID_ucv}");
-                _log.Info($"ID_DonViBauCu: {candidateVoteDTO.ID_DonViBauCu}");
-                _log.Info($"ID_Cap: {candidateVoteDTO.ID_Cap}");
-                _log.Info($"GiaTriPhieuBau: {candidateVoteDTO.GiaTriPhieuBau}");
-                
-                //18.-1 Kiếm ngày bắt đầu không tồn tại thì báo lỗi
-                if(timeOfTheElectionDTO == null)
-                    return -10;
-
-                _log.Info($"Ngày KT: {timeOfTheElectionDTO.ngayKT}");
-                _log.Info("\t\t --------------------------");
-
-                //Chuyển đổi giá trị phiếu
-                BigInteger GiaTriPhieuBauHienTai = BigInteger.Parse(candidateVoteDTO.GiaTriPhieuBau);
-
-                //18.0 Kiêm tra xem thời điểm bỏ phiếu hợp lệ không. Nếu không thì trả về
-                // if(DateTime.Now > timeOfTheElectionDTO.ngayKT || DateTime.Now < votingDay){
-                //    return 0;
-                // } 
-
-                //18.1 Kiểm tra xem ứng cử viên có tồn tại không
-                bool checkVoterExists = await _candidateRepository._CheckCandidateExists(candidateVoteDTO.ID_ucv, connect);
-                if(!checkVoterExists)
-                    return -1;
-
-                //18.2 Kiểm tra xem thời điểm bắt đầu bầu cử có tồn tại không
-                bool checkElectionExist = await _electionsRepository._CheckIfElectionTimeExists(votingDay, connect);
-                if(!checkElectionExist){
-                    _log.Info("Kiểm tra xem thời điểm bắt đầu bầu cử có tồn tại không");
-                    return -2;
-                } 
-                
-                //18.3 Kiểm tra xem ứng cử viên đã bỏ phiếu chưa ,nếu rồi thì không cho bỏ hiếu
-                bool checkVoterHasVoted = await _candidateRepository._CheckCandidateHasVoted(candidateVoteDTO.ID_ucv, votingDay, connect);
-                if(checkVoterHasVoted)
-                    return -3;
-
-                //18.4 Kiểm tra giá trị phiếu bầu có hợp lệ không
-                int SoLuotBinhChonToiDa = await _electionsRepository._MaximumNumberOfVotes(votingDay, connect);
-                int SoLuongToiDaCuTri = await _electionsRepository._MaximumNumberOfVoters(votingDay, connect);
-                _log.Info($"SoLuotBinhChonToiDa(S): {SoLuotBinhChonToiDa}");
-                _log.Info($"SoLuongToiDaCuTri(N): {SoLuongToiDaCuTri}");
-                
-                BigInteger GiaTriPhieuLonNhat = _paillierServices.GiaTriToiDaCuaPhieuBau_M(SoLuongToiDaCuTri+1, SoLuotBinhChonToiDa);
-                _log.Info($"GiaTriPhieuLonNhat: {GiaTriPhieuLonNhat} - Check:{GiaTriPhieuLonNhat < GiaTriPhieuBauHienTai}");
-                
-                if(GiaTriPhieuLonNhat < GiaTriPhieuBauHienTai)
-                    return -4;
-
-                //18.5 Kiểm tra ID của danh mục úng cử & ngày bầu cử có tồn tại trong kỳ bầu cử không không
-                bool CheckID_ListOfPosition = await _listOfPositionRepository._CheckTheListOgCandidatesWithTheVotingDateTogether(votingDay,candidateVoteDTO.ID_Cap,connect);
-                if(!CheckID_ListOfPosition) return -5;
-
-                //18.6 Kiểm tra ID của đơn vị bầu, mã cử tri và ngày bắt đầu có cùng tồn tại không
-                bool CheckID_Constituency = await _constituencyRepository._CheckCandidateID_ConsituencyID_andPollingDateTogether(candidateVoteDTO.ID_DonViBauCu.ToString(),candidateVoteDTO.ID_ucv,votingDay ,connect);
-                if(!CheckID_Constituency) return -6;
-                
-                //18.7 Tự tạo phiếu phầu khi người dùng bỏ phiếu và thêm vào đó luôn
-                    //Lấy 2 ký tự ngẫu nhiên
-                string randomString = RandomString.ChuoiNgauNhien(2);
-                DateTime currentDay = DateTime.Now;
-                string ID_Phieu = randomString+$"{currentDay:yyyyMMddHHmmssff}";
-
-                    //Lấy N và G dựa trên ngày bầu cử
-                LockDTO Lock = await  _lockRepository._getLockBasedOnElectionDate(candidateVoteDTO.ngayBD,connect);
-                _log.Info($"N: {Lock.N}"); 
-                _log.Info($"G: {Lock.G}");
-                _log.Info($"GiaTriPhieuBauHienTai: {GiaTriPhieuBauHienTai}");
-                    
-                    //Mã hóa phiếu trước khi lưu    
-                BigInteger GiaTriPhieuBauHienTai_MaHoa = _paillierServices.Encryption(Lock.G, Lock.N, GiaTriPhieuBauHienTai);
-
-                VoteDto phieubau = new VoteDto();
-                phieubau.ngayBD = candidateVoteDTO.ngayBD.ToString();
-                phieubau.ID_cap = candidateVoteDTO.ID_Cap;
-                phieubau.GiaTriPhieuBau = GiaTriPhieuBauHienTai_MaHoa;
-
-                bool addVote = await _voteRepository._AddVote(ID_Phieu, phieubau, connect);
-                if(!addVote){
-                    await transaction.RollbackAsync();
-                    return -7;
-                }
-                _log.Info($"Đã thêm phiếu bầu (Mã phiếu: {ID_Phieu})");
-
-                //18.7 Cập nhật trạng thái phiếu bầu là người dùng này đã bầu
-                bool updateStatusElections= await _UpdateStatusElectionsBy_IDucv(candidateVoteDTO.ID_ucv, candidateVoteDTO.ngayBD,connect);
-                if(updateStatusElections != true){
-                    await transaction.RollbackAsync();
-                    return -8;
-                }
-
-                //18.8 Cập nhật chi tiết phiếu bầu , là cho biết cử tri đã bầu bằng phiếu nào và thời điểm nào
-                ElectionDetailsDTO electionDetailsDTO = new ElectionDetailsDTO{
-                    ID_ucv = candidateVoteDTO.ID_ucv,
-                    ID_Phieu = ID_Phieu,
-                    ThoiDiem = DateTime.Now
-                };
-                bool addElectionDetail = await _AddElectionDetailsBy_IDucv(electionDetailsDTO,connect);
-                if(!addElectionDetail){
-                    await transaction.RollbackAsync();
-                    return -9;
-                }
-
-                await transaction.CommitAsync();
-                _log.Info($"Đã ghi nhận bỏ phiếu");
-                return 1;
-
-            }catch(MySqlException ex){
-                _log.Info($"Error message: {ex.Message}");
-                _log.Info($"Error Code: {ex.Code}");
-                _log.Info($"Error Source: {ex.Source}");
-                _log.Info($"Error HResult: {ex.HResult}");
-                await transaction.RollbackAsync();
-                throw;
-            }
-            catch(Exception ex){
-                _log.Info($"Error message: {ex.Message}");
-                _log.Info($"Error Source: {ex.Source}");
-                _log.Info($"Error StackTrace: {ex.StackTrace}");
-                _log.Info($"Error TargetSite: {ex.TargetSite}");
-                _log.Info($"Error HResult: {ex.HResult}");
-                _log.Info($"Error InnerException: {ex.InnerException}");
-                await transaction.RollbackAsync();
-                throw;
-            }
+        // Phương thức bỏ phiếu cho cử tri
+        public async Task<int> _VoterVote(VoterVoteDTO voterVoteDTO)
+        {
+            _log.Info(" >>> Bắt đầu cửu tri bỏ phiếu");
+            return await ProcessVoteAsync(
+                voterVoteDTO.ngayBD,
+                voterVoteDTO.GiaTriPhieuBau,
+                voterVoteDTO.ID_Cap,
+                voterVoteDTO.ID_DonViBauCu,
+                voterVoteDTO.ID_CuTri,
+                VoterType.Voter);
         }
 
-        //19. cán bộ bỏ phiếu
-        public async Task<int> _CadreVote(CadreVoteDTO cadreVoteDTO){
-            using var connect = await _context.Get_MySqlConnection();
-            //Kiểm tra kết nối
-            if(connect.State != System.Data.ConnectionState.Open )
-                await connect.OpenAsync();
-            
-            using var transaction = await connect.BeginTransactionAsync();
+        // Phương thức bỏ phiếu cho ứng cử viên
+        public async Task<int> _CandidateVote(CandidateVoteDTO candidateVoteDTO)
+        {
+            _log.Info(" >>> Bắt đầu ứng cử viên bỏ phiếu");
+            return await ProcessVoteAsync(
+                candidateVoteDTO.ngayBD,
+                candidateVoteDTO.GiaTriPhieuBau,
+                candidateVoteDTO.ID_Cap,
+                candidateVoteDTO.ID_DonViBauCu,
+                candidateVoteDTO.ID_ucv,
+                VoterType.Candidate);
+        }
 
-            try{
-                _log.Info(" --- Đến bên trong phần kiểm tra --- ");
-                //Chuyển đổi dữ liệu
-                CultureInfo provider = CultureInfo.InvariantCulture;
-                DateTime votingDay = DateTime.ParseExact(cadreVoteDTO.ngayBD,"yyyy-MM-dd HH:mm:ss",provider);
-                var timeOfTheElectionDTO = await _electionsRepository._GetTimeOfElection(cadreVoteDTO.ngayBD, connect);
-                //DateTime pollingStopTime = 
+        // Phương thức bỏ phiếu cho cán bộ
+        public async Task<int> _CadreVote(CadreVoteDTO cadreVoteDTO)
+        {
+            _log.Info(" >>> Bắt đầu cán bộ bỏ phiếu");
+            return await ProcessVoteAsync(
+                cadreVoteDTO.ngayBD,
+                cadreVoteDTO.GiaTriPhieuBau,
+                cadreVoteDTO.ID_Cap,
+                cadreVoteDTO.ID_DonViBauCu,
+                cadreVoteDTO.ID_CanBo,
+                VoterType.Cadre);
+        }
 
-                _log.Info("\t\t --- Thông tin đầu vào --");
-                _log.Info($"timeOfTheElectionDTO: {timeOfTheElectionDTO}");
-                _log.Info($"Ngày BD: {votingDay}");
-                _log.Info($"Ngày HIện tại: {DateTime.Now}");
-                _log.Info($"ID_ucv: {cadreVoteDTO.ID_CanBo}");
-                _log.Info($"ID_DonViBauCu: {cadreVoteDTO.ID_DonViBauCu}");
-                _log.Info($"ID_Cap: {cadreVoteDTO.ID_Cap}");
-                _log.Info($"GiaTriPhieuBau: {cadreVoteDTO.GiaTriPhieuBau}");
-                
-                //19.-1 Kiếm ngày bắt đầu không tồn tại thì báo lỗi
-                if(timeOfTheElectionDTO == null)
-                    return -10;
-
-                _log.Info($"Ngày KT: {timeOfTheElectionDTO.ngayKT}");
-                _log.Info("\t\t --------------------------");
-
-                //Chuyển đổi giá trị phiếu
-                BigInteger GiaTriPhieuBauHienTai = BigInteger.Parse(cadreVoteDTO.GiaTriPhieuBau);
-
-                //19.0 Kiêm tra xem thời điểm bỏ phiếu hợp lệ không. Nếu không thì trả về
-                // if(DateTime.Now > timeOfTheElectionDTO.ngayKT || DateTime.Now < votingDay){
-                //    return 0;
-                // } 
-
-                //19.1 Kiểm tra xem ứng cử viên có tồn tại không
-                bool checkVoterExists = await _cadreRepository._CheckCadreExists(cadreVoteDTO.ID_CanBo, connect);
-                if(!checkVoterExists)
-                    return -1;
-
-                //19.2 Kiểm tra xem thời điểm bắt đầu bầu cử có tồn tại không
-                bool checkElectionExist = await _electionsRepository._CheckIfElectionTimeExists(votingDay, connect);
-                if(!checkElectionExist){
-                    _log.Info("Kiểm tra xem thời điểm bắt đầu bầu cử có tồn tại không");
-                    return -2;
-                } 
-                
-                //19.3 Kiểm tra xem ứng cử viên đã bỏ phiếu chưa ,nếu rồi thì không cho bỏ hiếu
-                bool checkVoterHasVoted = await _cadreRepository._CheckCadreHasVoted(cadreVoteDTO.ID_CanBo, votingDay, connect);
-                if(checkVoterHasVoted)
-                    return -3;
-
-                //19.4 Kiểm tra giá trị phiếu bầu có hợp lệ không
-                int SoLuotBinhChonToiDa = await _electionsRepository._MaximumNumberOfVotes(votingDay, connect);
-                int SoLuongToiDaCuTri = await _electionsRepository._MaximumNumberOfVoters(votingDay, connect);
-                _log.Info($"SoLuotBinhChonToiDa(S): {SoLuotBinhChonToiDa}");
-                _log.Info($"SoLuongToiDaCuTri(N): {SoLuongToiDaCuTri}");
-                
-                BigInteger GiaTriPhieuLonNhat = _paillierServices.GiaTriToiDaCuaPhieuBau_M(SoLuongToiDaCuTri+1, SoLuotBinhChonToiDa);
-                _log.Info($"GiaTriPhieuLonNhat: {GiaTriPhieuLonNhat} - Check:{GiaTriPhieuLonNhat < GiaTriPhieuBauHienTai}");
-                
-                if(GiaTriPhieuLonNhat < GiaTriPhieuBauHienTai)
-                    return -4;
-
-                //19.5 Kiểm tra ID của danh mục úng cử & ngày bầu cử có tồn tại trong kỳ bầu cử không không
-                bool CheckID_ListOfPosition = await _listOfPositionRepository._CheckTheListOgCandidatesWithTheVotingDateTogether(votingDay,cadreVoteDTO.ID_Cap,connect);
-                if(!CheckID_ListOfPosition) return -5;
-
-                //19.6 Kiểm tra ID của đơn vị bầu, mã cử tri và ngày bắt đầu có cùng tồn tại không
-                bool CheckID_Constituency = await _constituencyRepository._CheckCadreID_ConsituencyID_andPollingDateTogether(cadreVoteDTO.ID_DonViBauCu.ToString(),cadreVoteDTO.ID_CanBo,votingDay ,connect);
-                if(!CheckID_Constituency) return -6;
-                
-                //19.7 Tự tạo phiếu phầu khi người dùng bỏ phiếu và thêm vào đó luôn
-                    //Lấy 2 ký tự ngẫu nhiên
-                string randomString = RandomString.ChuoiNgauNhien(2);
-                DateTime currentDay = DateTime.Now;
-                string ID_Phieu = randomString+$"{currentDay:yyyyMMddHHmmssff}";
-
-                    //Lấy N và G dựa trên ngày bầu cử
-                LockDTO Lock = await  _lockRepository._getLockBasedOnElectionDate(cadreVoteDTO.ngayBD,connect);
-                _log.Info($"N: {Lock.N}"); 
-                _log.Info($"G: {Lock.G}");
-                _log.Info($"GiaTriPhieuBauHienTai: {GiaTriPhieuBauHienTai}");
-                    
-                    //Mã hóa phiếu trước khi lưu    
-                BigInteger GiaTriPhieuBauHienTai_MaHoa = _paillierServices.Encryption(Lock.G, Lock.N, GiaTriPhieuBauHienTai);
-
-                VoteDto phieubau = new VoteDto();
-                phieubau.ngayBD = cadreVoteDTO.ngayBD.ToString();
-                phieubau.ID_cap = cadreVoteDTO.ID_Cap;
-                phieubau.GiaTriPhieuBau = GiaTriPhieuBauHienTai_MaHoa;
-
-                bool addVote = await _voteRepository._AddVote(ID_Phieu, phieubau, connect);
-                if(!addVote){
-                    await transaction.RollbackAsync();
-                    return -7;
-                }
-                _log.Info($"Đã thêm phiếu bầu (Mã phiếu: {ID_Phieu})");
-
-                //19.7 Cập nhật trạng thái phiếu bầu là người dùng này đã bầu
-                bool updateStatusElections= await _UpdateStatusElectionsBy_IDcanbo(cadreVoteDTO.ID_CanBo, cadreVoteDTO.ngayBD,connect);
-                if(updateStatusElections != true){
-                    await transaction.RollbackAsync();
-                    return -8;
-                }
-
-                //19.8 Cập nhật chi tiết phiếu bầu , là cho biết cử tri đã bầu bằng phiếu nào và thời điểm nào
-                ElectionDetailsDTO electionDetailsDTO = new ElectionDetailsDTO{
-                    ID_CanBo = cadreVoteDTO.ID_CanBo,
-                    ID_Phieu = ID_Phieu,
-                    ThoiDiem = DateTime.Now
-                };
-                bool addElectionDetail = await _AddElectionDetailsBy_IDcanbo(electionDetailsDTO,connect);
-                if(!addElectionDetail){
-                    await transaction.RollbackAsync();
-                    return -9;
-                }
-
-                await transaction.CommitAsync();
-                _log.Info($"Đã ghi nhận bỏ phiếu");
-                return 1;
-
-            }catch(MySqlException ex){
-                _log.Info($"Error message: {ex.Message}");
-                _log.Info($"Error Code: {ex.Code}");
-                _log.Info($"Error Source: {ex.Source}");
-                _log.Info($"Error HResult: {ex.HResult}");
-                await transaction.RollbackAsync();
-                throw;
-            }
-            catch(Exception ex){
-                _log.Info($"Error message: {ex.Message}");
-                _log.Info($"Error Source: {ex.Source}");
-                _log.Info($"Error StackTrace: {ex.StackTrace}");
-                _log.Info($"Error TargetSite: {ex.TargetSite}");
-                _log.Info($"Error HResult: {ex.HResult}");
-                _log.Info($"Error InnerException: {ex.InnerException}");
-                await transaction.RollbackAsync();
-                throw;
-            }
+        // Tạo ID phiếu ngẫu nhiên
+        private string GenerateVoteId()
+        {
+            string randomString = RandomString.ChuoiNgauNhien(2);
+            DateTime currentDay = DateTime.Now;
+            return $"{randomString}{currentDay:yyyyMMddHHmmssff}";
         }
 
         //Cập nhật chi tiết phiếu bầu cử tri

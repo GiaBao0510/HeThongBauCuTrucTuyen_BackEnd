@@ -612,14 +612,15 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 
                 var list = new List<CadreJoinedForElectionDTO>();
                 const string sql = @"
-                SELECT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, 
-                kbc.MoTa, kbc.SoLuongToiDaCuTri, kbc.SoLuongToiDaUngCuVien, 
+                SELECT DISTINCT kbc.ngayBD, kbc.ngayKT, kbc.TenKyBauCu, 
+                kbc.MoTa, kbc.SoLuongToiDaCuTri, kbc.SoLuongToiDaUngCuVien,
+                dm.ID_Cap, dm.ID_DonViBauCu, tt.GhiNhan,
                 kbc.SoLuotBinhChonToiDa, kbc.CongBo, dm.TenCapUngCu, dv.TenDonViBauCu
                 FROM kybaucu kbc 
-                JOIN hoatdong hd ON hd.ngayBD = kbc.ngayBD
+                JOIN trangthaibaucu tt ON tt.ngayBD = kbc.ngayBD
                 JOIN danhmucungcu dm ON dm.ID_Cap = kbc.ID_Cap
                 JOIN donvibaucu dv ON dv.ID_DonViBauCu = dm.ID_DonViBauCu
-                WHERE hd.ID_canbo = @ID_canbo;";
+                WHERE tt.ID_canbo = @ID_canbo;";
 
                 using(var command = new MySqlCommand(sql, connection)){
                     command.Parameters.AddWithValue("@ID_canbo", ID_CanBo);
@@ -637,6 +638,9 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                             CongBo =reader.GetString(reader.GetOrdinal("CongBo")),
                             TenCapUngCu = reader.GetString(reader.GetOrdinal("TenCapUngCu")),
                             TenDonViBauCu = reader.GetString(reader.GetOrdinal("TenDonViBauCu")),
+                            ID_Cap = reader.GetInt32(reader.GetOrdinal("ID_Cap")),
+                            ID_DonViBauCu = reader.GetInt32(reader.GetOrdinal("ID_DonViBauCu")),
+                            GhiNhan = reader.GetString(reader.GetOrdinal("GhiNhan"))
                         });
                     }
                 }

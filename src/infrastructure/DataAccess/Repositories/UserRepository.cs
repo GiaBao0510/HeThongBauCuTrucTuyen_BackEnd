@@ -7,6 +7,7 @@ using BackEnd.src.core.Common;
 using Isopoh.Cryptography.Argon2;
 using BackEnd.src.infrastructure.Services;
 using Microsoft.AspNetCore.Http;
+using log4net;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -14,6 +15,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
     {
         private readonly DatabaseContext _context;
         private readonly CloudinaryService _cloudinaryService;
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
 
         //Khởi tạo
         public UserRepository(DatabaseContext context, CloudinaryService cloudinaryService){
@@ -1179,5 +1181,57 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 throw;
             }
         } 
+
+        //Lấy danh sách người dùng chư bỏ phiếu tại kỳ bầu cử đã công bố
+        public async Task<List<UserHaveNotVotedYetDTO>> _getListOfUsersWhoHaveNotVotedByElection(string ngayBD){
+            try{
+                using var connection = await _context.Get_MySqlConnection();
+                List<UserHaveNotVotedYetDTO> list = new List<UserHaveNotVotedYetDTO>();
+
+                const string sql = @"
+                SELECT nd.ID_user, nd.HoTen, nd.GioiTinh, nd.NgaySinh, 
+                	nd.Email, nd.SDT, nd.DiaChiLienLac
+                FROM trangthaibaucu tt 
+                	INNER JOIN kybaucu kbc ON tt.ngayBD = kbc.ngayBD
+                	LEFT JOIN ungcuvien ucv ON ucv.ID_ucv = tt.ID_ucv
+                	LEFT JOIN canbo cb ON cb.ID_CanBo = tt.ID_CanBo
+                	LEFT JOIN cutri ct ON ct.ID_CuTri = tt.ID_CuTri
+                	INNER JOIN nguoidung nd ON nd.ID_user = COALESCE(ucv.ID_user, ct.ID_user, cb.ID_user)
+                WHERE tt.GhiNhan = '0' AND kbc.ngayBD = @ngayBD
+                	AND kbc.CongBo = '1';";
+                
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ngayBD", ngayBD);
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(reader.Read()){
+                        list.Add(new  UserHaveNotVotedYetDTO{
+                            ID_user = reader.GetString(reader.GetOrdinal("ID_user")),
+                            HoTen = reader.GetString(reader.GetOrdinal("HoTen")),
+                            GioiTinh = reader.GetString(reader.GetOrdinal("GioiTinh")),
+                            NgaySinh = reader.GetDateTime(reader.GetOrdinal("NgaySinh")).ToString("dd-MM-yyyy"),
+                            Email = reader.GetString(reader.GetOrdinal("Email")),
+                            SDT = reader.GetString(reader.GetOrdinal("SDT")),
+                            DiaChiLienLac = reader.GetString(reader.GetOrdinal("DiaChiLienLac"))
+                        });
+                    }
+                    return list;
+                }
+            }catch(MySqlException ex){
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                throw;
+            }
+            catch(Exception ex){
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
     }
 }

@@ -152,7 +152,7 @@ namespace BackEnd.src.web_api.Controllers
                 Console.WriteLine($"kỳ bầu cử: {input.ngayBD}");
                 if(string.IsNullOrEmpty(input.ID_CanBo) || string.IsNullOrEmpty(input.ngayBD))
                     return BadRequest(new{Status = "False", Message = "Vui lòng điền ngày bắt đầu."});
-                
+                 
                 var result = await _lockRepository._CaculateAndAnnounceElectionResult(input.ngayBD, input.ID_CanBo);
                 
                 if(result <= 0){

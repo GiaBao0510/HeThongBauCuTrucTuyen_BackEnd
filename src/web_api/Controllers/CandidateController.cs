@@ -77,7 +77,7 @@ namespace BackEnd.src.web_api.Controllers
                     Message = $"Lỗi khi thực hiện thêm tài khoản ứng cử viên: {ex.Message}"
                 });
             }
-        }
+        } 
 
         //2. Lấy all ứng cử viên
         [HttpGet]

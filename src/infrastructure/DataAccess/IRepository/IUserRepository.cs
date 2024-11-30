@@ -44,5 +44,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<int> _UpdatePersonalInfomation(PersonalInformationDTO personalInfo);
         //11. Xóa thông tin người dùng theo ID
         Task<bool> _DeleteUserBy_ID(string ID, MySqlConnection connection);
+        //Lấy danh sách người dùng chư bỏ phiếu tại kỳ bầu cử đã công bố
+        Task<List<UserHaveNotVotedYetDTO>> _getListOfUsersWhoHaveNotVotedByElection(string ngayBD);
     }
 }

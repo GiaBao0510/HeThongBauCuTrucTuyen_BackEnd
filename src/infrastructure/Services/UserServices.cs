@@ -16,10 +16,10 @@ namespace BackEnd.src.infrastructure.Services
     public class UserServices: IDisposable, IUserServices
     {        
         private readonly DatabaseContext _context;
-        private static readonly ILog _log = LogManager.GetLogger(typeof(UserServices));
         private readonly IEmailSender _emailSender;
         private readonly IToken _token;
         private readonly IRedisServices _redisServices;
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
 
 
         //Khởi tạo
@@ -119,7 +119,7 @@ namespace BackEnd.src.infrastructure.Services
             
             if(!await reader.ReadAsync().ConfigureAwait(false)){
                 //_log.WarnExt("Đăng nhập thất bại vì không tìm thấy số điện thoại");
-                Console.WriteLine("Đăng nhập thất bại vì không tìm thấy số điện thoại");
+                _log.Error("Đăng nhập thất bại vì không tìm thấy số điện thoại");
                 return null;
             }
 
@@ -384,19 +384,19 @@ namespace BackEnd.src.infrastructure.Services
                     return 1;
                 }
             }catch(MySqlException ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Code: {ex.Code}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Code: {ex.Code}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error HResult: {ex.HResult}");
                 throw;
             }
             catch(Exception ex){
-                Console.WriteLine($"Error message: {ex.Message}");
-                Console.WriteLine($"Error Source: {ex.Source}");
-                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
-                Console.WriteLine($"Error HResult: {ex.HResult}");
-                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                _log.Error($"Error message: {ex.Message}");
+                _log.Error($"Error Source: {ex.Source}");
+                _log.Error($"Error StackTrace: {ex.StackTrace}");
+                _log.Error($"Error TargetSite: {ex.TargetSite}");
+                _log.Error($"Error HResult: {ex.HResult}");
+                _log.Error($"Error InnerException: {ex.InnerException}");
                 throw;
             }
         }

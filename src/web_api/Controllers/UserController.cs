@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using BackEnd.src.web_api.DTOs;
-using BackEnd.src.infrastructure.Services;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
@@ -18,7 +17,7 @@ namespace BackEnd.src.web_api.Controllers
     [EnableRateLimiting("FixedWindowLimiter")]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository; 
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<UserController> _logger;
         private readonly IMemoryCache _cache;
@@ -461,6 +460,31 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện cập nhật thông tin người dùng: {ex.Message}"
+                });
+            }
+        }
+
+        //16. Hiển thị danh sách người dùng chưa bỏ phiếu theo kỳ bầu cử
+        [HttpGet("get-list-of-users-who-have-not-voted-by-election")]
+        [Authorize(Roles= "1")]
+        public async Task<IActionResult> GetListOfUsersWhoHaveNotVotedByElection([FromQuery] string ngayBD){
+            try{
+                if(string.IsNullOrEmpty(ngayBD))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền ngày bắt đầu của kỳ bầu cử."});
+
+                var result = await _userRepository._getListOfUsersWhoHaveNotVotedByElection(ngayBD);
+                return Ok(new{
+                    Status="ok",
+                    Message="null",
+                    Data = result
+                });
+            }catch(Exception ex){
+                Console.WriteLine($"Error Message: {ex.Message}");
+                Console.WriteLine($"Error Data: {ex.Data}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                return StatusCode(500, new{
+                    Status = "false",
+                    Message=$"Error Message: {ex.Message}"
                 });
             }
         }

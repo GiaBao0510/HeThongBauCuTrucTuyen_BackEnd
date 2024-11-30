@@ -40,7 +40,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //-2 .Kiểm tra ID ứng cử viên có tồn tại không
         public async Task<bool> _CheckCandidateExists(string ID, MySqlConnection connection){
-            const string sqlCount = "SELECT COUNT(ID_ucv) FROM ungcuvien WHERE ID_ucv = @ID_ucv";
+            const string sqlCount = "SELECT COUNT(ID_ucv) FROM UngCuVien WHERE ID_ucv = @ID_ucv";
             using(var command = new MySqlCommand(sqlCount, connection)){
                 command.Parameters.AddWithValue("@ID_ucv",ID);
                 
@@ -60,7 +60,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //0. Lấy ID người dùng dựa trên ID ứng cử viên
         public async Task<string> GetIDUserBaseOnIDUngCuVien(string id, MySqlConnection connection){
             string ID_user = null;
-            const string sql = "SELECT ID_user FROM UngCuVien WHERE ID_ucv = @ID_ucv;";
+            const string sql = "SELECT ID_user FROM ungcuvien WHERE ID_ucv = @ID_ucv;";
             
             using (var command = new MySqlCommand(sql, connection)){
                 command.Parameters.AddWithValue("@ID_ucv", id);
@@ -135,7 +135,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         ID_user = FillInBasicInfo.ToString();
 
                 //Ngược lại thêm ứng cử viên, thêm phần vào bảng kết quả bầu cử
-                const string sqlCandidate = "INSERT INTO UngCuVien(ID_ucv,TrangThai,ID_user,GioiThieu) VALUES(@ID_ucv,@TrangThai,@ID_user,@GioiThieu);";
+                const string sqlCandidate = "INSERT INTO ungcuvien(ID_ucv,TrangThai,ID_user,GioiThieu) VALUES(@ID_ucv,@TrangThai,@ID_user,@GioiThieu);";
                 const string sqlElectionResult = @"
                 INSERT INTO ketquabaucu(SoLuotBinhChon,ThoiDiemDangKy,TyLeBinhChon,ngayBD,ID_ucv,ID_Cap) 
                 VALUES(@SoLuotBinhChon,@ThoiDiemDangKy,@TyLeBinhChon,@ngayBD,@ID_ucv,@ID_Cap);";
@@ -200,7 +200,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             
             const string sql = @"
             SELECT * 
-            FROM UngCuVien ct 
+            FROM ungcuvien ct 
             INNER JOIN nguoidung nd ON nd.ID_user = ct.ID_user 
             WHERE ct.ID_ucv = @ID_ucv;";
 
@@ -344,7 +344,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             	nd.Email, nd.Email, nd.SDT, nd.HinhAnh, nd.PublicID, nd.ID_DanToc, nd.RoleID,	
                 ct.ID_ucv, ct.TrangThai, ct.GioiThieu
             FROM nguoidung nd 
-            INNER JOIN UngCuVien ct ON ct.ID_user = nd.ID_user";
+            INNER JOIN ungcuvien ct ON ct.ID_user = nd.ID_user";
             
             using var command = new MySqlCommand(sql, connection);
             using var reader = await command.ExecuteReaderAsync();
@@ -381,7 +381,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             const string sql = @"
             UPDATE taikhoan tk 
             JOIN nguoidung nd ON nd.sdt = tk.TaiKhoan
-            JOIN UngCuVien ct ON nd.ID_user = ct.ID_user
+            JOIN ungcuvien ct ON nd.ID_user = ct.ID_user
             SET tk.MatKhau = @MatKhau
             WHERE ct.ID_ucv = @ID_ucv;";
             
@@ -406,7 +406,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             SELECT tk.MatKhau 
             FROM taikhoan tk
             INNER JOIN nguoidung nd ON tk.TaiKhoan = nd.SDT
-            INNER JOIN UngCuVien ct ON ct.ID_user = nd.ID_user
+            INNER JOIN ungcuvien ct ON ct.ID_user = nd.ID_user
             WHERE ct.ID_ucv = @ID_ucv;";
 
             using(var command0 = new MySqlCommand(sqlGetHashedPwd,connect)){
@@ -430,7 +430,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             const string sqlUpdatePwd = @"
             UPDATE taikhoan tk 
             JOIN nguoidung nd ON nd.sdt = tk.TaiKhoan
-            JOIN UngCuVien ct ON nd.ID_user = ct.ID_user
+            JOIN ungcuvien ct ON nd.ID_user = ct.ID_user
             SET tk.MatKhau = @MatKhau
             WHERE ct.ID_ucv = @ID_ucv;";
 
@@ -503,7 +503,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             ,tk.TaiKhoan,tk.MatKhau,tk.BiKhoa,tk.LyDoKhoa,tk.NgayTao,tk.SuDung,tk.RoleID 
             FROM nguoidung nd 
             INNER JOIN taikhoan tk ON tk.TaiKhoan = nd.SDT 
-            JOIN UngCuVien ct ON ct.ID_user = nd.ID_user";
+            JOIN ungcuvien ct ON ct.ID_user = nd.ID_user";
             using var command = new MySqlCommand(sql, connection);
             using var reader = await command.ExecuteReaderAsync();
             
@@ -545,7 +545,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 if(!CheckExists) return false;
 
                 //Gửi báo cáo
-                const string sqlSend = @"INSERT INTO phanhoiungcuvien(ID_ucv,ThoiDiem,Ykien) 
+                const string sqlSend = @"INSERT INTO phanhoiUngCuVien(ID_ucv,ThoiDiem,Ykien) 
                 VALUES(@ID_ucv,@ThoiDiem,@Ykien);";
 
                 using(var command = new MySqlCommand(sqlSend, connect)){
@@ -784,12 +784,15 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 var list = new List<CandidateRegistedForElectionsDTO>();
                 const string sql = @"
-                SELECT kbc.TenKyBauCu, kbc.ngayBD, kbc.ngayKT ,kbc.MoTa, dm.TenCapUngCu, dv.TenDonViBauCu 
-                FROM ketquabaucu kq
-                JOIN kybaucu kbc ON kbc.ngayBD = kq.ngayBD
-                JOIN danhmucungcu dm ON dm.ID_Cap = kq.ID_Cap
-                JOIN donvibaucu dv ON dv.ID_DonViBauCu = dm.ID_DonViBauCu
-                WHERE kq.ID_ucv =  @ID_ucv;";
+                SELECT DISTINCT tt.ngayBD, tt.GhiNhan, tt.ID_DonViBauCu,
+                	kbc.ngayKT, kbc.TenKyBauCu, kbc.MoTa, kbc.CongBo, kbc.ID_Cap,
+                	kbc.SoLuongToiDaCuTri, kbc.SoLuongToiDaUngCuVien, kbc.SoLuotBinhChonToiDa,
+                	dm.TenCapUngCu, dm.ID_DonViBauCu, dv.TenDonViBauCu
+                FROM trangthaibaucu tt
+                INNER JOIN kybaucu kbc ON kbc.ngayBD = tt.ngayBD
+                INNER JOIN danhmucungcu dm ON dm.ID_Cap = kbc.ID_Cap
+                INNER JOIN donvibaucu dv ON dv.ID_DonViBauCu = dm.ID_DonViBauCu
+                WHERE tt.ID_ucv =@ID_ucv;";
 
                 using var command = new MySqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@ID_ucv", ID_ucv);
@@ -802,7 +805,13 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         TenKyBauCu = reader.GetString(reader.GetOrdinal("TenKyBauCu")),
                         MoTa = reader.GetString(reader.GetOrdinal("MoTa")),
                         TenCapUngCu = reader.GetString(reader.GetOrdinal("TenCapUngCu")),
-                        TenDonViBauCu = reader.GetString(reader.GetOrdinal("TenDonViBauCu"))
+                        TenDonViBauCu = reader.GetString(reader.GetOrdinal("TenDonViBauCu")),
+                        ID_Cap = reader.GetInt32(reader.GetOrdinal("ID_Cap")),
+                        ID_DonViBauCu = reader.GetInt32(reader.GetOrdinal("ID_DonViBauCu")),
+                        SoLuongToiDaCuTri = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaCuTri")),
+                        SoLuotBinhChonToiDa = reader.GetInt32(reader.GetOrdinal("SoLuotBinhChonToiDa")),
+                        SoLuongToiDaUngCuVien = reader.GetInt32(reader.GetOrdinal("SoLuongToiDaUngCuVien")),
+                        GhiNhan = reader.GetString(reader.GetOrdinal("GhiNhan"))
                     });
                 }
                 return list;

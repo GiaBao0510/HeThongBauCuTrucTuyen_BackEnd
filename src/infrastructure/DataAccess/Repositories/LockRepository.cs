@@ -342,11 +342,14 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 }
 
                 const string sql = @"
-                SELECT pb.ID_Phieu,pb.GiaTriPhieuBau,ctbc.ThoiDiem, nd.ID_user,nd.HoTen 
-                FROM phieubau pb 
+                SELECT pb.ID_Phieu, pb.GiaTriPhieuBau, 
+                   ctbc.ThoiDiem, nd.ID_user, nd.HoTen
+                FROM phieubau pb
                 JOIN chitietbaucu ctbc ON ctbc.ID_Phieu = pb.ID_Phieu
-                JOIN cutri ct ON ct.ID_CuTri = ctbc.ID_CuTri
-                JOIN nguoidung nd ON nd.ID_user = ct.ID_user
+                LEFT JOIN ungcuvien ucv ON ucv.ID_ucv = ctbc.ID_ucv
+                LEFT JOIN canbo cb ON cb.ID_CanBo = ctbc.ID_CanBo
+                LEFT JOIN cutri ct ON ct.ID_CuTri = ctbc.ID_CuTri
+                JOIN nguoidung nd ON nd.ID_user = COALESCE(ucv.ID_user, cb.ID_user, ct.ID_user)
                 WHERE pb.ngayBD =  @ngayBD;";
 
                 //Kiểm tra đường dẫn tồn tại không 
@@ -597,7 +600,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         
                         await command.ExecuteNonQueryAsync();
                     }
-                }
+                } 
 
                 //Cập nhật công bố kỳ bầu cử đã công bố
                 bool checkUpdateResultAnnouncement = await _electionsRepository._UpdateResultAnnouncementElectionBasedOnElectionDate(startTime, connection);

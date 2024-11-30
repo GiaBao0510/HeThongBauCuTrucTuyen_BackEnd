@@ -1363,3 +1363,1102 @@
 2024-11-26 23:26:14,048 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
 2024-11-26 23:26:14,150 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
 2024-11-26 23:26:14,212 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:39,060 [1] INFO  BackEnd.Program - 	 ---- Start Application - 26-11-2024 23:46:39 ---- 
+2024-11-26 23:46:43,730 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:43,945 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:44,006 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:44,158 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:44,229 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:44,308 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:44,702 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241114150058 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:44,890 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:44,946 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:45,047 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:45,154 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143132 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:46:45,205 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143237 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:46:45,262 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143445 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:46:45,346 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:46:45,472 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:46:45,653 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:45,815 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:46:45,944 [13] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:47:36,597 [7] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-26 23:47:37,733 [14] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-26 23:47:37,733 [14] INFO  BackEnd.Program - Ngày bầu cử: 29/11/2024 5:55:55 SA
+2024-11-26 23:47:37,734 [14] INFO  BackEnd.Program - ID Người bầu: 20241003000921
+2024-11-26 23:47:37,734 [14] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-26 23:47:37,757 [14] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-26 23:47:37,758 [14] INFO  BackEnd.Program - Giá trị phiếu bầu: 150
+2024-11-26 23:47:37,956 [7] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 2
+2024-11-26 23:47:38,035 [7] ERROR BackEnd.Program - Đơn vị bầu cử không hợp lệ.
+2024-11-26 23:52:11,485 [1] INFO  BackEnd.Program - 	 ---- Start Application - 26-11-2024 23:52:11 ---- 
+2024-11-26 23:52:14,672 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:15,121 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:15,306 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:15,479 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:15,544 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:15,727 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:15,894 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241114150058 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:16,038 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:16,290 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:16,369 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:16,435 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143132 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:52:16,468 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143237 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:52:16,552 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143445 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:52:16,631 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:52:16,668 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:52:16,906 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:16,976 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:52:17,015 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:53:09,775 [9] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-26 23:53:09,881 [9] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-26 23:53:09,881 [9] INFO  BackEnd.Program - Ngày bầu cử: 29/11/2024 5:55:55 SA
+2024-11-26 23:53:09,881 [9] INFO  BackEnd.Program - ID Người bầu: 20241003000921
+2024-11-26 23:53:09,882 [9] INFO  BackEnd.Program - ID Đơn vị bầu cử: 9
+2024-11-26 23:53:09,882 [9] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-26 23:53:09,882 [9] INFO  BackEnd.Program - Giá trị phiếu bầu: 150
+2024-11-26 23:53:10,008 [9] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 2
+2024-11-26 23:53:10,043 [12] ERROR BackEnd.Program - Đơn vị bầu cử không hợp lệ.
+2024-11-26 23:57:14,696 [1] INFO  BackEnd.Program - 	 ---- Start Application - 26-11-2024 23:57:14 ---- 
+2024-11-26 23:57:19,849 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:20,413 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:20,544 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:20,797 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:21,118 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:21,319 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:21,696 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241114150058 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:21,838 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:22,119 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:22,741 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:23,023 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143132 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:57:23,491 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143237 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:57:23,672 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143445 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:57:23,914 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:57:24,081 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:57:24,544 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:24,837 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:24,949 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:57:28,407 [9] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-26 23:57:28,656 [10] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-26 23:57:28,656 [10] INFO  BackEnd.Program - Ngày bầu cử: 29/11/2024 5:55:55 SA
+2024-11-26 23:57:28,657 [10] INFO  BackEnd.Program - ID Người bầu: 20241003000921
+2024-11-26 23:57:28,657 [10] INFO  BackEnd.Program - ID Đơn vị bầu cử: 9
+2024-11-26 23:57:28,657 [10] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-26 23:57:28,658 [10] INFO  BackEnd.Program - Giá trị phiếu bầu: 150
+2024-11-26 23:57:28,836 [10] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 2
+2024-11-26 23:57:28,866 [10] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên ứng cử viên
+2024-11-26 23:57:28,919 [10] ERROR BackEnd.Program - Đơn vị bầu cử không hợp lệ.
+2024-11-26 23:59:20,136 [1] INFO  BackEnd.Program - 	 ---- Start Application - 26-11-2024 23:59:20 ---- 
+2024-11-26 23:59:22,746 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:22,822 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:22,875 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:22,971 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:23,073 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:23,121 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:23,325 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241114150058 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:23,377 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:23,437 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:23,481 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:23,520 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143132 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:59:23,546 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143237 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:59:23,602 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143445 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:59:23,645 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:59:23,741 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-26 23:59:23,844 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:23,940 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:23,987 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-26 23:59:46,348 [12] INFO  BackEnd.Program -  >>> Bắt đầu ứng cử viên bỏ phiếu
+2024-11-26 23:59:46,791 [10] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-26 23:59:46,953 [10] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-26 23:59:46,954 [10] INFO  BackEnd.Program - Ngày bầu cử: 29/11/2024 5:55:55 SA
+2024-11-26 23:59:46,954 [10] INFO  BackEnd.Program - ID Người bầu: 20241003000921
+2024-11-26 23:59:46,955 [10] INFO  BackEnd.Program - ID Đơn vị bầu cử: 9
+2024-11-26 23:59:46,955 [10] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-26 23:59:46,955 [10] INFO  BackEnd.Program - Giá trị phiếu bầu: 150
+2024-11-26 23:59:47,012 [10] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 2
+2024-11-26 23:59:47,019 [10] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên ứng cử viên
+2024-11-26 23:59:47,024 [10] ERROR BackEnd.Program - Đơn vị bầu cử không hợp lệ.
+2024-11-27 00:00:31,877 [17] INFO  BackEnd.Program -  >>> Bắt đầu ứng cử viên bỏ phiếu
+2024-11-27 00:00:31,964 [15] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-27 00:00:32,002 [15] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-27 00:00:32,003 [15] INFO  BackEnd.Program - Ngày bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 00:00:32,004 [15] INFO  BackEnd.Program - ID Người bầu: 20241003000921
+2024-11-27 00:00:32,004 [15] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-27 00:00:32,005 [15] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-27 00:00:32,005 [15] INFO  BackEnd.Program - Giá trị phiếu bầu: 150
+2024-11-27 00:00:32,028 [16] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 2
+2024-11-27 00:00:32,028 [16] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên ứng cử viên
+2024-11-27 00:00:33,118 [16] INFO  BackEnd.Program - Đã cập nhật trạng thái bầu cử ứng cử viên
+2024-11-27 00:00:33,346 [17] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-27 00:00:50,021 [16] INFO  BackEnd.Program -  >>> Bắt đầu ứng cử viên bỏ phiếu
+2024-11-27 00:00:50,082 [15] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-27 00:00:50,198 [17] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-27 00:00:50,224 [17] INFO  BackEnd.Program - Ngày bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 00:00:50,275 [17] INFO  BackEnd.Program - ID Người bầu: 20241003000921
+2024-11-27 00:00:50,279 [17] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-27 00:00:50,282 [17] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-27 00:00:50,297 [17] INFO  BackEnd.Program - Giá trị phiếu bầu: 150
+2024-11-27 00:00:50,412 [17] ERROR BackEnd.Program - Người bầu đã bỏ phiếu.
+2024-11-27 00:00:59,395 [15] INFO  BackEnd.Program -  >>> Bắt đầu cửu tri bỏ phiếu
+2024-11-27 00:00:59,480 [16] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-27 00:00:59,489 [16] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-27 00:00:59,489 [16] INFO  BackEnd.Program - Ngày bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 00:00:59,490 [16] INFO  BackEnd.Program - ID Người bầu: 20240916232132
+2024-11-27 00:00:59,490 [16] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-27 00:00:59,490 [16] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-27 00:00:59,490 [16] INFO  BackEnd.Program - Giá trị phiếu bầu: 150
+2024-11-27 00:00:59,659 [17] ERROR BackEnd.Program - Người bầu đã bỏ phiếu.
+2024-11-27 00:01:36,831 [17] INFO  BackEnd.Program -  >>> Bắt đầu cửu tri bỏ phiếu
+2024-11-27 00:01:36,887 [15] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-27 00:01:36,897 [17] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-27 00:01:36,898 [17] INFO  BackEnd.Program - Ngày bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 00:01:36,905 [17] INFO  BackEnd.Program - ID Người bầu: 20240916232132
+2024-11-27 00:01:36,907 [17] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-27 00:01:36,907 [17] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-27 00:01:36,908 [17] INFO  BackEnd.Program - Giá trị phiếu bầu: 150
+2024-11-27 00:01:36,956 [20] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 2
+2024-11-27 00:01:36,959 [20] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cử tri
+2024-11-27 00:01:37,057 [15] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-27 00:01:43,263 [20] INFO  BackEnd.Program -  >>> Bắt đầu cán bộ bỏ phiếu
+2024-11-27 00:01:43,313 [15] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-27 00:01:43,321 [15] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-27 00:01:43,321 [15] INFO  BackEnd.Program - Ngày bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 00:01:43,322 [15] INFO  BackEnd.Program - ID Người bầu: 20241025153453
+2024-11-27 00:01:43,322 [15] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-27 00:01:43,322 [15] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-27 00:01:43,322 [15] INFO  BackEnd.Program - Giá trị phiếu bầu: 150
+2024-11-27 00:01:43,427 [17] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 2
+2024-11-27 00:01:43,429 [17] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cán bộ
+2024-11-27 00:01:43,474 [17] INFO  BackEnd.Program - Đã cập nhật trạng thái bầu cử ứng cử viên
+2024-11-27 00:01:43,495 [17] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-27 00:01:46,892 [15] INFO  BackEnd.Program -  >>> Bắt đầu cán bộ bỏ phiếu
+2024-11-27 00:01:46,994 [3] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-27 00:01:47,009 [3] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-27 00:01:47,010 [3] INFO  BackEnd.Program - Ngày bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 00:01:47,010 [3] INFO  BackEnd.Program - ID Người bầu: 20241025153453
+2024-11-27 00:01:47,011 [3] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-27 00:01:47,011 [3] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-27 00:01:47,011 [3] INFO  BackEnd.Program - Giá trị phiếu bầu: 150
+2024-11-27 00:01:47,028 [3] ERROR BackEnd.Program - Người bầu đã bỏ phiếu.
+2024-11-27 09:09:07,275 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 09:09:06 ---- 
+2024-11-27 09:15:29,211 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 09:15:29 ---- 
+2024-11-27 09:15:31,960 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:32,324 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:32,353 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:32,390 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:32,413 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:32,438 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:32,465 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:32,491 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:32,519 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:32,555 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:32,583 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:33,234 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:33,268 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:33,320 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:33,397 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:33,480 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:33,546 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:33,593 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:33,649 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:33,713 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:33,759 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:33,802 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:33,905 [11] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241114150058 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:33,985 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:34,011 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:34,038 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:34,068 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,099 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,131 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,161 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,200 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,235 [11] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,273 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143132 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-27 09:15:34,311 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143237 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-27 09:15:34,339 [11] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143445 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-27 09:15:34,373 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-27 09:15:34,414 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 28/11/2024 11:10:10 SA
+2024-11-27 09:15:34,440 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:34,471 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:34,540 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:34,588 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:34,617 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 28/11/2024 11:11:11 SA
+2024-11-27 09:15:34,649 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,679 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,715 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,746 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,771 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 09:15:34,793 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:34,817 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:34,839 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:34,895 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:15:34,931 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 09:17:13,093 [9] WARN  BackEnd.src.infrastructure.Services.UserServices - Đăng nhập thất bại: Sai mật khẩu
+2024-11-27 09:18:00,295 [9] WARN  BackEnd.src.infrastructure.Services.UserServices - Đăng nhập thất bại: Sai mật khẩu
+2024-11-27 16:56:56,231 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 16:56:56 ---- 
+2024-11-27 16:57:17,442 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:19,244 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:19,759 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:20,183 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:20,247 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:20,368 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:20,406 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:20,488 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:20,650 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:20,843 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:21,147 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:21,223 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:21,330 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:21,446 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:21,492 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:21,566 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:22,491 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:22,749 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:22,817 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:22,895 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:22,973 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:23,055 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:23,117 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:23,184 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:23,739 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:24,100 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:24,573 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:24,692 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:24,855 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 16:57:24,917 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:25,028 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:25,128 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:25,228 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 16:57:25,309 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:40,783 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 17:01:40 ---- 
+2024-11-27 17:01:46,603 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:46,903 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:47,073 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:47,169 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:47,250 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:47,348 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:47,454 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:47,575 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:47,773 [13] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:47,888 [13] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:48,016 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:48,267 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:48,446 [13] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:48,663 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:49,006 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:49,693 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:50,762 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:50,999 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:51,543 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:51,726 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:51,790 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:51,946 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:52,164 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:52,895 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:53,997 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:54,095 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:54,471 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:55,796 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:56,205 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:01:56,266 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:56,467 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:56,673 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:56,801 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:01:57,003 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:38,943 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 17:03:38 ---- 
+2024-11-27 17:03:42,751 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:42,862 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:42,942 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:42,986 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:43,056 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:43,240 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:43,773 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:43,887 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:44,212 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:44,301 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:44,339 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:44,553 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:44,605 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:44,937 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:44,991 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:45,108 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:45,364 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:45,403 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:45,478 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:45,532 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:45,603 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:45,724 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:45,780 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:45,818 [11] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:45,975 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:46,044 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:46,090 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:46,190 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:46,293 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 17:03:46,335 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:46,382 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:46,406 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:46,623 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 17:03:46,695 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:36:29,127 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 19:36:29 ---- 
+2024-11-27 19:37:19,183 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:26,419 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:26,647 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:27,805 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:28,089 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:28,223 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:28,535 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:28,926 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:29,097 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:29,339 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:29,592 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:30,043 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:32,511 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:32,701 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:33,468 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:33,824 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:37,225 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:38,474 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:39,345 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:39,956 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:40,099 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:40,127 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:40,161 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:40,293 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:42,511 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:42,720 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:43,056 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:43,108 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:43,363 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 19:37:43,664 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:43,697 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:43,837 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:44,508 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 19:37:47,203 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:24,053 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 20:59:24 ---- 
+2024-11-27 20:59:30,027 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:30,685 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:30,738 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:30,828 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:30,896 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:30,994 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:31,056 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:31,101 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:31,278 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:31,370 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:31,417 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:31,500 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:31,548 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:31,599 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:31,716 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:31,817 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:32,100 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:32,149 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:32,200 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:32,287 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:32,332 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:32,383 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:32,483 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:32,583 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:32,860 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:33,061 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:33,104 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:33,198 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:33,244 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 20:59:33,301 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:33,332 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:33,467 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:33,538 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 20:59:33,584 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:06:55,339 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 21:06:55 ---- 
+2024-11-27 21:06:59,517 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:00,005 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:00,164 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:00,274 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:00,409 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:00,656 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:00,737 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:00,787 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:00,834 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:00,920 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:00,975 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:01,097 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:01,129 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:01,205 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:01,384 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:01,491 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:02,273 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:02,379 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:02,542 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:02,572 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:02,614 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:02,654 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:02,877 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:02,903 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:03,395 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:03,546 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:03,610 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:03,669 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:03,721 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:07:03,745 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:03,774 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:03,797 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:03,883 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:07:03,952 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:50:57,999 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 21:50:57 ---- 
+2024-11-27 21:51:05,136 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:08,016 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:08,282 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:09,923 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:10,252 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:10,425 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:10,672 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:10,851 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:10,895 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:11,067 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:11,143 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:11,285 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:11,311 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:11,494 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:11,628 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:11,654 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:12,051 [8] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:12,238 [8] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:12,291 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:12,354 [8] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:12,382 [8] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:12,412 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:12,495 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:12,562 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:12,945 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:13,015 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:13,056 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:13,147 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:13,239 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:51:13,270 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:13,438 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:13,481 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:13,520 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:51:13,540 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:35,012 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 21:53:34 ---- 
+2024-11-27 21:53:41,800 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:42,038 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:42,215 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:42,552 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:42,691 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:43,108 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:43,618 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:43,908 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:44,469 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:44,638 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:44,784 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:44,870 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:44,992 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:45,083 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:45,234 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:45,445 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:46,168 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:46,293 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:46,486 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:46,683 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:46,790 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:46,932 [8] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:47,022 [11] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:47,161 [8] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:47,799 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:48,380 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:48,675 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:48,892 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:49,097 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 21:53:49,447 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:49,594 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:49,874 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:50,027 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 21:53:50,464 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 22:32:55,549 [31] INFO  BackEnd.Program -  >>> Bắt đầu ứng cử viên bỏ phiếu
+2024-11-27 22:32:55,790 [36] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-27 22:32:55,847 [36] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-27 22:32:55,849 [36] INFO  BackEnd.Program - Ngày bầu cử: 28/11/2024 11:10:10 SA
+2024-11-27 22:32:55,851 [36] INFO  BackEnd.Program - ID Người bầu: 20241012212410
+2024-11-27 22:32:55,852 [36] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-27 22:32:55,852 [36] INFO  BackEnd.Program - ID Cấp: 1
+2024-11-27 22:32:55,865 [36] INFO  BackEnd.Program - Giá trị phiếu bầu: 133
+2024-11-27 22:32:56,168 [31] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 5
+2024-11-27 22:32:56,171 [31] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên ứng cử viên
+2024-11-27 22:32:56,429 [31] ERROR BackEnd.Program - Đơn vị bầu cử không hợp lệ.
+2024-11-27 23:30:13,665 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 23:30:13 ---- 
+2024-11-27 23:30:43,918 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:47,547 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:47,827 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:48,101 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:48,454 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:48,752 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:48,980 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:49,263 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:49,317 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:49,439 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:49,730 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:49,859 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:51,503 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:51,695 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:51,857 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:51,993 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:53,319 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:53,586 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:54,172 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:54,544 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:54,807 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:54,894 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:55,009 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:55,146 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:56,155 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:56,220 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:56,503 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:56,567 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:56,610 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:30:56,686 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:56,818 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:57,022 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:57,054 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:30:57,182 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:35:17,364 [12] INFO  BackEnd.Program -  >>> Bắt đầu ứng cử viên bỏ phiếu
+2024-11-27 23:35:17,620 [10] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-27 23:35:17,664 [10] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-27 23:35:17,666 [10] INFO  BackEnd.Program - Ngày bầu cử: 28/11/2024 11:10:10 SA
+2024-11-27 23:35:17,670 [10] INFO  BackEnd.Program - ID Người bầu: 20241012212410
+2024-11-27 23:35:17,671 [10] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-27 23:35:17,671 [10] INFO  BackEnd.Program - ID Cấp: 1
+2024-11-27 23:35:17,683 [10] INFO  BackEnd.Program - Giá trị phiếu bầu: 1343
+2024-11-27 23:35:18,002 [16] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 5
+2024-11-27 23:35:18,009 [16] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên ứng cử viên
+2024-11-27 23:35:18,169 [16] ERROR BackEnd.Program - Đơn vị bầu cử không hợp lệ.
+2024-11-27 23:35:51,065 [12] INFO  BackEnd.Program -  >>> Bắt đầu ứng cử viên bỏ phiếu
+2024-11-27 23:35:52,090 [10] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-27 23:35:52,303 [16] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-27 23:35:52,304 [16] INFO  BackEnd.Program - Ngày bầu cử: 28/11/2024 11:10:10 SA
+2024-11-27 23:35:52,304 [16] INFO  BackEnd.Program - ID Người bầu: 20241012212410
+2024-11-27 23:35:52,305 [16] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-27 23:35:52,305 [16] INFO  BackEnd.Program - ID Cấp: 1
+2024-11-27 23:35:52,305 [16] INFO  BackEnd.Program - Giá trị phiếu bầu: 15983
+2024-11-27 23:35:52,752 [16] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 5
+2024-11-27 23:35:52,753 [16] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên ứng cử viên
+2024-11-27 23:35:52,794 [12] ERROR BackEnd.Program - Đơn vị bầu cử không hợp lệ.
+2024-11-27 23:51:15,957 [1] INFO  BackEnd.Program - 	 ---- Start Application - 27-11-2024 23:51:15 ---- 
+2024-11-27 23:51:25,485 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:25,706 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:25,759 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:25,823 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:25,890 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:25,948 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:25,991 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:26,030 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:26,094 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:26,179 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:26,218 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:26,284 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:26,334 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:26,394 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:26,439 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:26,488 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:26,663 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:26,812 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:26,946 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:27,110 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:27,297 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:27,471 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:27,717 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:27,934 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:28,225 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:28,375 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:28,477 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:28,509 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:28,542 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 4:14:47 SA
+2024-11-27 23:51:28,571 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:28,598 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025152418 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:28,645 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153453 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:28,677 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153720 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:51:28,708 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025153942 Ngày bắt đầu bầu cử: 29/11/2024 5:55:55 SA
+2024-11-27 23:52:34,562 [12] INFO  BackEnd.Program -  >>> Bắt đầu ứng cử viên bỏ phiếu
+2024-11-27 23:52:34,643 [10] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-27 23:52:34,671 [10] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-27 23:52:34,671 [10] INFO  BackEnd.Program - Ngày bầu cử: 28/11/2024 11:10:10 SA
+2024-11-27 23:52:34,672 [10] INFO  BackEnd.Program - ID Người bầu: 20241012212410
+2024-11-27 23:52:34,672 [10] INFO  BackEnd.Program - ID Đơn vị bầu cử: 10
+2024-11-27 23:52:34,673 [10] INFO  BackEnd.Program - ID Cấp: 1
+2024-11-27 23:52:34,673 [10] INFO  BackEnd.Program - Giá trị phiếu bầu: 14653
+2024-11-27 23:52:34,757 [10] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 5
+2024-11-27 23:52:34,758 [10] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên ứng cử viên
+2024-11-27 23:52:36,052 [10] INFO  BackEnd.Program - Đã cập nhật trạng thái bầu cử ứng cử viên
+2024-11-27 23:52:36,293 [12] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-28 10:45:05,775 [1] INFO  BackEnd.Program - 	 ---- Start Application - 28-11-2024 10:45:05 ---- 
+2024-11-28 10:54:49,082 [23] INFO  BackEnd.Program -  --------------- Start add election ---------------
+2024-11-28 10:54:49,089 [23] INFO  BackEnd.Program - NgayBD: 30/11/2024 6:56:56 SA
+2024-11-28 10:54:49,090 [23] INFO  BackEnd.Program - NgayKT: 09/12/2024 6:56:56 SA
+2024-11-28 10:54:49,090 [23] INFO  BackEnd.Program - NgayKT_UngCu: 03/12/2024 10:54:48 SA
+2024-11-28 10:54:49,090 [23] INFO  BackEnd.Program - TenKyBauCu: Bầu cử ban chấp hành đoàn A1
+2024-11-28 10:54:49,091 [23] INFO  BackEnd.Program - MoTa: Diễn ra tại phòng 217
+2024-11-28 10:54:49,091 [23] INFO  BackEnd.Program - SoLuongToiDaCuTri: 100
+2024-11-28 10:54:49,091 [23] INFO  BackEnd.Program - SoLuongToiDaUngCuVien: 7
+2024-11-28 10:54:49,091 [23] INFO  BackEnd.Program - SoLuotBinhChonToiDa: 6
+2024-11-28 10:54:49,092 [23] INFO  BackEnd.Program - ID_Cap: 12
+2024-11-28 10:54:49,145 [23] INFO  BackEnd.Program - Chuẩn bị tạo khóa công khai và khóa cá nhân
+2024-11-28 10:54:49,147 [23] INFO  BackEnd.Program - Chuẩn bị tạo số nguyên tố Q và P
+2024-11-28 10:54:49,154 [23] INFO  BackEnd.Program - 	Kiểm tra giá kết quả kiểm phiếu lớn nhất = 107213535210600
+2024-11-28 10:54:49,201 [23] INFO  BackEnd.Program - 	>> Q = 99998663
+2024-11-28 10:54:49,202 [23] INFO  BackEnd.Program - 	>> P = 99998429
+2024-11-28 10:54:49,202 [23] INFO  BackEnd.Program - 	>> Q = 99998663
+2024-11-28 10:54:49,203 [23] INFO  BackEnd.Program - 	>> P = 99998429
+2024-11-28 10:54:49,203 [23] INFO  BackEnd.Program - 	>> N = 9999709202100427
+2024-11-28 10:54:49,204 [23] INFO  BackEnd.Program - 	>> lamda = 4999854501051668
+2024-11-28 10:54:49,205 [23] INFO  BackEnd.Program - 	>> Nx2 = 99994184126571958396068593582329
+2024-11-28 10:54:49,206 [23] INFO  BackEnd.Program - 	>> Chọn đại g = 84911365534592389175358120626752
+2024-11-28 10:54:49,207 [23] INFO  BackEnd.Program - 	>> Nguyên tố cùng nhau với N ...
+2024-11-28 10:54:49,208 [23] INFO  BackEnd.Program - 	>> G = 84911365534592389175358120626752
+2024-11-28 10:54:49,208 [23] INFO  BackEnd.Program - 	>> U = 53695257460449301312183501030515
+2024-11-28 10:54:49,208 [23] INFO  BackEnd.Program - 	>> LU = 5369681895266582
+2024-11-28 10:54:49,209 [23] INFO  BackEnd.Program - 	>> muy = 6706162738800879
+2024-11-28 10:54:49,209 [23] INFO  BackEnd.Program - Tạo khóa công khai và khóa cá nhân thành công
+2024-11-28 10:54:49,210 [23] INFO  BackEnd.Program - Now: 2024-11-28_10-54-49
+2024-11-28 10:55:19,007 [18] INFO  BackEnd.Program -  --------------- Start add election ---------------
+2024-11-28 10:55:19,008 [18] INFO  BackEnd.Program - NgayBD: 30/11/2024 7:57:57 SA
+2024-11-28 10:55:19,009 [18] INFO  BackEnd.Program - NgayKT: 09/12/2024 7:57:57 SA
+2024-11-28 10:55:19,009 [18] INFO  BackEnd.Program - NgayKT_UngCu: 03/12/2024 10:55:18 SA
+2024-11-28 10:55:19,009 [18] INFO  BackEnd.Program - TenKyBauCu: Bầu cử ban chấp hành đoàn A2
+2024-11-28 10:55:19,009 [18] INFO  BackEnd.Program - MoTa: Diễn ra tại phòng 217
+2024-11-28 10:55:19,010 [18] INFO  BackEnd.Program - SoLuongToiDaCuTri: 100
+2024-11-28 10:55:19,010 [18] INFO  BackEnd.Program - SoLuongToiDaUngCuVien: 7
+2024-11-28 10:55:19,010 [18] INFO  BackEnd.Program - SoLuotBinhChonToiDa: 6
+2024-11-28 10:55:19,010 [18] INFO  BackEnd.Program - ID_Cap: 12
+2024-11-28 10:55:19,014 [18] INFO  BackEnd.Program - Chuẩn bị tạo khóa công khai và khóa cá nhân
+2024-11-28 10:55:19,015 [18] INFO  BackEnd.Program - Chuẩn bị tạo số nguyên tố Q và P
+2024-11-28 10:55:19,015 [18] INFO  BackEnd.Program - 	Kiểm tra giá kết quả kiểm phiếu lớn nhất = 107213535210600
+2024-11-28 10:55:19,016 [18] INFO  BackEnd.Program - 	>> Q = 99994607
+2024-11-28 10:55:19,018 [18] INFO  BackEnd.Program - 	>> P = 99992939
+2024-11-28 10:55:19,019 [18] INFO  BackEnd.Program - 	>> Q = 99994607
+2024-11-28 10:55:19,020 [18] INFO  BackEnd.Program - 	>> P = 99992939
+2024-11-28 10:55:19,020 [18] INFO  BackEnd.Program - 	>> N = 9998754638079973
+2024-11-28 10:55:19,021 [18] INFO  BackEnd.Program - 	>> lamda = 4999377219046214
+2024-11-28 10:55:19,021 [18] INFO  BackEnd.Program - 	>> Nx2 = 99975094312525771853335943680729
+2024-11-28 10:55:19,021 [18] INFO  BackEnd.Program - 	>> Chọn đại g = 64430841175185504984296922725308
+2024-11-28 10:55:19,022 [18] INFO  BackEnd.Program - 	>> Nguyên tố cùng nhau với N ...
+2024-11-28 10:55:19,022 [18] INFO  BackEnd.Program - 	>> G = 64430841175185504984296922725308
+2024-11-28 10:55:19,023 [18] INFO  BackEnd.Program - 	>> U = 17053071247693261084290814022844
+2024-11-28 10:55:19,023 [18] INFO  BackEnd.Program - 	>> LU = 1705519523676191
+2024-11-28 10:55:19,024 [18] INFO  BackEnd.Program - 	>> muy = 9407030785225329
+2024-11-28 10:55:19,024 [18] INFO  BackEnd.Program - Tạo khóa công khai và khóa cá nhân thành công
+2024-11-28 10:55:19,024 [18] INFO  BackEnd.Program - Now: 2024-11-28_10-55-19
+2024-11-28 11:00:17,076 [27] INFO  BackEnd.Program -  --------------- Start add election ---------------
+2024-11-28 11:00:17,078 [27] INFO  BackEnd.Program - NgayBD: 30/11/2024 9:59:59 SA
+2024-11-28 11:00:17,078 [27] INFO  BackEnd.Program - NgayKT: 09/12/2024 7:57:57 SA
+2024-11-28 11:00:17,078 [27] INFO  BackEnd.Program - NgayKT_UngCu: 03/12/2024 11:00:16 SA
+2024-11-28 11:00:17,079 [27] INFO  BackEnd.Program - TenKyBauCu: Bầu cử Lớp trưởng KHMT A1
+2024-11-28 11:00:17,079 [27] INFO  BackEnd.Program - MoTa: Diễn ra tại phòng 218
+2024-11-28 11:00:17,079 [27] INFO  BackEnd.Program - SoLuongToiDaCuTri: 100
+2024-11-28 11:00:17,079 [27] INFO  BackEnd.Program - SoLuongToiDaUngCuVien: 7
+2024-11-28 11:00:17,080 [27] INFO  BackEnd.Program - SoLuotBinhChonToiDa: 6
+2024-11-28 11:00:17,080 [27] INFO  BackEnd.Program - ID_Cap: 12
+2024-11-28 11:00:17,083 [27] INFO  BackEnd.Program - Chuẩn bị tạo khóa công khai và khóa cá nhân
+2024-11-28 11:00:17,084 [27] INFO  BackEnd.Program - Chuẩn bị tạo số nguyên tố Q và P
+2024-11-28 11:00:17,084 [27] INFO  BackEnd.Program - 	Kiểm tra giá kết quả kiểm phiếu lớn nhất = 107213535210600
+2024-11-28 11:00:17,085 [27] INFO  BackEnd.Program - 	>> Q = 99996257
+2024-11-28 11:00:17,086 [27] INFO  BackEnd.Program - 	>> P = 99990113
+2024-11-28 11:00:17,086 [27] INFO  BackEnd.Program - 	>> Q = 99996257
+2024-11-28 11:00:17,086 [27] INFO  BackEnd.Program - 	>> P = 99990113
+2024-11-28 11:00:17,086 [27] INFO  BackEnd.Program - 	>> N = 9998637037007041
+2024-11-28 11:00:17,086 [27] INFO  BackEnd.Program - 	>> lamda = 312457401156896
+2024-11-28 11:00:17,087 [27] INFO  BackEnd.Program - 	>> Nx2 = 99972742597808940175755083575681
+2024-11-28 11:00:17,087 [27] INFO  BackEnd.Program - 	>> Chọn đại g = 80621509075338875375973383343134
+2024-11-28 11:00:17,087 [27] INFO  BackEnd.Program - 	>> Nguyên tố cùng nhau với N ...
+2024-11-28 11:00:17,088 [27] INFO  BackEnd.Program - 	>> G = 80621509075338875375973383343134
+2024-11-28 11:00:17,088 [27] INFO  BackEnd.Program - 	>> U = 97702739911986124078772058421767
+2024-11-28 11:00:17,088 [27] INFO  BackEnd.Program - 	>> LU = 9771605824910726
+2024-11-28 11:00:17,088 [27] INFO  BackEnd.Program - 	>> muy = 12854967284779186
+2024-11-28 11:00:17,089 [27] INFO  BackEnd.Program - Tạo khóa công khai và khóa cá nhân thành công
+2024-11-28 11:00:17,089 [27] INFO  BackEnd.Program - Now: 2024-11-28_11-00-17
+2024-11-28 11:21:55,008 [13] INFO  BackEnd.Program - Thêm danh sách wungs cử viên vào kỳ bầu cử
+2024-11-28 11:23:16,231 [3] INFO  BackEnd.Program - Thêm danh sách wungs cử viên vào kỳ bầu cử
+2024-11-28 11:23:16,260 [3] INFO  BackEnd.Program - Số lượng ứng cử viên tối đa: 7
+2024-11-28 11:23:16,274 [3] INFO  BackEnd.Program - Số lượng ứng cử viên hiện tại: 0
+2024-11-28 11:23:16,290 [26] INFO  BackEnd.Program - Số lượng ứng cử viên hiện tại với số lượng ứng cử viên từ danh sách đầu vào : 6
+2024-11-28 11:23:23,093 [14] INFO  BackEnd.Program - Thêm danh sách wungs cử viên vào kỳ bầu cử
+2024-11-28 11:23:23,105 [3] INFO  BackEnd.Program - Số lượng ứng cử viên tối đa: 7
+2024-11-28 11:23:23,109 [3] INFO  BackEnd.Program - Số lượng ứng cử viên hiện tại: 6
+2024-11-28 11:23:23,112 [3] INFO  BackEnd.Program - Số lượng ứng cử viên hiện tại với số lượng ứng cử viên từ danh sách đầu vào : 12
+2024-11-28 11:23:38,240 [3] INFO  BackEnd.Program - Thêm danh sách wungs cử viên vào kỳ bầu cử
+2024-11-28 11:23:38,251 [3] INFO  BackEnd.Program - Số lượng ứng cử viên tối đa: 7
+2024-11-28 11:23:38,255 [3] INFO  BackEnd.Program - Số lượng ứng cử viên hiện tại: 6
+2024-11-28 11:23:38,259 [3] INFO  BackEnd.Program - Số lượng ứng cử viên hiện tại với số lượng ứng cử viên từ danh sách đầu vào : 7
+2024-11-28 11:24:13,054 [19] INFO  BackEnd.Program - Thêm danh sách wungs cử viên vào kỳ bầu cử
+2024-11-28 11:24:13,062 [19] INFO  BackEnd.Program - Số lượng ứng cử viên tối đa: 7
+2024-11-28 11:24:13,067 [19] INFO  BackEnd.Program - Số lượng ứng cử viên hiện tại: 0
+2024-11-28 11:24:13,070 [19] INFO  BackEnd.Program - Số lượng ứng cử viên hiện tại với số lượng ứng cử viên từ danh sách đầu vào : 7
+2024-11-28 12:45:52,371 [1] INFO  BackEnd.Program - 	 ---- Start Application - 28-11-2024 12:45:52 ---- 
+2024-11-28 12:46:09,479 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:09,889 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:09,987 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:10,065 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:10,103 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:10,209 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:10,339 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:10,409 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:10,600 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:10,658 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:10,850 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:10,946 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:11,016 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:11,172 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:11,384 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:11,645 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:11,699 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:11,855 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:11,900 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:11,962 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:12,006 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:12,061 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109134558 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:12,105 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109134558 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:12,162 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109134558 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:12,218 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:12,271 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:12,329 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:12,381 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:12,430 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:12,486 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:12,566 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:12,658 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:12,717 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:12,941 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:13,014 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:13,066 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:13,124 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:13,163 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003050 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:13,213 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:13,346 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:46:13,393 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:13,440 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:13,519 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:13,655 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:13,705 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003050 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:13,763 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:13,820 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241114150058 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:14,063 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 12:46:14,179 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 12:46:14,222 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:47:43,187 [7] INFO  BackEnd.Program -  >>> Bắt đầu ứng cử viên bỏ phiếu
+2024-11-28 12:47:43,424 [10] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-28 12:47:43,488 [10] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-28 12:47:43,488 [10] INFO  BackEnd.Program - Ngày bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 12:47:43,489 [10] INFO  BackEnd.Program - ID Người bầu: 20241012212410
+2024-11-28 12:47:43,489 [10] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-28 12:47:43,489 [10] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-28 12:47:43,489 [10] INFO  BackEnd.Program - Giá trị phiếu bầu: 105101005
+2024-11-28 12:47:43,534 [15] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 7
+2024-11-28 12:47:43,538 [15] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên ứng cử viên
+2024-11-28 12:47:43,901 [15] INFO  BackEnd.Program - Đã cập nhật trạng thái bầu cử ứng cử viên
+2024-11-28 12:47:44,013 [15] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-28 13:34:12,045 [13] WARN  BackEnd.src.infrastructure.Services.UserServices - Đăng nhập thất bại: Sai mật khẩu
+2024-11-28 13:34:21,788 [17] WARN  BackEnd.src.infrastructure.Services.UserServices - Đăng nhập thất bại: Sai mật khẩu
+2024-11-28 13:36:34,504 [12] INFO  BackEnd.Program -  >>> Bắt đầu cán bộ bỏ phiếu
+2024-11-28 13:36:34,967 [15] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-28 13:36:35,064 [15] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-28 13:36:35,079 [15] INFO  BackEnd.Program - Ngày bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 13:36:35,079 [15] INFO  BackEnd.Program - ID Người bầu: 20241025151435
+2024-11-28 13:36:35,080 [15] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-28 13:36:35,080 [15] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-28 13:36:35,080 [15] INFO  BackEnd.Program - Giá trị phiếu bầu: 1072135352106
+2024-11-28 13:36:35,396 [25] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 7
+2024-11-28 13:36:35,401 [25] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cán bộ
+2024-11-28 13:36:35,593 [15] INFO  BackEnd.Program - Đã cập nhật trạng thái bầu cử ứng cử viên
+2024-11-28 13:36:35,676 [12] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-28 14:04:47,064 [3] INFO  BackEnd.Program - ngày bắt đầu không tồn tại
+2024-11-28 14:08:21,785 [1] INFO  BackEnd.Program - 	 ---- Start Application - 28-11-2024 14:08:21 ---- 
+2024-11-28 14:08:44,240 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:48,057 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:48,336 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:48,430 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:48,857 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:48,970 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:49,011 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:49,033 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:49,210 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:49,293 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:49,380 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:49,529 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:49,640 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:49,752 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:49,833 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:49,916 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:49,938 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:49,961 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:50,470 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:50,558 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:50,723 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:50,764 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109134558 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:50,804 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109134558 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:51,036 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109134558 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:51,060 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:51,312 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:51,417 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:51,505 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:51,607 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:51,849 [8] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:52,253 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:52,318 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:52,450 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:52,894 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:53,351 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:53,520 [5] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:53,763 [5] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:53,798 [8] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003050 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:53,896 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:53,939 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:08:54,132 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:54,307 [5] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:54,767 [5] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:54,925 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:55,020 [8] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003050 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:55,180 [8] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:55,334 [8] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241114150058 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:55,578 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:08:55,687 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:08:55,728 [5] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:17:55,213 [23] INFO  BackEnd.Program -  >>> Bắt đầu cán bộ bỏ phiếu
+2024-11-28 14:17:55,836 [20] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-28 14:17:55,955 [20] ERROR BackEnd.Program - Không tìm thấy thông tin bầu cử.
+2024-11-28 14:18:17,724 [23] INFO  BackEnd.Program -  >>> Bắt đầu cán bộ bỏ phiếu
+2024-11-28 14:18:19,253 [22] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-28 14:18:19,262 [22] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-28 14:18:19,279 [22] INFO  BackEnd.Program - Ngày bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:18:19,279 [22] INFO  BackEnd.Program - ID Người bầu: 20241025151435
+2024-11-28 14:18:19,286 [22] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-28 14:18:19,287 [22] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-28 14:18:19,287 [22] INFO  BackEnd.Program - Giá trị phiếu bầu: 1500
+2024-11-28 14:18:20,550 [22] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 7
+2024-11-28 14:18:20,554 [22] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cán bộ
+2024-11-28 14:18:21,208 [23] INFO  BackEnd.Program - Đã cập nhật trạng thái bầu cử ứng cử viên
+2024-11-28 14:18:21,391 [23] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-28 14:33:03,451 [1] INFO  BackEnd.Program - 	 ---- Start Application - 28-11-2024 14:33:03 ---- 
+2024-11-28 14:33:07,267 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:07,397 [13] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:07,478 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:07,531 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:07,561 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:07,592 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:07,631 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:07,667 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:07,732 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:07,767 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:07,991 [13] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:08,021 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:08,146 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:08,202 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:08,241 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:08,303 [13] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:08,349 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:08,373 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:08,412 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:08,442 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:08,476 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:08,503 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109134558 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:08,556 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109134558 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:08,582 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109134558 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:08,635 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:08,681 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:08,737 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:08,790 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:08,825 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:08,860 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:08,890 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:08,933 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:08,971 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:09,092 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003000921 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:09,151 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:09,202 [10] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:09,236 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:09,309 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003050 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:09,341 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:09,378 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-28 14:33:09,407 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:09,453 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:09,493 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:09,532 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:09,636 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003050 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:09,675 [7] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:09,729 [13] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241114150058 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:09,843 [13] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 30/11/2024 7:57:57 SA
+2024-11-28 14:33:09,898 [10] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-28 14:33:09,946 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 30/11/2024 6:56:56 SA
+2024-11-29 09:07:10,561 [1] INFO  BackEnd.Program - 	 ---- Start Application - 29-11-2024 09:07:10 ---- 
+2024-11-29 09:07:25,311 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916220819 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,497 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916221039 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,555 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240916232132 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,590 [7] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919194845 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,627 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240919200022 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,669 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165456 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,711 [11] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20240930165802 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,756 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109134558 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,784 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109142305 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,836 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109221936 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,878 [9] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241109234117 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:25,976 [11] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241017143409 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:26,048 [11] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241012212410 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:26,084 [11] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002121 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:26,118 [11] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003002930 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:26,152 [9] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003050 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:26,186 [12] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241003003142 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:26,226 [11] INFO  BackEnd.Program - >>>>>Thông báo ID ứng cử viên: 20241114150058 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:07:26,317 [12] INFO  BackEnd.Program - >>>>>Thông báo ID cử tri: 20241025151435 Ngày bắt đầu bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:43:06,434 [9] INFO  BackEnd.Program -  >>> Bắt đầu cửu tri bỏ phiếu
+2024-11-29 09:43:06,872 [9] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-29 09:43:06,979 [16] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-29 09:43:06,985 [16] INFO  BackEnd.Program - Ngày bầu cử: 30/11/2024 6:56:56 SA
+2024-11-29 09:43:06,989 [16] INFO  BackEnd.Program - ID Người bầu: 20240919194845
+2024-11-29 09:43:06,998 [16] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-29 09:43:07,000 [16] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-29 09:43:07,063 [16] INFO  BackEnd.Program - Giá trị phiếu bầu: 104070603
+2024-11-29 09:43:07,342 [9] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 7
+2024-11-29 09:43:07,355 [9] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cử tri
+2024-11-29 09:43:08,395 [30] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-29 09:54:27,908 [12] INFO  BackEnd.Program -  >>> Bắt đầu cửu tri bỏ phiếu
+2024-11-29 09:54:27,969 [13] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-29 09:54:27,976 [13] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-29 09:54:27,977 [13] INFO  BackEnd.Program - Ngày bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:54:27,979 [13] INFO  BackEnd.Program - ID Người bầu: 20240916220819
+2024-11-29 09:54:27,980 [13] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-29 09:54:27,980 [13] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-29 09:54:27,981 [13] INFO  BackEnd.Program - Giá trị phiếu bầu: 1061624221304
+2024-11-29 09:54:28,009 [18] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 7
+2024-11-29 09:54:28,010 [18] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cử tri
+2024-11-29 09:54:28,173 [16] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-29 09:54:36,213 [18] INFO  BackEnd.Program -  >>> Bắt đầu cửu tri bỏ phiếu
+2024-11-29 09:54:36,263 [12] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-29 09:54:36,278 [12] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-29 09:54:36,279 [12] INFO  BackEnd.Program - Ngày bầu cử: 30/11/2024 6:56:56 SA
+2024-11-29 09:54:36,279 [12] INFO  BackEnd.Program - ID Người bầu: 20240916220819
+2024-11-29 09:54:36,279 [12] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-29 09:54:36,280 [12] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-29 09:54:36,280 [12] INFO  BackEnd.Program - Giá trị phiếu bầu: 1030403
+2024-11-29 09:54:36,307 [18] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 7
+2024-11-29 09:54:36,308 [18] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cử tri
+2024-11-29 09:54:36,373 [18] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-29 09:55:57,579 [12] INFO  BackEnd.Program -  >>> Bắt đầu cửu tri bỏ phiếu
+2024-11-29 09:55:57,643 [16] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-29 09:55:57,664 [12] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-29 09:55:57,666 [12] INFO  BackEnd.Program - Ngày bầu cử: 30/11/2024 6:56:56 SA
+2024-11-29 09:55:57,666 [12] INFO  BackEnd.Program - ID Người bầu: 20240930165456
+2024-11-29 09:55:57,667 [12] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-29 09:55:57,667 [12] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-29 09:55:57,668 [12] INFO  BackEnd.Program - Giá trị phiếu bầu: 10614160903
+2024-11-29 09:55:57,696 [12] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 7
+2024-11-29 09:55:57,701 [12] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cử tri
+2024-11-29 09:55:57,871 [11] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-29 09:56:16,135 [12] INFO  BackEnd.Program -  >>> Bắt đầu cửu tri bỏ phiếu
+2024-11-29 09:56:16,190 [12] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-29 09:56:16,241 [12] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-29 09:56:16,245 [12] INFO  BackEnd.Program - Ngày bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 09:56:16,256 [12] INFO  BackEnd.Program - ID Người bầu: 20240930165456
+2024-11-29 09:56:16,258 [12] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-29 09:56:16,349 [12] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-29 09:56:16,349 [12] INFO  BackEnd.Program - Giá trị phiếu bầu: 1030403
+2024-11-29 09:56:16,376 [11] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 7
+2024-11-29 09:56:16,376 [11] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cử tri
+2024-11-29 09:56:16,463 [16] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-29 10:03:07,583 [17] INFO  BackEnd.Program -  >>> Bắt đầu cửu tri bỏ phiếu
+2024-11-29 10:03:07,640 [9] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-29 10:03:07,649 [15] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-29 10:03:07,649 [15] INFO  BackEnd.Program - Ngày bầu cử: 30/11/2024 6:56:56 SA
+2024-11-29 10:03:07,650 [15] INFO  BackEnd.Program - ID Người bầu: 20240930165802
+2024-11-29 10:03:07,650 [15] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-29 10:03:07,651 [15] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-29 10:03:07,651 [15] INFO  BackEnd.Program - Giá trị phiếu bầu: 1030403
+2024-11-29 10:03:07,667 [15] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 7
+2024-11-29 10:03:07,668 [15] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cử tri
+2024-11-29 10:03:07,717 [15] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-29 10:03:17,146 [15] INFO  BackEnd.Program -  >>> Bắt đầu cửu tri bỏ phiếu
+2024-11-29 10:03:17,342 [9] INFO  BackEnd.Program -  --- Bắt đầu quá trình bỏ phiếu --- 
+2024-11-29 10:03:17,372 [15] INFO  BackEnd.Program - Thông tin đầu vào:
+2024-11-29 10:03:17,373 [15] INFO  BackEnd.Program - Ngày bầu cử: 30/11/2024 9:59:59 SA
+2024-11-29 10:03:17,380 [15] INFO  BackEnd.Program - ID Người bầu: 20240930165802
+2024-11-29 10:03:17,381 [15] INFO  BackEnd.Program - ID Đơn vị bầu cử: 3
+2024-11-29 10:03:17,382 [15] INFO  BackEnd.Program - ID Cấp: 12
+2024-11-29 10:03:17,382 [15] INFO  BackEnd.Program - Giá trị phiếu bầu: 1040603
+2024-11-29 10:03:17,439 [9] INFO  BackEnd.Program - Đếm ngayBD trong danh muc dựa trên kq bầu cử: 7
+2024-11-29 10:03:17,440 [9] INFO  BackEnd.Program - Kiểm tra đơn vị bầu cử bên cử tri
+2024-11-29 10:03:17,485 [15] INFO  BackEnd.Program - Bỏ phiếu thành công.
+2024-11-29 10:06:40,082 [12] INFO  BackEnd.Program - 		 == Chuẩn bị cập nhật công bố kết quả bầu cử ==
+2024-11-29 10:06:40,681 [12] ERROR BackEnd.Program - Error message: Data is Null. This method or property cannot be called on Null values.
+2024-11-29 10:06:40,683 [12] ERROR BackEnd.Program - Error Source: MySql.Data
+2024-11-29 10:06:40,685 [12] ERROR BackEnd.Program - Error StackTrace:    at MySql.Data.MySqlClient.MySqlDataReader.GetFieldValue(Int32 index, Boolean checkNull)
+   at MySql.Data.MySqlClient.MySqlDataReader.GetString(Int32 i)
+   at BackEnd.src.infrastructure.DataAccess.Repositories.VoterReposistory._getVoterID_ListBasedOnElection(String ngayBD, MySqlConnection connect) in D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\src\infrastructure\DataAccess\Repositories\VoterReposistory.cs:line 871
+   at BackEnd.src.infrastructure.Hubs.NotificationHubs._announceElectionResult(String ngayBD, MySqlConnection connect) in D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\src\infrastructure\Hubs\NotificationHubs.cs:line 399
+2024-11-29 10:06:40,686 [12] ERROR BackEnd.Program - Error TargetSite: MySql.Data.Types.IMySqlValue GetFieldValue(Int32, Boolean)
+2024-11-29 10:06:40,687 [12] ERROR BackEnd.Program - Error HResult: -2146232015
+2024-11-29 10:06:40,687 [12] ERROR BackEnd.Program - Error InnerException: 
+2024-11-29 10:06:40,688 [12] ERROR BackEnd.Program - Error message: Data is Null. This method or property cannot be called on Null values.
+2024-11-29 10:06:40,688 [12] ERROR BackEnd.Program - Error Source: MySql.Data
+2024-11-29 10:06:40,690 [12] ERROR BackEnd.Program - Error StackTrace:    at MySql.Data.MySqlClient.MySqlDataReader.GetFieldValue(Int32 index, Boolean checkNull)
+   at MySql.Data.MySqlClient.MySqlDataReader.GetString(Int32 i)
+   at BackEnd.src.infrastructure.DataAccess.Repositories.VoterReposistory._getVoterID_ListBasedOnElection(String ngayBD, MySqlConnection connect) in D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\src\infrastructure\DataAccess\Repositories\VoterReposistory.cs:line 871
+   at BackEnd.src.infrastructure.Hubs.NotificationHubs._announceElectionResult(String ngayBD, MySqlConnection connect) in D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\src\infrastructure\Hubs\NotificationHubs.cs:line 399
+   at BackEnd.src.infrastructure.DataAccess.Repositories.LockRepository._CaculateAndAnnounceElectionResult(String ngayBD, String ID_CanBo) in D:\HocTap\LuanVanNganhKHMT\XayDungHeThongBauCuTrucTuyen\HeThongBauCuTrucTuyen_BackEnd\src\infrastructure\DataAccess\Repositories\LockRepository.cs:line 620
+2024-11-29 10:06:40,692 [12] ERROR BackEnd.Program - Error TargetSite: MySql.Data.Types.IMySqlValue GetFieldValue(Int32, Boolean)
+2024-11-29 10:06:40,693 [12] ERROR BackEnd.Program - Error HResult: -2146232015
+2024-11-29 10:06:40,693 [12] ERROR BackEnd.Program - Error InnerException: 
+2024-11-29 10:23:07,108 [1] INFO  BackEnd.Program - 	 ---- Start Application - 29-11-2024 10:23:07 ---- 
+2024-11-29 10:23:25,786 [7] INFO  BackEnd.Program - 		 == Chuẩn bị cập nhật công bố kết quả bầu cử ==
+2024-11-29 10:23:27,298 [10] INFO  BackEnd.Program - 		 ====> công bố thành công
+2024-11-29 10:23:38,276 [10] INFO  BackEnd.Program - 		 == Chuẩn bị cập nhật công bố kết quả bầu cử ==
+2024-11-29 10:23:38,595 [9] INFO  BackEnd.Program - 		 ====> công bố thành công
+2024-11-29 10:23:46,229 [10] INFO  BackEnd.Program - 		 == Chuẩn bị cập nhật công bố kết quả bầu cử ==
+2024-11-29 10:23:54,534 [9] INFO  BackEnd.Program - 		 == Chuẩn bị cập nhật công bố kết quả bầu cử ==
+2024-11-29 11:06:08,475 [1] INFO  BackEnd.Program - 	 ---- Start Application - 29-11-2024 11:06:08 ---- 
+2024-11-29 13:30:25,808 [1] INFO  BackEnd.Program - 	 ---- Start Application - 29-11-2024 13:30:25 ---- 
+2024-11-29 14:10:59,042 [1] INFO  BackEnd.Program - 	 ---- Start Application - 29-11-2024 14:10:58 ---- 
+2024-11-29 14:19:46,069 [1] INFO  BackEnd.Program - 	 ---- Start Application - 29-11-2024 14:19:46 ---- 
+2024-11-29 14:49:07,008 [1] INFO  BackEnd.Program - 	 ---- Start Application - 29-11-2024 14:49:06 ---- 
+2024-11-29 15:16:43,613 [26] INFO  BackEnd.Program -  --------------- Start add election ---------------
+2024-11-29 15:16:43,664 [26] INFO  BackEnd.Program - NgayBD: 29/11/2024 3:15:31 SA
+2024-11-29 15:16:43,676 [26] INFO  BackEnd.Program - NgayKT: 30/11/2024 3:15:37 CH
+2024-11-29 15:16:43,679 [26] INFO  BackEnd.Program - NgayKT_UngCu: 04/12/2024 3:16:42 CH
+2024-11-29 15:16:43,680 [26] INFO  BackEnd.Program - TenKyBauCu: Bầu cử thủ quỹ lớp KHMT A2
+2024-11-29 15:16:43,680 [26] INFO  BackEnd.Program - MoTa: Diễn ra tại phòng 201
+2024-11-29 15:16:43,681 [26] INFO  BackEnd.Program - SoLuongToiDaCuTri: 70
+2024-11-29 15:16:43,682 [26] INFO  BackEnd.Program - SoLuongToiDaUngCuVien: 8
+2024-11-29 15:16:43,682 [26] INFO  BackEnd.Program - SoLuotBinhChonToiDa: 7
+2024-11-29 15:16:43,683 [26] INFO  BackEnd.Program - ID_Cap: 12
+2024-11-29 15:16:43,703 [26] INFO  BackEnd.Program - Chuẩn bị tạo khóa công khai và khóa cá nhân
+2024-11-29 15:16:43,707 [26] INFO  BackEnd.Program - Chuẩn bị tạo số nguyên tố Q và P
+2024-11-29 15:16:43,733 [26] INFO  BackEnd.Program - 	Kiểm tra giá kết quả kiểm phiếu lớn nhất = 645753531245690
+2024-11-29 15:16:43,853 [26] INFO  BackEnd.Program - 	>> Q = 99992771
+2024-11-29 15:16:43,855 [26] INFO  BackEnd.Program - 	>> P = 99997897
+2024-11-29 15:16:43,856 [26] INFO  BackEnd.Program - 	>> Q = 99992771
+2024-11-29 15:16:43,857 [26] INFO  BackEnd.Program - 	>> P = 99997897
+2024-11-29 15:16:43,858 [26] INFO  BackEnd.Program - 	>> N = 9999066815202587
+2024-11-29 15:16:43,859 [26] INFO  BackEnd.Program - 	>> lamda = 4999533307605960
+2024-11-29 15:16:43,860 [26] INFO  BackEnd.Program - 	>> Nx2 = 99981337174885606122741851492569
+2024-11-29 15:16:43,866 [26] INFO  BackEnd.Program - 	>> Chọn đại g = 81329837607181270631820016305966
+2024-11-29 15:16:43,868 [26] INFO  BackEnd.Program - 	>> Nguyên tố cùng nhau với N ...
+2024-11-29 15:16:43,870 [26] INFO  BackEnd.Program - 	>> G = 81329837607181270631820016305966
+2024-11-29 15:16:43,873 [26] INFO  BackEnd.Program - 	>> U = 65650957339300379443550563436140
+2024-11-29 15:16:43,874 [26] INFO  BackEnd.Program - 	>> LU = 6565708435859697
+2024-11-29 15:16:43,875 [26] INFO  BackEnd.Program - 	>> muy = 7831571495438268
+2024-11-29 15:16:43,876 [26] INFO  BackEnd.Program - Tạo khóa công khai và khóa cá nhân thành công
+2024-11-29 15:16:43,878 [26] INFO  BackEnd.Program - Now: 2024-11-29_15-16-43
+2024-11-29 15:23:15,941 [15] INFO  BackEnd.Program - ngày bắt đầu không tồn tại
+2024-11-30 09:08:22,292 [1] INFO  BackEnd.Program - 	 ---- Start Application - 30-11-2024 09:08:22 ---- 
+2024-11-30 09:32:32,441 [1] INFO  BackEnd.Program - 	 ---- Start Application - 30-11-2024 09:32:32 ---- 
+2024-11-30 09:40:36,197 [31] INFO  BackEnd.Program -  --------------- Start add election ---------------
+2024-11-30 09:40:36,198 [31] INFO  BackEnd.Program - NgayBD: 01/12/2024 9:39:32 SA
+2024-11-30 09:40:36,199 [31] INFO  BackEnd.Program - NgayKT: 02/12/2024 9:39:38 SA
+2024-11-30 09:40:36,199 [31] INFO  BackEnd.Program - NgayKT_UngCu: 05/12/2024 9:40:36 SA
+2024-11-30 09:40:36,199 [31] INFO  BackEnd.Program - TenKyBauCu: Bầu cử phó trường lớp KHMT A3
+2024-11-30 09:40:36,200 [31] INFO  BackEnd.Program - MoTa: Diễn ra tại DI/101
+2024-11-30 09:40:36,200 [31] INFO  BackEnd.Program - SoLuongToiDaCuTri: 120
+2024-11-30 09:40:36,200 [31] INFO  BackEnd.Program - SoLuongToiDaUngCuVien: 10
+2024-11-30 09:40:36,201 [31] INFO  BackEnd.Program - SoLuotBinhChonToiDa: 9
+2024-11-30 09:40:36,201 [31] INFO  BackEnd.Program - ID_Cap: 12
+2024-11-30 09:40:36,314 [31] INFO  BackEnd.Program - Chuẩn bị tạo khóa công khai và khóa cá nhân
+2024-11-30 09:40:36,316 [31] INFO  BackEnd.Program - Chuẩn bị tạo số nguyên tố Q và P
+2024-11-30 09:40:36,321 [31] INFO  BackEnd.Program - 	Kiểm tra giá kết quả kiểm phiếu lớn nhất = 672749994932560009080
+2024-11-30 09:40:36,395 [31] INFO  BackEnd.Program - 	>> Q = 99996803

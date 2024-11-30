@@ -279,8 +279,10 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 SELECT pb.ID_Phieu, pb.GiaTriPhieuBau, ctpb.ThoiDiem, nd.ID_user ,nd.HoTen 
                 FROM phieubau pb 
                 JOIN chitietbaucu ctpb ON pb.ID_Phieu = ctpb.ID_Phieu
-                JOIN cutri ct ON ct.ID_CuTri = ctpb.ID_CuTri
-                JOIN nguoidung nd ON nd.ID_user = ct.ID_user
+                LEFT JOIN ungcuvien ucv ON ucv.ID_ucv = ctpb.ID_ucv
+                LEFT JOIN canbo cb ON cb.ID_CanBo = ctpb.ID_CanBo
+                LEFT JOIN cutri ct ON ct.ID_CuTri = ctpb.ID_CuTri
+                JOIN nguoidung nd ON nd.ID_user = COALESCE(ucv.ID_user, cb.ID_user, ct.ID_user)
                 WHERE pb.ngayBD = @ngayBD;";
                 
                 using(var command = new MySqlCommand(sql, connection)){
