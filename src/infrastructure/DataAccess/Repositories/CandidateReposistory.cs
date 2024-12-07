@@ -40,7 +40,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //-2 .Kiểm tra ID ứng cử viên có tồn tại không
         public async Task<bool> _CheckCandidateExists(string ID, MySqlConnection connection){
-            const string sqlCount = "SELECT COUNT(ID_ucv) FROM UngCuVien WHERE ID_ucv = @ID_ucv";
+            const string sqlCount = "SELECT COUNT(ID_ucv) FROM ungcuvien WHERE ID_ucv = @ID_ucv";
             using(var command = new MySqlCommand(sqlCount, connection)){
                 command.Parameters.AddWithValue("@ID_ucv",ID);
                 
@@ -784,7 +784,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
                 var list = new List<CandidateRegistedForElectionsDTO>();
                 const string sql = @"
-                SELECT DISTINCT tt.ngayBD, tt.GhiNhan, tt.ID_DonViBauCu,
+                SELECT DISTINCT tt.ngayBD, tt.GhiNhan,
                 	kbc.ngayKT, kbc.TenKyBauCu, kbc.MoTa, kbc.CongBo, kbc.ID_Cap,
                 	kbc.SoLuongToiDaCuTri, kbc.SoLuongToiDaUngCuVien, kbc.SoLuotBinhChonToiDa,
                 	dm.TenCapUngCu, dm.ID_DonViBauCu, dv.TenDonViBauCu
@@ -907,6 +907,46 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 Console.WriteLine($"Error Source: {ex.Source}");
                 Console.WriteLine($"Error HResult: {ex.HResult}");
                 throw;
+            }
+            catch(Exception ex){
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                Console.WriteLine($"Error InnerException: {ex.InnerException}");
+                throw;
+            }
+        }
+
+        //Lấy danh sách lịch sử bỏ phiếu
+        public async Task<List<VotingHistoryDTO>> _getListOfVotingHistory(string ID_ucv){
+            try{
+                _log.Info("Lịch Sử bỏ phiếu ứng cử viên");
+                using var connection = await _context.Get_MySqlConnection();
+                var list = new List<VotingHistoryDTO>();
+                const string sql = @"
+                SELECT ct.ThoiDiem, p.ID_Phieu, p.ngayBD, dm.TenCapUngCu, ct.XacThuc
+                FROM chitietbaucu ct 
+                INNER JOIN phieubau p ON p.ID_Phieu = ct.ID_Phieu
+                INNER JOIN danhmucungcu dm ON dm.ID_Cap = p.ID_cap
+                WHERE ct.ID_ucv =@ID_ucv AND ID_ucv IS NOT NULL;";
+                
+                using(var command = new MySqlCommand(sql, connection)){
+                    command.Parameters.AddWithValue("@ID_ucv", ID_ucv);
+                    
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync()){
+                        list.Add(new VotingHistoryDTO{
+                            ThoiDiemBoPhieu = reader.GetDateTime(reader.GetOrdinal("ThoiDiem")),
+                            ID_Phieu = reader.GetString(reader.GetOrdinal("ID_Phieu")),
+                            ngayBD = reader.GetDateTime(reader.GetOrdinal("ngayBD")),
+                            TenCapUngCu = reader.GetString(reader.GetOrdinal("TenCapUngCu")),
+                            XacThuc = reader.GetInt32(reader.GetOrdinal("XacThuc"))
+                        });
+                    }
+                    return list;
+                }
             }
             catch(Exception ex){
                 Console.WriteLine($"Error message: {ex.Message}");

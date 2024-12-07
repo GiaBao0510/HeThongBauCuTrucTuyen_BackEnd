@@ -3,11 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore; 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using System.Net;
 using System.Text;
+using log4net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
@@ -23,7 +24,6 @@ using BackEnd.infrastructure.config;
 using BackEnd.src.core.Interfaces;
 using Newtonsoft.Json;
 using AspNetCoreRateLimit;
-using Microsoft.AspNetCore.RateLimiting;
 using BackEnd.src.infrastructure.Hubs;
 
 namespace BackEnd
@@ -31,6 +31,7 @@ namespace BackEnd
     public class Startup 
     {
         public IConfiguration Configuration{get;}
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
 
         //Hàm khởi tạo
         public Startup(IConfiguration configuration) => Configuration = configuration;
@@ -159,13 +160,10 @@ namespace BackEnd
                 };
                 opt.Events = new JwtBearerEvents{
                     OnAuthenticationFailed = context => {
-                        Console.WriteLine($"AuthenticationFailed: {context.Exception.Message}");
+                        _log.Info($"AuthenticationFailed: {context.Exception.Message}");
                         return Task.CompletedTask;
                     },
                     OnTokenValidated =  context => {
-                        // Console.WriteLine($"OnTokenValidated: {context.SecurityToken}");
-                        // Console.WriteLine($"HttpContext: {context.HttpContext}");
-                        // Console.WriteLine($"Request: {context.Request}");
                         return Task.CompletedTask;
                     },
                 };      
@@ -213,36 +211,10 @@ namespace BackEnd
                 options.SignIn.RequireConfirmedPhoneNumber = true; //Cấu hình chỉ xác thực bằng Email
             });
 
-            //12. Cấu hình giới hạn tốc độ(Cho phép người dùng có thể tương tác với api nào đó bao nhiêu lần trong mỗi khoảng thời gian)
-            services.AddInMemoryRateLimiting();
-            services.AddRateLimiter(options =>{
-                options.AddFixedWindowLimiter("FixedWindowLimiter", opt =>{     //"FixedWindowLimiter": Đây là tên duy nhất của RateLimiter
-                    opt.Window = TimeSpan.FromMinutes(1);                       //Đếm số lượng yêu cầu trong 1 phút
-                    opt.PermitLimit = 10;                                       //Thiết lập giới hạn cho phép 10 yêu caaud trong 1 phút
-                    opt.QueueLimit = 20;                                        //THiết lập hàng đợi là 20 yêu cầu. Nếu số lượng yêu cầu vượt quá 10 sẽ vào hàng đợi
-                    opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;  //Thiết lập thứ tự xử lý các yêu cầu trong hàng đợi là "OldestFirst"
-                }).RejectionStatusCode = 429;   //Too many Request
-
-                //Dùng cử xổ trượt để tính toán giới hạn
-                options.AddSlidingWindowLimiter("SlidingWindowLimiter", opt =>{
-                    opt.Window = TimeSpan.FromMinutes(1);       //Thiết lập thời gian của cửa số trượt là 1 phút
-                    opt.PermitLimit = 10;                       //Thiết lập giới hạn yêu cầu là 10 trong mỗi 1 phút
-                    opt.QueueLimit = 20;                        //THiết lập hàng đợi là 20 yêu cầu. Nếu số lượng yêu cầu vượt quá 10 sẽ vào hàng đợi
-                    opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;  //Thiết lập quy trình xử lý là đến sớm sẽ được xử lý sớm
-                    opt.SegmentsPerWindow = 3;                  //THiết lập số lượng phân đoạn là 3 (Tức là 1 phút/3 = 20s).Rate limiter sẽ đếm số lượt yêu cầu trong mỗi phân đoạn và tổng hợp kết quả lại để quyết định có chặn yêu cầu này không
-                }).RejectionStatusCode = 429;
-
-                //Giới hạn số lượng yêu cầu đồng thời được xử lý bởi hệ thống. Giúp bảo vệ hệ thống không bị quá tải
-                options.AddConcurrencyLimiter("ConcurrencyLimiter",opt =>{
-                    opt.PermitLimit = 10;                       //chỉ có tối đa 10 yêu cầu được xử lý cùng một lúc.
-                    opt.QueueLimit = 20;                        //hiết lập giới hạn cho hàng đợi là 20 yêu cầu. Nếu số lượng yêu cầu vượt quá 10
-                    opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;  //Thiết lập quy trình xử lý là đến sớm sẽ được xử lý sớm
-                }).RejectionStatusCode = 429;
-            });
-
                 //13. Thêm dịch vụ signal
             services.AddSignalR(); 
             
+            //Giới hạn tốc độ truy cập của người dùng trên api
             services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
             services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
             services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
@@ -326,7 +298,6 @@ namespace BackEnd
             app.UseHttpsRedirection();
 
             // 3. Rate Limiting (Đặt trước CORS và Authentication)
-            app.UseRateLimiter();
             app.UseIpRateLimiting();
 
             // 4. CORS Configuration (Đặt trước Authentication và Routing)

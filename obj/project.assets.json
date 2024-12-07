@@ -16373,7 +16373,7 @@
     "version": "1.0.0",
     "restore": {
       "projectUniqueName": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\BackEnd.csproj",
-      "projectName": "BackEnd",
+      "projectName": "HeThongBauCuTrucTuyen_BackEnd",
       "projectPath": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\BackEnd.csproj",
       "packagesPath": "C:\\Users\\VTOS\\.nuget\\packages\\",
       "outputPath": "D:\\HocTap\\LuanVanNganhKHMT\\XayDungHeThongBauCuTrucTuyen\\HeThongBauCuTrucTuyen_BackEnd\\obj\\",

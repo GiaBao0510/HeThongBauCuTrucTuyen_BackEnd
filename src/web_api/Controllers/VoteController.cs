@@ -2,14 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using BackEnd.src.web_api.DTOs;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BackEnd.src.web_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableRateLimiting("FixedWindowLimiter")]
     public class VoteController : ControllerBase
     {
         private readonly IVoteRepository _voteReposistory;
@@ -243,8 +241,7 @@ namespace BackEnd.src.web_api.Controllers
 
         //Lấy thông tin chi tiết phiếu bầu dựa trên ngày bầu cử
         [HttpGet("get-details-about-votes-based-on-election-date")]
-        [Authorize(Roles= "1,8")] 
-        [EnableRateLimiting("SlidingWindowLimiter")]
+        [Authorize(Roles= "1,8")]
         public async Task<IActionResult> GetDetailsAboutVotesBasedOnElectionDate([FromQuery]DateTime ngayBD){
             try{
                 if(ngayBD.ToString().IsNullOrEmpty()){
@@ -280,7 +277,6 @@ namespace BackEnd.src.web_api.Controllers
         //Lấy thông tin chi tiết phiếu bầu dựa trên năm
         [HttpGet("get-details-about-votes-based-on-year")]
         [Authorize(Roles= "1,8")]
-        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> GetDetailsAboutVotesBasedOnElectionYear([FromQuery]string year){
             try{
                 if(year.ToString().IsNullOrEmpty()){

@@ -14,7 +14,6 @@ namespace BackEnd.src.web_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableRateLimiting("FixedWindowLimiter")]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
@@ -343,7 +342,6 @@ namespace BackEnd.src.web_api.Controllers
 
         //Người dùng thay đổi mật dựa trên email người dùng
         [HttpPut("set-pwd-based-on-email")]
-        [EnableRateLimiting("SlidingWindowLimiter")]
 
         public async Task<IActionResult> SetPwdBasedOnUserEmail([FromQuery]string email ,[FromBody] SetPasswordDto setPasswordByEmailDto){
             try{
@@ -370,7 +368,6 @@ namespace BackEnd.src.web_api.Controllers
 
         //Người dùng thay đổi mật dựa trên email người dùng
         [HttpGet("get-personal-information")]
-        [EnableRateLimiting("SlidingWindowLimiter")]
         [Authorize(Roles= "1,2,3,4,5,8")]
 
         public async Task<IActionResult> GetPersonnalInfomationByEmail([FromQuery]string email){

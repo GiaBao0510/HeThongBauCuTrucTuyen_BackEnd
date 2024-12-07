@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using BackEnd.src.infrastructure.DataAccess.Repositories;
 using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Http;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
@@ -15,7 +14,6 @@ namespace BackEnd.src.web_api.Controllers
     {
         private readonly IVoterRepository _voterReposistory;
         private readonly IVotingServices _votingServices;
-
         //Khởi tạo
         public VoterController(
             IVoterRepository vouterReposistory,
@@ -31,13 +29,6 @@ namespace BackEnd.src.web_api.Controllers
         [Authorize(Roles= "1")]
         public async Task<IActionResult> CreateVouter([FromForm] VoterDto vouter,  IFormFile fileAnh){
             try{
-                Console.WriteLine($"Họ tên: {vouter.HoTen}");
-                Console.WriteLine($"Giới tính: {vouter.GioiTinh}");
-                Console.WriteLine($"Ngày sinh: {vouter.NgaySinh}");
-                Console.WriteLine($"Địa chỉ: {vouter.DiaChiLienLac}");
-                Console.WriteLine($"Số điện thoại: {vouter.SDT}");
-                Console.WriteLine($"Email: {vouter.Email}");
-                Console.WriteLine($"ID_ChucVu: {vouter.ID_ChucVu}");
                 //Kiểm tra đầu vào
                 if(string.IsNullOrEmpty(vouter.HoTen))
                     return StatusCode(400,new{

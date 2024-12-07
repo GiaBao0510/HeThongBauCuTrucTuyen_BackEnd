@@ -7,7 +7,7 @@ using BackEnd.src.infrastructure.Services;
 using BackEnd.src.core.Common;
 using Isopoh.Cryptography.Argon2;
 using BackEnd.src.core.Interfaces;
-using System.Numerics;
+using log4net;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -18,6 +18,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         private readonly IProfileRepository _profileRepository;
         private readonly IElectionsRepository _electionsRepository;
         private readonly IConstituencyRepository _constituencyRepository;
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
+
         //Khởi tạo
         public VoterReposistory(
             DatabaseContext context,CloudinaryService cloudinaryService,
@@ -67,11 +69,6 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //1.Thêm
         public async Task<int> _AddVoter(VoterDto voter, IFormFile fileAnh){
             using var connect = await _context.Get_MySqlConnection();
-
-            //Kiểm tra kết nối
-            if(connect.State != System.Data.ConnectionState.Open )
-                await connect.OpenAsync();
-            
             using var transaction =await connect.BeginTransactionAsync();
 
             try{
@@ -98,20 +95,16 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                         ID_user = FillInBasicInfo.ToString();
 
                 //Ngược lại thêm cử tri
-                const string sql = "INSERT INTO cutri(ID_CuTri,ID_user) VALUES(@ID_CuTri,@ID_user);";
+                const string sql = @"
+                INSERT INTO cutri(ID_CuTri,ID_user) VALUES(@ID_CuTri,@ID_user);
+                INSERT INTO hosonguoidung(TrangThaiDangKy,ID_user) VALUES(@TrangThaiDangKy,@ID_user);
+                ";
                 using(var command = new MySqlCommand(sql, connect)){
                     command.Parameters.AddWithValue("@ID_CuTri", ID_cutri);
                     command.Parameters.AddWithValue("@ID_user", ID_user);
+                    command.Parameters.AddWithValue("@TrangThaiDangKy", "0");
 
                     await command.ExecuteNonQueryAsync();
-                }
-
-                //Tạo hồ sơ
-                bool AddProfile = await _profileRepository._AddProfile(ID_user, "0", connect);
-                if(!AddProfile){
-                    Console.WriteLine("Lỗi khi tạo hồ sơ cho cử tri");
-                    await transaction.RollbackAsync();
-                    return -5;
                 }
 
                 //Tạo chức vụ cho cử tri
@@ -643,6 +636,9 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
             int sl_cuTriHienTai = await  _electionsRepository._GetCurrentVoterCountByElection(voterListInElectionDto.ngayBD, connect);
             if(sl_cuTriToiDa < 0) return -4;
 
+            _log.Info($"Số lượng cử tri hiện tại: {sl_cuTriHienTai}");
+            _log.Info($"Số lượng cử tri tối đa: {sl_cuTriToiDa}");
+            _log.Info($"Số lượng cử tri trong danh sách: {voterListInElectionDto.listIDVoter.Count}");
             if((sl_cuTriHienTai + voterListInElectionDto.listIDVoter.Count) > sl_cuTriToiDa) return -3;
 
             //thêm từng cử tri trong danh sách vào cuộc bầu cử

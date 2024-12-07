@@ -331,7 +331,7 @@ namespace BackEnd.src.web_api.Controllers
                 if(result <=0){
                     int status = result switch{
                         0 => 400, -1 => 400, -2 => 500, -3 => 400, -4 => 500, -5 => 400, -6=>400,_ => 500
-                    };
+                    }; 
                     string errorMessage = result switch{
                         0 => "Không tìm thấy được ngày tổ chức cuộc bầu cử",
                         -1 => "Không tìm thấy ID vị trí ứng cử",
@@ -504,6 +504,34 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện bỏ phiếu: {ex.Message}"
+                });
+            }
+        }
+
+        //18. Danh sách lich sử bỏ phiếu
+        [HttpGet("get-list-of-voting-history")]
+        [Authorize(Roles= "1,2")]
+        public async Task<IActionResult> GetListOfVotingHistory([FromQuery]string ID_ucv){
+            try{
+                if(string.IsNullOrEmpty(ID_ucv))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền mã ứng cử viên."});
+
+                var result = await _candidateReposistory._getListOfVotingHistory(ID_ucv);
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Danh sách lịch sử bỏ phiếu",
+                    Data = result,
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy danh sách lịch sử bỏ phiếu: {ex.Message}"
                 });
             }
         }

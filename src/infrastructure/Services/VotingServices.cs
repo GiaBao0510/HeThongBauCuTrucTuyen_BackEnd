@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+using System.Diagnostics;
 using BackEnd.src.core.Common;
 using BackEnd.src.core.Interfaces;
 using BackEnd.src.infrastructure.DataAccess.Context;
@@ -75,6 +75,9 @@ namespace BackEnd.src.infrastructure.Services
             string idNguoiBau,
             VoterType voterType)
         {
+            //Bắt đầu đo thời gian bỏ phiếu
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             using var connect = await _context.Get_MySqlConnection();
             if (connect.State != System.Data.ConnectionState.Open)
                 await connect.OpenAsync();
@@ -83,7 +86,7 @@ namespace BackEnd.src.infrastructure.Services
 
             try
             {
-                _log.Info(" --- Bắt đầu quá trình bỏ phiếu --- ");
+                //_log.Info(" --- Bắt đầu quá trình bỏ phiếu --- ");
 
                 // Chuyển đổi dữ liệu
                 if (!DateTime.TryParseExact(ngayBD, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime votingDay))
@@ -99,12 +102,12 @@ namespace BackEnd.src.infrastructure.Services
                     return -10;
                 }
 
-                _log.Info("Thông tin đầu vào:");
-                _log.Info($"Ngày bầu cử: {votingDay}");
-                _log.Info($"ID Người bầu: {idNguoiBau}");
-                _log.Info($"ID Đơn vị bầu cử: {idDonViBauCu}");
-                _log.Info($"ID Cấp: {idCap}");
-                _log.Info($"Giá trị phiếu bầu: {giaTriPhieuBauStr}");
+                // _log.Info("Thông tin đầu vào:");
+                // _log.Info($"Ngày bầu cử: {votingDay}");
+                // _log.Info($"ID Người bầu: {idNguoiBau}");
+                // _log.Info($"ID Đơn vị bầu cử: {idDonViBauCu}");
+                // _log.Info($"ID Cấp: {idCap}");
+                // _log.Info($"Giá trị phiếu bầu: {giaTriPhieuBauStr}");
 
                 if (!BigInteger.TryParse(giaTriPhieuBauStr, out BigInteger giaTriPhieuBau))
                 {
@@ -167,9 +170,9 @@ namespace BackEnd.src.infrastructure.Services
                     VoterType.Voter => await _constituencyRepository._CheckVoterID_ConsituencyID_andPollingDateTogether(idDonViBauCu.ToString(), idNguoiBau, votingDay, connect),
                     VoterType.Candidate => await _constituencyRepository._CheckCandidateID_ConsituencyID_andPollingDateTogether(idDonViBauCu.ToString(), idNguoiBau, votingDay, connect),
                     VoterType.Cadre => await _constituencyRepository._CheckCadreID_ConsituencyID_andPollingDateTogether(idDonViBauCu.ToString(), idNguoiBau, votingDay, connect),
-                    _ => false
+                    _ => false 
                 };
-                if (!isValidConstituency){
+                if (!isValidConstituency){ 
                     _log.Error("Đơn vị bầu cử không hợp lệ.");
                     return -6;
                 }
@@ -237,6 +240,11 @@ namespace BackEnd.src.infrastructure.Services
 
                 await transaction.CommitAsync();
                 _log.Info("Bỏ phiếu thành công.");
+
+                //Kết thúc đo thời gian bỏ phiếu
+                stopwatch.Stop();
+                _log.Info($"Thời gian bỏ phiếu: {stopwatch.ElapsedMilliseconds} ms");
+
                 return 1;
             }
             catch (MySqlException ex)

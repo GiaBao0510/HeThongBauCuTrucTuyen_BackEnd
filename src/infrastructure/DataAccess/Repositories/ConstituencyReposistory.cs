@@ -156,7 +156,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //Kiểm tra ID của đơn vị bầu, mã cử tri và ngày bắt đầu có cùng tồn tại không
         public async Task<bool> _CheckVoterID_ConsituencyID_andPollingDateTogether(string ID_DonViBauCu, string IDcutri, DateTime ngayBD, MySqlConnection connection){
-            _log.Info($"Kiểm tra đơn vị bầu cử bên cử tri");
+            _log.Info($">> Kiểm tra đơn vị bầu cử {ID_DonViBauCu} - cử tri: {IDcutri} <<");
 
             //Kiểm tra trạng thái kết nối trước khi mở
             if(connection.State != System.Data.ConnectionState.Open)

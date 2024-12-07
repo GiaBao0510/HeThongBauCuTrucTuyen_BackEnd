@@ -6,13 +6,11 @@ using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackEnd.src.web_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableRateLimiting("FixedWindowLimiter")]
     public class CadreController : ControllerBase
     {
         private readonly ICadreRepository _CadreRepository;
@@ -32,7 +30,6 @@ namespace BackEnd.src.web_api.Controllers
         [HttpPost]
         [Consumes("multipart/form-data")]
         [Authorize(Roles = "1")]
-        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> CreateCadre([FromForm] CadreDto Cadre,IFormFile fileAnh){
             try{
                 //Kiểm tra đầu vào
@@ -347,7 +344,6 @@ namespace BackEnd.src.web_api.Controllers
         [HttpGet]
         [Route("get-list-of-cadre-joined-for-election")]
         [Authorize(Roles = "1,8")]
-        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> getListOfCadreJoinedForElection([FromQuery] string ID_CanBo){
             try{
                 if(string.IsNullOrEmpty(ID_CanBo) )
@@ -371,7 +367,7 @@ namespace BackEnd.src.web_api.Controllers
         }
 
         //14. cán bộ bỏ phiếu
-        [HttpPost("cadre-vote")]
+        [HttpPost("cadre-vote")] 
         [Authorize(Roles= "1,8")]
         public async Task<IActionResult> CadreVote([FromBody] CadreVoteDTO cadreVoteDTO){
             try{
@@ -419,6 +415,34 @@ namespace BackEnd.src.web_api.Controllers
                 return StatusCode(500, new{
                     Status = "False", 
                     Message = $"Lỗi khi thực hiện bỏ phiếu: {ex.Message}"
+                });
+            }
+        }
+
+        //18. Danh sách lich sử bỏ phiếu
+        [HttpGet("get-list-of-voting-history")]
+        [Authorize(Roles= "1,8")]
+        public async Task<IActionResult> GetListOfVotingHistory([FromQuery]string ID_CanBo){
+            try{
+                if(string.IsNullOrEmpty(ID_CanBo))
+                    return BadRequest(new{Status = "False", Message = "Vui lòng điền mã cán bộ."});
+
+                var result = await _CadreRepository._getListOfVotingHistory(ID_CanBo);
+
+                return Ok(new ApiRespons{
+                    Success = true,
+                    Message = "Danh sách lịch sử bỏ phiếu",
+                    Data = result,
+                });
+            }catch(Exception ex){
+                // Log lỗi và xuất ra chi tiết lỗi
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"Error TargetSite: {ex.TargetSite}");
+                Console.WriteLine($"Error Source: {ex.Source}");
+                Console.WriteLine($"Error HResult: {ex.HResult}");
+                return StatusCode(500, new{
+                    Status = "False", 
+                    Message = $"Lỗi khi thực hiện lấy danh sách lịch sử bỏ phiếu: {ex.Message}"
                 });
             }
         }

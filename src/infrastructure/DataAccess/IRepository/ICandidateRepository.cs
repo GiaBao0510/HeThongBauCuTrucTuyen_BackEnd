@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using BackEnd.src.web_api.DTOs;
 using Microsoft.AspNetCore.Http;
 using MySql.Data.MySqlClient;
@@ -47,5 +44,7 @@ namespace BackEnd.src.infrastructure.DataAccess.IRepository
         Task<List<CandidateID_DTO>> _getCandidateID_ListBasedOnElection(string ngayBD, MySqlConnection connect);
         //Kiểm tra xem cán bộ đã bỏ phiếu hay chưa
         Task<bool> _CheckCandidateHasVoted(string ID_ucv, DateTime ngayBD, MySqlConnection connect);
+        //Lịch sử bỏ phiếu
+        Task<List<VotingHistoryDTO>> _getListOfVotingHistory(string ID_ucv);
     }
 }

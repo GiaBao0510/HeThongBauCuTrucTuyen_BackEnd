@@ -8,6 +8,7 @@ using BackEnd.src.web_api.DTOs;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using log4net;
+using System.Diagnostics;
 
 namespace BackEnd.src.infrastructure.DataAccess.Repositories
 {
@@ -331,6 +332,8 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //6.Giải mã các giá trị phiếu bầu dựa trên kỳ bầu cử
         public async Task<dynamic> _ListOfDecodedVotesBasedOnElection(string ngayBD){
+            //Bắt đầu đo thời gian
+            Stopwatch stopwatch = Stopwatch.StartNew();
             using var connection = await _context.Get_MySqlConnection();
 
             try{
@@ -393,6 +396,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                             list.Add(vote);
                         }
                     }
+
+                    //Dừng đo thời gian
+                    stopwatch.Stop();
+                    TimeSpan timeElapsed = stopwatch.Elapsed;
+                    _log.Info($"Thời gian giải mã: {stopwatch.ElapsedMilliseconds} ms");
+
                     return list;
                 }
             }catch(MySqlException ex){

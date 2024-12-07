@@ -1,5 +1,4 @@
-using System.Data.Common;
-using System;
+using log4net;
 using BackEnd.src.core.Interfaces;
 using MySql.Data.MySqlClient;
 using BackEnd.src.infrastructure.Config;
@@ -12,6 +11,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Context
         private readonly string _connectionString;
         private readonly SemaphoreSlim _semaphore; // Giới hạn xử lý task đồng thòi là 10
         private const int MaxRetries = 3;
+        private static readonly ILog _log = LogManager.GetLogger(typeof(Program)); 
         private bool _disposed;
         private static readonly object _lock = new object();
         private readonly ConnectionPool _pool;
@@ -19,7 +19,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Context
         //Khởi tạo
         public DatabaseContext(IAppConfig appConfig){
             _connectionString = GetConnectionStringWithPooling(appConfig.GetMySQLConnectionString());
-            _semaphore = new SemaphoreSlim(10); // Giới hạn xử lý task đồng thời là 10
+            _semaphore = new SemaphoreSlim(20); // Giới hạn xử lý task đồng thời là 10
             _pool = new ConnectionPool(Max: 100); // Tạo pool kết nối
         }
 
@@ -30,7 +30,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Context
                 Pooling = true,             //Tái sử dụng kết nối , thay vì mỗi lần mở cổng kết nối
                 ConnectionTimeout = 30,     //Thiết lập thời gian chờ để kết nối, Nếu gặp ngoại lệ sẽ ném ra
                 DefaultCommandTimeout = 30, //Thiết lập thời gian chờ mặc định cho mỗi lệnh truy vấn sql
-                MaximumPoolSize = 100,      //Giới hạn tối đa là 100 kết nối, nếu hơn thì sẽ chờ cho đến khi được giải phóng
+                MaximumPoolSize = 200,      //Giới hạn tối đa là 200 kết nối, nếu hơn thì sẽ chờ cho đến khi được giải phóng
                 MinimumPoolSize = 5,        //Số kết nối tối thiểu
                 ConnectionLifeTime = 300,   //Thời gian sống của kết nối
             }.ToString();
@@ -54,8 +54,9 @@ namespace BackEnd.src.infrastructure.DataAccess.Context
             }
             catch (Exception ex)
             {
-                _semaphore.Release();
                 throw new Exception("Failed to establish database connection", ex);
+            }finally{
+                _semaphore.Release();
             }
         }
 

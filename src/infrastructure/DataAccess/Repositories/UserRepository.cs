@@ -754,6 +754,12 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
 
         //17. Thêm người cử tri có Connection
         public async Task<object> _AddVoterWithConnect(UserDto user ,IFormFile fileAnh ,MySqlConnection connection, MySqlTransaction transaction){
+            _log.Info($"Họ tên: {user.HoTen}");
+            _log.Info($"Giới tính: {user.GioiTinh}");
+            _log.Info($"Ngày sinh: {user.NgaySinh}");
+            _log.Info($"Địa chỉ: {user.DiaChiLienLac}");
+            _log.Info($"Số điện thoại: {user.SDT}");
+            _log.Info($"Email: {user.Email}");
 
             //Kiểm tra trạng thái kết nối trước khi mở
             if(connection.State != System.Data.ConnectionState.Open)
@@ -773,23 +779,21 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                 string ID_user = RandomString.CreateID_User();
 
                 //Kiểm tra xem nếu ảnh có tồn tại thì lưu thông tin
-                if(fileAnh != null && fileAnh.Length > 0){
+                if(fileAnh?.Length > 0){
                     //Đưa file ảnh lên cloudinary
                     var uploadResult = await _cloudinaryService.UploadImage(fileAnh);
                     user.PublicID = uploadResult.PublicId;
                     user.HinhAnh = uploadResult.Url.ToString();
                 }
 
-                //Đặt mật khẩu mặt định, có băm
-                string hashedPwd = Argon2.Hash("88888888");
-
                 //Thêm thông tin người dùng - tài khoản
-                string Input = @"INSERT INTO nguoidung(ID_user,HoTen,GioiTinh,NgaySinh,DiaChiLienLac,SDT,HinhAnh,PublicID,RoleID,ID_DanToc,Email) 
-                VALUES(@ID_user,@HoTen,@GioiTinh,@NgaySinh,@DiaChiLienLac,@SDT,@HinhAnh,@PublicID,@RoleID,@ID_DanToc,@Email);";
-                string inputAccount = @"INSERT INTO taikhoan(TaiKhoan,MatKhau,BiKhoa,LyDoKhoa,NgayTao,SuDung,RoleID)
-                VALUES(@TaiKhoan,@MatKhau,@BiKhoa,@LyDoKhoa,@NgayTao,@SuDung,@RoleID);";
+                string sql = @"
+                INSERT INTO nguoidung(ID_user,HoTen,GioiTinh,NgaySinh,DiaChiLienLac,SDT,HinhAnh,PublicID,RoleID,ID_DanToc,Email) 
+                    VALUES(@ID_user,@HoTen,@GioiTinh,@NgaySinh,@DiaChiLienLac,@SDT,@HinhAnh,@PublicID,@RoleID,@ID_DanToc,@Email);
+                INSERT INTO taikhoan(TaiKhoan,MatKhau,RoleID)
+                    VALUES(@SDT,@MatKhau,@RoleID);";
 
-                using(var command = new MySqlCommand($"{Input} {inputAccount}", connection, transaction)){
+                using(var command = new MySqlCommand($"{sql}", connection, transaction)){
                     command.Parameters.AddWithValue("@ID_user", ID_user);
                     command.Parameters.AddWithValue("@HoTen", user.HoTen);
                     command.Parameters.AddWithValue("@GioiTinh", user.GioiTinh);
@@ -800,12 +804,7 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
                     command.Parameters.AddWithValue("@PublicID", user.PublicID);
                     command.Parameters.AddWithValue("@RoleID", user.RoleID);
                     command.Parameters.AddWithValue("@ID_DanToc", user.ID_DanToc);
-                    command.Parameters.AddWithValue("@TaiKhoan",user.SDT);
-                    command.Parameters.AddWithValue("@MatKhau",hashedPwd);     //Để mặc định vậy.  Sau đó cử tri đăng nhập sẽ yêu cầu cử tri đặt lại mật khẩu
-                    command.Parameters.AddWithValue("@BiKhoa",0);
-                    command.Parameters.AddWithValue("@LyDoKhoa","null");
-                    command.Parameters.AddWithValue("@NgayTao",DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                    command.Parameters.AddWithValue("@SuDung",1);
+                    command.Parameters.AddWithValue("@MatKhau", Argon2.Hash("88888888"));     //Để mặc định vậy.  Sau đó cử tri đăng nhập sẽ yêu cầu cử tri đặt lại mật khẩu
                     command.Parameters.AddWithValue("@Email",user.Email);
                 
                     await command.ExecuteNonQueryAsync();

@@ -5,6 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AssemblyName>HeThongBauCuTrucTuyen_BackEnd</AssemblyName>
      <!-- Tắt thông báo cảnh báo theo mã hiệu Cảnh báo-->
     <NoWarn>
       AD0001;CS8073;NU1701;CS8603;CS8604;CS8601;CS0472;CS8618;CS8766;

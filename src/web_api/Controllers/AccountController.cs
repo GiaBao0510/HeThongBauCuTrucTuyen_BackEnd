@@ -1,33 +1,20 @@
-using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+
 using BackEnd.src.core.Models;
 using BackEnd.src.infrastructure.DataAccess.IRepository;
 using BackEnd.src.web_api.DTOs;
 using BackEnd.src.core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Cryptography;
-using Microsoft.IdentityModel.JsonWebTokens;
 using log4net;
 using BackEnd.src.infrastructure.DataAccess.Context;
-using MySql.Data.MySqlClient;
-using System.Web;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using AspNetCoreRateLimit;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackEnd.src.web_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableRateLimiting("FixedWindowLimiter")]
     public class AccountController: ControllerBase
     {
         private readonly IUserServices _userServices;
@@ -65,8 +52,7 @@ namespace BackEnd.src.web_api.Controllers
         }
 
         //1.Đăng nhập
-        [HttpPost("login")]   
-        [EnableRateLimiting("SlidingWindowLimiter")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]LoginModel loginModel){
             try{
                 
@@ -359,7 +345,6 @@ namespace BackEnd.src.web_api.Controllers
 
         //9.Gửi mã Otp trước khi người dùng gửi phiếu bầu
         [HttpPost("send-otp-before-sending")]
-        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> SendOtpBeforeApply([FromBody] EmailDTO emailDTO){
             try{
                 if(string.IsNullOrEmpty(emailDTO.Email))
@@ -388,7 +373,6 @@ namespace BackEnd.src.web_api.Controllers
 
         //10. Gửi mã Otp sau khi người dùng cử tri đăng ký tài khoản
         [HttpPost("send-otp-after-registration")]
-        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> SendOtpÀterRegistration([FromBody] EmailDTO emailDTO){
             try{
                 if(string.IsNullOrEmpty(emailDTO.Email))
@@ -459,7 +443,6 @@ namespace BackEnd.src.web_api.Controllers
 
         //12. Gửi  mã OTP
         [HttpPost("send-otp")]
-        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> SendOtpAsync([FromBody] EmailDTO emailDTO){
             try{
                 if(string.IsNullOrEmpty(emailDTO.Email))
@@ -487,7 +470,6 @@ namespace BackEnd.src.web_api.Controllers
 
         //13. Kiểm tra email có tồn tại không trước khi đăng nhập
         [HttpGet("check-email-exists")] 
-        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> CheckEmailExists([FromQuery] string email){
             try{
                 if(string.IsNullOrEmpty(email))
@@ -515,7 +497,6 @@ namespace BackEnd.src.web_api.Controllers
 
         //14. Xử lý khi người dùng đăng ký
         [HttpPost("register")]
-        [EnableRateLimiting("SlidingWindowLimiter")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto){
             try{
                 if(string.IsNullOrEmpty(registerDto.SDT))

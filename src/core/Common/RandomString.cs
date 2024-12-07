@@ -34,7 +34,7 @@ namespace BackEnd.src.core.Common
         //Tạo ID cho các lớp cử tri, cán bộ, ứng cử viên
         public static string CreateID(){
             DateTime current = DateTime.Now;
-            string CurrentTime = current.ToString("yyyyMMddHHmmss");
+            string CurrentTime = current.ToString("yyMMddHHmmssff");
             return CurrentTime;
         }
 
