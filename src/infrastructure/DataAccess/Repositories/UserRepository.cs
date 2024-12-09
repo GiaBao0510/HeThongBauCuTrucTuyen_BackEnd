@@ -755,11 +755,11 @@ namespace BackEnd.src.infrastructure.DataAccess.Repositories
         //17. Thêm người cử tri có Connection
         public async Task<object> _AddVoterWithConnect(UserDto user ,IFormFile fileAnh ,MySqlConnection connection, MySqlTransaction transaction){
             _log.Info($"Họ tên: {user.HoTen}");
-            _log.Info($"Giới tính: {user.GioiTinh}");
-            _log.Info($"Ngày sinh: {user.NgaySinh}");
-            _log.Info($"Địa chỉ: {user.DiaChiLienLac}");
-            _log.Info($"Số điện thoại: {user.SDT}");
-            _log.Info($"Email: {user.Email}");
+            // _log.Info($"Giới tính: {user.GioiTinh}");
+            // _log.Info($"Ngày sinh: {user.NgaySinh}");
+            // _log.Info($"Địa chỉ: {user.DiaChiLienLac}");
+            // _log.Info($"Số điện thoại: {user.SDT}");
+            // _log.Info($"Email: {user.Email}");
 
             //Kiểm tra trạng thái kết nối trước khi mở
             if(connection.State != System.Data.ConnectionState.Open)
