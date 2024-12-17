@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HeThongBauCuTrucTuyen_BackEnd")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4941cf4345f4701160ab8c73aa85799545ecf6ff")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+02d479d0737c478ec550ebb631bdef7aa863b855")]
 [assembly: System.Reflection.AssemblyProductAttribute("HeThongBauCuTrucTuyen_BackEnd")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HeThongBauCuTrucTuyen_BackEnd")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

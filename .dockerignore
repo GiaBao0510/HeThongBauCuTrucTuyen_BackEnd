@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+publish/
+Dockerfile
+docker-compose.yml
+.idea/
+*.md
+*.user
+*.sln
